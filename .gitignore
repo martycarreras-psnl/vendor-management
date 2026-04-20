@@ -1,18 +1,18 @@
-# Environment files with actual secrets
+# Secrets
 .env.local
 .env.*.local
 
-# Power Platform auth profiles
+# Power Platform
 .pac/
 auth.json
 
 # Dependencies
 node_modules/
 
-# Build output
+# Build
 dist/
 
-# Test output
+# Tests
 coverage/
 test-results/
 playwright-report/
@@ -25,12 +25,12 @@ playwright-report/
 .DS_Store
 Thumbs.db
 
-# Solution exports (binary zips — unpack to solution-source/ for source control)
+# Solution zips
 solution/*.zip
 
-# Wizard state (machine-specific, no secrets)
+# Wizard state
 .wizard-state.json
 
-# Temporary files
+# Temp
 *.tmp
 *.log
