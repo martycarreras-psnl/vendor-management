@@ -1,0 +1,34 @@
+{
+  "generatedAt": "2026-04-21T03:17:34.067Z",
+  "sourcePlan": "dataverse/planning-payload.json",
+  "dataverseTables": [
+    "rpvms_vendor",
+    "rpvms_supplier",
+    "rpvms_vendorsupplier",
+    "rpvms_gltransaction",
+    "rpvms_contract",
+    "rpvms_contractparty",
+    "rpvms_onetrustassessment",
+    "rpvms_servicenowassessment",
+    "rpvms_vendorscore",
+    "rpvms_vendorbudget",
+    "rpvms_vendorratecard",
+    "rpvms_vendorproductservice",
+    "rpvms_vendornamealias"
+  ],
+  "pacCommands": [
+    "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_vendor",
+    "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_supplier",
+    "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_vendorsupplier",
+    "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_gltransaction",
+    "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_contract",
+    "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_contractparty",
+    "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_onetrustassessment",
+    "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_servicenowassessment",
+    "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_vendorscore",
+    "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_vendorbudget",
+    "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_vendorratecard",
+    "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_vendorproductservice",
+    "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_vendornamealias"
+  ]
+}

@@ -34,3 +34,8 @@ solution/*.zip
 # Temp
 *.tmp
 *.log
+
+# Local caches and build artifacts
+.power/
+dataverse/.spec-dump.json
+*.zip

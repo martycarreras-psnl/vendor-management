@@ -1,0 +1,8 @@
+{
+  "_comment": "Suppliers are the invoicing entities. Three VAR/resellers from the CSV + one direct-pay shell per vendor that invoices directly (generated on the fly in the generator). This file lists only the explicit ones; direct-pay shells are auto-created from vendors with isVar=false.",
+  "suppliers": [
+    { "name": "Herjavec Group", "suppliercategory": "Security Reseller", "tintype": "EIN", "taxid": "27-1188211", "isreseller": true, "workdaySupplierId": "SUP-00101" },
+    { "name": "Logicalis", "suppliercategory": "IT Infrastructure Reseller", "tintype": "EIN", "taxid": "38-3489622", "isreseller": true, "workdaySupplierId": "SUP-00102" },
+    { "name": "Mission Critical Systems", "suppliercategory": "Security Reseller", "tintype": "EIN", "taxid": "65-0822417", "isreseller": true, "workdaySupplierId": "SUP-00103" }
+  ]
+}

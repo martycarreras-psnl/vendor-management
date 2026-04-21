@@ -1,5 +1,5 @@
 {
-  "appId": "",
+  "appId": "81f55faf-3c2c-4b62-aaeb-62991b2dc5f0",
   "appDisplayName": "Vendor Management",
   "description": null,
   "environmentId": "f9b87f8b-0abf-e629-affb-b13195d1ed14",
@@ -8,6 +8,74 @@
   "logoPath": "Default",
   "localAppUrl": "http://localhost:3000/",
   "region": "prod",
-  "connectionReferences": {},
-  "databaseReferences": {}
+  "connectionReferences": {
+    "c4c4477e-7f1b-42f1-bba4-1d66da063eaf": {
+      "id": "/providers/Microsoft.PowerApps/apis/shared_office365users",
+      "displayName": "Office 365 Users",
+      "dataSources": [
+        "office365users"
+      ],
+      "dataSets": {}
+    }
+  },
+  "databaseReferences": {
+    "default.cds": {
+      "dataSources": {
+        "vendors": {
+          "entitySetName": "rpvms_vendors",
+          "logicalName": "rpvms_vendor"
+        },
+        "suppliers": {
+          "entitySetName": "rpvms_suppliers",
+          "logicalName": "rpvms_supplier"
+        },
+        "vendorsuppliers": {
+          "entitySetName": "rpvms_vendorsuppliers",
+          "logicalName": "rpvms_vendorsupplier"
+        },
+        "gltransactions": {
+          "entitySetName": "rpvms_gltransactions",
+          "logicalName": "rpvms_gltransaction"
+        },
+        "contracts": {
+          "entitySetName": "rpvms_contracts",
+          "logicalName": "rpvms_contract"
+        },
+        "contractpartys": {
+          "entitySetName": "rpvms_contractparties",
+          "logicalName": "rpvms_contractparty"
+        },
+        "onetrustassessments": {
+          "entitySetName": "rpvms_onetrustassessments",
+          "logicalName": "rpvms_onetrustassessment"
+        },
+        "servicenowassessments": {
+          "entitySetName": "rpvms_servicenowassessments",
+          "logicalName": "rpvms_servicenowassessment"
+        },
+        "vendorscores": {
+          "entitySetName": "rpvms_vendorscores",
+          "logicalName": "rpvms_vendorscore"
+        },
+        "vendorbudgets": {
+          "entitySetName": "rpvms_vendorbudgets",
+          "logicalName": "rpvms_vendorbudget"
+        },
+        "vendorratecards": {
+          "entitySetName": "rpvms_vendorratecards",
+          "logicalName": "rpvms_vendorratecard"
+        },
+        "vendorproduct_services": {
+          "entitySetName": "rpvms_vendorproductservices",
+          "logicalName": "rpvms_vendorproductservice"
+        },
+        "vendornamealias": {
+          "entitySetName": "rpvms_vendornamealiases",
+          "logicalName": "rpvms_vendornamealias"
+        }
+      },
+      "environmentVariableName": ""
+    }
+  },
+  "version": "1.0"
 }

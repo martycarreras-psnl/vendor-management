@@ -25,6 +25,10 @@
     "validate:schema-plan": "node scripts/validate-schema-plan.mjs dataverse/planning-payload.json",
     "generate:dataverse-plan": "node scripts/generate-dataverse-plan.mjs dataverse/planning-payload.json",
     "register:dataverse": "node scripts/register-dataverse-data-sources.mjs dataverse/register-datasources.plan.json",
+    "schema:import": "node scripts/import-schema-from-xlsx.mjs dataverse/VendorDataModel_Dataverse_Spec.xlsx dataverse/planning-payload.json",
+    "schema:provision": "node scripts/provision-dataverse-schema.mjs --plan dataverse/planning-payload.json",
+    "schema:provision:dry": "node scripts/provision-dataverse-schema.mjs --plan dataverse/planning-payload.json --dry-run",
+    "fabric:map": "node scripts/generate-source-target-map.mjs",
     "sync:foundations": "node scripts/sync-foundations.mjs"
   },
   "dependencies": {
@@ -81,6 +85,7 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.59.0",
     "vite": "^6.4.2",
-    "vitest": "^2.1.9"
+    "vitest": "^2.1.9",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   }
 }

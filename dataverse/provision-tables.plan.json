@@ -1,0 +1,1571 @@
+{
+  "generatedAt": "2026-04-21T03:17:34.063Z",
+  "sourcePlan": "dataverse/planning-payload.json",
+  "globalOptionSets": [
+    {
+      "name": "rpvms_commercialrole",
+      "referencedBy": [
+        {
+          "table": "rpvms_vendors",
+          "column": "rpvms_commercialrole"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_classification",
+      "referencedBy": [
+        {
+          "table": "rpvms_vendors",
+          "column": "rpvms_classification"
+        },
+        {
+          "table": "rpvms_onetrustassessments",
+          "column": "rpvms_classification"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_vendorstatus",
+      "referencedBy": [
+        {
+          "table": "rpvms_vendors",
+          "column": "rpvms_status"
+        },
+        {
+          "table": "rpvms_vendorscores",
+          "column": "rpvms_status"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_yesnona",
+      "referencedBy": [
+        {
+          "table": "rpvms_vendors",
+          "column": "rpvms_activephiaccess"
+        },
+        {
+          "table": "rpvms_contracts",
+          "column": "rpvms_autorenew"
+        },
+        {
+          "table": "rpvms_contracts",
+          "column": "rpvms_amended"
+        },
+        {
+          "table": "rpvms_contracts",
+          "column": "rpvms_terminationwithoutcause"
+        },
+        {
+          "table": "rpvms_onetrustassessments",
+          "column": "rpvms_ephi"
+        },
+        {
+          "table": "rpvms_servicenowassessments",
+          "column": "rpvms_isbudgeted"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_tintype",
+      "referencedBy": [
+        {
+          "table": "rpvms_suppliers",
+          "column": "rpvms_tintype"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_relationshiptype",
+      "referencedBy": [
+        {
+          "table": "rpvms_vendorsuppliers",
+          "column": "rpvms_relationshiptype"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_glstatus",
+      "referencedBy": [
+        {
+          "table": "rpvms_gltransactions",
+          "column": "rpvms_status"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_paymentstatus",
+      "referencedBy": [
+        {
+          "table": "rpvms_gltransactions",
+          "column": "rpvms_paymentstatus"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_contracttype",
+      "referencedBy": [
+        {
+          "table": "rpvms_contracts",
+          "column": "rpvms_contracttype"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_contractstatus",
+      "referencedBy": [
+        {
+          "table": "rpvms_contracts",
+          "column": "rpvms_contractstatus"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_partyslot",
+      "referencedBy": [
+        {
+          "table": "rpvms_contractparties",
+          "column": "rpvms_partyslot"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_partytargettype",
+      "referencedBy": [
+        {
+          "table": "rpvms_contractparties",
+          "column": "rpvms_partytargettype"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_criticalitylevel",
+      "referencedBy": [
+        {
+          "table": "rpvms_onetrustassessments",
+          "column": "rpvms_criticality"
+        },
+        {
+          "table": "rpvms_servicenowassessments",
+          "column": "rpvms_criticalitylevel"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_systemaccess",
+      "referencedBy": [
+        {
+          "table": "rpvms_onetrustassessments",
+          "column": "rpvms_systemaccess"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_assessmenttype",
+      "referencedBy": [
+        {
+          "table": "rpvms_servicenowassessments",
+          "column": "rpvms_assessmenttype"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_quintilerating",
+      "referencedBy": [
+        {
+          "table": "rpvms_vendorbudgets",
+          "column": "rpvms_quintilerating"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_locationtype",
+      "referencedBy": [
+        {
+          "table": "rpvms_vendorratecards",
+          "column": "rpvms_locationtype"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_experiencelevel",
+      "referencedBy": [
+        {
+          "table": "rpvms_vendorratecards",
+          "column": "rpvms_experiencelevel"
+        }
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "schemaName": "rpvms_Vendor",
+      "displayName": "Vendor",
+      "displayCollectionName": "Vendors",
+      "logicalSingularName": "rpvms_vendor",
+      "logicalPluralName": "rpvms_vendors",
+      "entitySetName": "rpvms_vendors",
+      "tableLogicalName": "rpvms_vendors",
+      "description": "Anchor: product/service providers",
+      "ownership": "UserOwned",
+      "hasActivities": false,
+      "hasNotes": true,
+      "primaryName": {
+        "schemaName": "rpvms_VendorName",
+        "displayName": "Vendor Name",
+        "description": "Normalized business key (trim, upper, dedupe)",
+        "maxLength": 200
+      },
+      "columns": [
+        {
+          "schemaName": "rpvms_CategoryL1",
+          "logicalName": "rpvms_categoryl1",
+          "displayName": "Category L1",
+          "requiredLevel": "None",
+          "description": "From VendorScores Category Level 1 -- promote to Vendor attr",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        },
+        {
+          "schemaName": "rpvms_CategoryL2",
+          "logicalName": "rpvms_categoryl2",
+          "displayName": "Category L2",
+          "requiredLevel": "None",
+          "description": "From VendorScores.Vendor Category Level 2",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        },
+        {
+          "schemaName": "rpvms_CommercialRole",
+          "logicalName": "rpvms_commercialrole",
+          "displayName": "Commercial Role",
+          "requiredLevel": "None",
+          "description": "From VendorScores.Vendor Commercial Role",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_commercialrole"
+        },
+        {
+          "schemaName": "rpvms_PrimaryOffering",
+          "logicalName": "rpvms_primaryoffering",
+          "displayName": "Primary Offering",
+          "requiredLevel": "None",
+          "description": "From VendorScores.Primary Offering Name",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 200
+        },
+        {
+          "schemaName": "rpvms_Classification",
+          "logicalName": "rpvms_classification",
+          "displayName": "Classification",
+          "requiredLevel": "None",
+          "description": "Clinical / ProfSvc / Security / etc.",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_classification"
+        },
+        {
+          "schemaName": "rpvms_IsVAR",
+          "logicalName": "rpvms_isvar",
+          "displayName": "Is VAR",
+          "requiredLevel": "None",
+          "description": "Derived from VendorScores.VAR_Vendor",
+          "type": "Boolean"
+        },
+        {
+          "schemaName": "rpvms_Status",
+          "logicalName": "rpvms_status",
+          "displayName": "Status",
+          "requiredLevel": "None",
+          "description": "Active / Inactive / Onboarding / etc.",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_vendorstatus"
+        },
+        {
+          "schemaName": "rpvms_ActivePHIAccess",
+          "logicalName": "rpvms_activephiaccess",
+          "displayName": "PHI Access",
+          "requiredLevel": "None",
+          "description": "From VendorScores.Does vendor have access to PHI",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_yesnona"
+        }
+      ]
+    },
+    {
+      "schemaName": "rpvms_Supplier",
+      "displayName": "Supplier",
+      "displayCollectionName": "Suppliers",
+      "logicalSingularName": "rpvms_supplier",
+      "logicalPluralName": "rpvms_suppliers",
+      "entitySetName": "rpvms_suppliers",
+      "tableLogicalName": "rpvms_suppliers",
+      "description": "Anchor: ERP pay-to entities",
+      "ownership": "UserOwned",
+      "hasActivities": false,
+      "hasNotes": true,
+      "primaryName": {
+        "schemaName": "rpvms_SupplierName",
+        "displayName": "Supplier Name",
+        "description": "Primary name for the record",
+        "maxLength": 200
+      },
+      "columns": [
+        {
+          "schemaName": "rpvms_SupplierID",
+          "logicalName": "rpvms_supplierid",
+          "displayName": "Supplier ID",
+          "requiredLevel": "ApplicationRequired",
+          "description": "Primary key = ExtractSuppliersAll.Supplier ID (Workday)",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 50
+        },
+        {
+          "schemaName": "rpvms_SupplierCategory",
+          "logicalName": "rpvms_suppliercategory",
+          "displayName": "Supplier Category",
+          "requiredLevel": "None",
+          "description": "Freeform for now; consider Choice once taxonomy stabilizes",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        },
+        {
+          "schemaName": "rpvms_TINType",
+          "logicalName": "rpvms_tintype",
+          "displayName": "TIN Type",
+          "requiredLevel": "None",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_tintype"
+        },
+        {
+          "schemaName": "rpvms_TaxID",
+          "logicalName": "rpvms_taxid",
+          "displayName": "Tax ID",
+          "requiredLevel": "None",
+          "description": "Mask for PII; consider column-level security",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 50
+        },
+        {
+          "schemaName": "rpvms_IsReseller",
+          "logicalName": "rpvms_isreseller",
+          "displayName": "Is Reseller",
+          "requiredLevel": "None",
+          "description": "Derived: True if appears as Reseller in Reseller-VAR source",
+          "type": "Boolean"
+        }
+      ]
+    },
+    {
+      "schemaName": "rpvms_VendorSupplier",
+      "displayName": "Vendor Supplier",
+      "displayCollectionName": "Vendor Suppliers",
+      "logicalSingularName": "rpvms_vendorsupplier",
+      "logicalPluralName": "rpvms_vendorsuppliers",
+      "entitySetName": "rpvms_vendorsuppliers",
+      "tableLogicalName": "rpvms_vendorsuppliers",
+      "description": "M:M bridge with Direct vs VAR role",
+      "ownership": "UserOwned",
+      "hasActivities": false,
+      "hasNotes": true,
+      "primaryName": {
+        "schemaName": "rpvms_VendorSupplierName",
+        "displayName": "Name",
+        "description": "Auto-populated: {VendorName} via {SupplierName}",
+        "maxLength": 250
+      },
+      "columns": [
+        {
+          "schemaName": "rpvms_RelationshipType",
+          "logicalName": "rpvms_relationshiptype",
+          "displayName": "Relationship Type",
+          "requiredLevel": "ApplicationRequired",
+          "description": "Direct / VAR-Reseller / Subcontractor",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_relationshiptype"
+        },
+        {
+          "schemaName": "rpvms_ProductsServicesCovered",
+          "logicalName": "rpvms_productsservicescovered",
+          "displayName": "Products/Services Covered",
+          "requiredLevel": "None",
+          "description": "From Reseller-VAR Product & Service Names",
+          "type": "Memo",
+          "maxLength": 2000
+        },
+        {
+          "schemaName": "rpvms_EffectiveFrom",
+          "logicalName": "rpvms_effectivefrom",
+          "displayName": "Effective From",
+          "requiredLevel": "None",
+          "type": "DateTime",
+          "format": "DateOnly"
+        },
+        {
+          "schemaName": "rpvms_EffectiveTo",
+          "logicalName": "rpvms_effectiveto",
+          "displayName": "Effective To",
+          "requiredLevel": "None",
+          "type": "DateTime",
+          "format": "DateOnly"
+        }
+      ]
+    },
+    {
+      "schemaName": "rpvms_GLTransaction",
+      "displayName": "GL Transaction",
+      "displayCollectionName": "GL Transactions",
+      "logicalSingularName": "rpvms_gltransaction",
+      "logicalPluralName": "rpvms_gltransactions",
+      "entitySetName": "rpvms_gltransactions",
+      "tableLogicalName": "rpvms_gltransactions",
+      "description": "Consolidated GL journal lines 2024-2026",
+      "ownership": "UserOwned",
+      "hasActivities": false,
+      "hasNotes": true,
+      "primaryName": {
+        "schemaName": "rpvms_GLTransactionName",
+        "displayName": "Name",
+        "description": "Auto: {WorkdayID}-{JournalLine}",
+        "maxLength": 100
+      },
+      "columns": [
+        {
+          "schemaName": "rpvms_WorkdayID",
+          "logicalName": "rpvms_workdayid",
+          "displayName": "Workday ID",
+          "requiredLevel": "ApplicationRequired",
+          "description": "Part of alt key with JournalLine + FiscalYear",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 50
+        },
+        {
+          "schemaName": "rpvms_JournalLine",
+          "logicalName": "rpvms_journalline",
+          "displayName": "Journal Line",
+          "requiredLevel": "ApplicationRequired",
+          "description": "Part of alt key",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 20
+        },
+        {
+          "schemaName": "rpvms_FiscalYear",
+          "logicalName": "rpvms_fiscalyear",
+          "displayName": "Fiscal Year",
+          "requiredLevel": "ApplicationRequired",
+          "description": "Discriminator 2024/2025/2026. Part of alt key.",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "rpvms_SupplierNameRaw",
+          "logicalName": "rpvms_suppliernameraw",
+          "displayName": "Supplier Name (Raw)",
+          "requiredLevel": "None",
+          "description": "As loaded, for audit / unresolved matches",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 200
+        },
+        {
+          "schemaName": "rpvms_AccountingDate",
+          "logicalName": "rpvms_accountingdate",
+          "displayName": "Accounting Date",
+          "requiredLevel": "None",
+          "type": "DateTime",
+          "format": "DateOnly"
+        },
+        {
+          "schemaName": "rpvms_PostedDate",
+          "logicalName": "rpvms_posteddate",
+          "displayName": "Posted Date",
+          "requiredLevel": "None",
+          "type": "DateTime",
+          "format": "DateOnly"
+        },
+        {
+          "schemaName": "rpvms_FiscalPeriodEndDate",
+          "logicalName": "rpvms_fiscalperiodenddate",
+          "displayName": "Fiscal Period End",
+          "requiredLevel": "None",
+          "type": "DateTime",
+          "format": "DateOnly"
+        },
+        {
+          "schemaName": "rpvms_JournalNumber",
+          "logicalName": "rpvms_journalnumber",
+          "displayName": "Journal Number",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 50
+        },
+        {
+          "schemaName": "rpvms_JournalSource",
+          "logicalName": "rpvms_journalsource",
+          "displayName": "Journal Source",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        },
+        {
+          "schemaName": "rpvms_Status",
+          "logicalName": "rpvms_status",
+          "displayName": "Status",
+          "requiredLevel": "None",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_glstatus"
+        },
+        {
+          "schemaName": "rpvms_PaymentStatus",
+          "logicalName": "rpvms_paymentstatus",
+          "displayName": "Payment Status",
+          "requiredLevel": "None",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_paymentstatus"
+        },
+        {
+          "schemaName": "rpvms_SupplierInvoiceNumber",
+          "logicalName": "rpvms_supplierinvoicenumber",
+          "displayName": "Supplier Invoice Number",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        },
+        {
+          "schemaName": "rpvms_SupplierInvoiceDate",
+          "logicalName": "rpvms_supplierinvoicedate",
+          "displayName": "Supplier Invoice Date",
+          "requiredLevel": "None",
+          "description": "Coerce from varchar in 2025/2026 sources",
+          "type": "DateTime",
+          "format": "DateOnly"
+        },
+        {
+          "schemaName": "rpvms_LedgerAccount",
+          "logicalName": "rpvms_ledgeraccount",
+          "displayName": "Ledger Account",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 50
+        },
+        {
+          "schemaName": "rpvms_AccountName",
+          "logicalName": "rpvms_accountname",
+          "displayName": "Account Name",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 200
+        },
+        {
+          "schemaName": "rpvms_DebitAmount",
+          "logicalName": "rpvms_debitamount",
+          "displayName": "Debit Amount",
+          "requiredLevel": "None",
+          "type": "Money"
+        },
+        {
+          "schemaName": "rpvms_CreditAmount",
+          "logicalName": "rpvms_creditamount",
+          "displayName": "Credit Amount",
+          "requiredLevel": "None",
+          "type": "Money"
+        },
+        {
+          "schemaName": "rpvms_NetAmount",
+          "logicalName": "rpvms_netamount",
+          "displayName": "Net Amount",
+          "requiredLevel": "None",
+          "type": "Money"
+        },
+        {
+          "schemaName": "rpvms_UnpaidAmount",
+          "logicalName": "rpvms_unpaidamount",
+          "displayName": "Unpaid Amount",
+          "requiredLevel": "None",
+          "type": "Money"
+        },
+        {
+          "schemaName": "rpvms_Currency",
+          "logicalName": "rpvms_currency",
+          "displayName": "Currency",
+          "requiredLevel": "None",
+          "description": "ISO code; Dataverse currency field manages conversion",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 10
+        },
+        {
+          "schemaName": "rpvms_Company",
+          "logicalName": "rpvms_company",
+          "displayName": "Company",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        },
+        {
+          "schemaName": "rpvms_CostCenter",
+          "logicalName": "rpvms_costcenter",
+          "displayName": "Cost Center",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        },
+        {
+          "schemaName": "rpvms_LocalPracticeName",
+          "logicalName": "rpvms_localpracticename",
+          "displayName": "Local Practice Name",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 200
+        },
+        {
+          "schemaName": "rpvms_DivisionName",
+          "logicalName": "rpvms_divisionname",
+          "displayName": "Division Name",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        },
+        {
+          "schemaName": "rpvms_SpendCategory",
+          "logicalName": "rpvms_spendcategory",
+          "displayName": "Spend Category",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        },
+        {
+          "schemaName": "rpvms_LineMemo",
+          "logicalName": "rpvms_linememo",
+          "displayName": "Line Memo",
+          "requiredLevel": "None",
+          "type": "Memo",
+          "maxLength": 4000
+        },
+        {
+          "schemaName": "rpvms_HeaderMemo",
+          "logicalName": "rpvms_headermemo",
+          "displayName": "Header Memo",
+          "requiredLevel": "None",
+          "type": "Memo",
+          "maxLength": 4000
+        }
+      ]
+    },
+    {
+      "schemaName": "rpvms_Contract",
+      "displayName": "Contract",
+      "displayCollectionName": "Contracts",
+      "logicalSingularName": "rpvms_contract",
+      "logicalPluralName": "rpvms_contracts",
+      "entitySetName": "rpvms_contracts",
+      "tableLogicalName": "rpvms_contracts",
+      "description": "CSC legal contract register",
+      "ownership": "UserOwned",
+      "hasActivities": false,
+      "hasNotes": true,
+      "primaryName": {
+        "schemaName": "rpvms_ContractName",
+        "displayName": "Contract Title",
+        "description": "Primary name; from Document Title",
+        "maxLength": 500
+      },
+      "columns": [
+        {
+          "schemaName": "rpvms_DocumentID",
+          "logicalName": "rpvms_documentid",
+          "displayName": "Document ID",
+          "requiredLevel": "ApplicationRequired",
+          "description": "Alt key from CSCListLegal.Document Id",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "rpvms_MatterID",
+          "logicalName": "rpvms_matterid",
+          "displayName": "Matter ID",
+          "requiredLevel": "None",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "rpvms_MatterFullName",
+          "logicalName": "rpvms_matterfullname",
+          "displayName": "Matter Full Name",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 500
+        },
+        {
+          "schemaName": "rpvms_MatterShortName",
+          "logicalName": "rpvms_mattershortname",
+          "displayName": "Matter Short Name",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 200
+        },
+        {
+          "schemaName": "rpvms_ContractingEntityName",
+          "logicalName": "rpvms_contractingentityname",
+          "displayName": "Contracting Entity Name",
+          "requiredLevel": "None",
+          "description": "As loaded; resolved via SupplierID lookup",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 300
+        },
+        {
+          "schemaName": "rpvms_PracticeName",
+          "logicalName": "rpvms_practicename",
+          "displayName": "Practice Name",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 200
+        },
+        {
+          "schemaName": "rpvms_ContractType",
+          "logicalName": "rpvms_contracttype",
+          "displayName": "Contract Type",
+          "requiredLevel": "None",
+          "description": "MSA / SOW / License / NDA / BAA / Amendment",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_contracttype"
+        },
+        {
+          "schemaName": "rpvms_SubContractType",
+          "logicalName": "rpvms_subcontracttype",
+          "displayName": "Sub Contract Type",
+          "requiredLevel": "None",
+          "description": "Keep as text until taxonomy locked",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 200
+        },
+        {
+          "schemaName": "rpvms_ContractStatus",
+          "logicalName": "rpvms_contractstatus",
+          "displayName": "Contract Status",
+          "requiredLevel": "None",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_contractstatus"
+        },
+        {
+          "schemaName": "rpvms_EffectiveDate",
+          "logicalName": "rpvms_effectivedate",
+          "displayName": "Effective Date",
+          "requiredLevel": "None",
+          "description": "From Commencement/Effective Date",
+          "type": "DateTime",
+          "format": "DateOnly"
+        },
+        {
+          "schemaName": "rpvms_ExpirationDate",
+          "logicalName": "rpvms_expirationdate",
+          "displayName": "Expiration Date (As Amended)",
+          "requiredLevel": "None",
+          "type": "DateTime",
+          "format": "DateOnly"
+        },
+        {
+          "schemaName": "rpvms_NoticeDate",
+          "logicalName": "rpvms_noticedate",
+          "displayName": "Notice Date (re term)",
+          "requiredLevel": "None",
+          "type": "DateTime",
+          "format": "DateOnly"
+        },
+        {
+          "schemaName": "rpvms_DateSigned",
+          "logicalName": "rpvms_datesigned",
+          "displayName": "Date Signed",
+          "requiredLevel": "None",
+          "type": "DateTime",
+          "format": "DateOnly"
+        },
+        {
+          "schemaName": "rpvms_AutoRenew",
+          "logicalName": "rpvms_autorenew",
+          "displayName": "Auto Renew",
+          "requiredLevel": "None",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_yesnona"
+        },
+        {
+          "schemaName": "rpvms_AutoRenewalDetails",
+          "logicalName": "rpvms_autorenewaldetails",
+          "displayName": "Auto Renewal Details",
+          "requiredLevel": "None",
+          "type": "Memo",
+          "maxLength": 4000
+        },
+        {
+          "schemaName": "rpvms_Amended",
+          "logicalName": "rpvms_amended",
+          "displayName": "Amended",
+          "requiredLevel": "None",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_yesnona"
+        },
+        {
+          "schemaName": "rpvms_TerminationWithoutCause",
+          "logicalName": "rpvms_terminationwithoutcause",
+          "displayName": "Termination Without Cause",
+          "requiredLevel": "None",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_yesnona"
+        },
+        {
+          "schemaName": "rpvms_TerminationNoticeDetail",
+          "logicalName": "rpvms_terminationnoticedetail",
+          "displayName": "Termination Notice Detail",
+          "requiredLevel": "None",
+          "type": "Memo",
+          "maxLength": 4000
+        },
+        {
+          "schemaName": "rpvms_OtherSignificantTerms",
+          "logicalName": "rpvms_othersignificantterms",
+          "displayName": "Other Significant Terms/Notes",
+          "requiredLevel": "None",
+          "type": "Memo",
+          "maxLength": 4000
+        }
+      ]
+    },
+    {
+      "schemaName": "rpvms_ContractParty",
+      "displayName": "Contract Party",
+      "displayCollectionName": "Contract Partys",
+      "logicalSingularName": "rpvms_contractparty",
+      "logicalPluralName": "rpvms_contractparties",
+      "entitySetName": "rpvms_contractparties",
+      "tableLogicalName": "rpvms_contractparties",
+      "description": "Normalized Other Party 1/2/3 child",
+      "ownership": "UserOwned",
+      "hasActivities": false,
+      "hasNotes": true,
+      "primaryName": {
+        "schemaName": "rpvms_ContractPartyName",
+        "displayName": "Name",
+        "description": "Auto: {ContractTitle}-{PartySlot}",
+        "maxLength": 300
+      },
+      "columns": [
+        {
+          "schemaName": "rpvms_PartyName",
+          "logicalName": "rpvms_partyname",
+          "displayName": "Party Name",
+          "requiredLevel": "ApplicationRequired",
+          "description": "From Other Party 1/2/3 raw",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 300
+        },
+        {
+          "schemaName": "rpvms_PartySlot",
+          "logicalName": "rpvms_partyslot",
+          "displayName": "Party Slot",
+          "requiredLevel": "ApplicationRequired",
+          "description": "Other1 / Other2 / Other3",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_partyslot"
+        },
+        {
+          "schemaName": "rpvms_PartyTargetType",
+          "logicalName": "rpvms_partytargettype",
+          "displayName": "Party Target Type",
+          "requiredLevel": "ApplicationRequired",
+          "description": "Vendor (default) | Supplier",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_partytargettype"
+        }
+      ]
+    },
+    {
+      "schemaName": "rpvms_OneTrustAssessment",
+      "displayName": "OneTrust Assessment",
+      "displayCollectionName": "OneTrust Assessments",
+      "logicalSingularName": "rpvms_onetrustassessment",
+      "logicalPluralName": "rpvms_onetrustassessments",
+      "entitySetName": "rpvms_onetrustassessments",
+      "tableLogicalName": "rpvms_onetrustassessments",
+      "description": "Risk/compliance vendor profile (1:1 Vendor)",
+      "ownership": "UserOwned",
+      "hasActivities": false,
+      "hasNotes": true,
+      "primaryName": {
+        "schemaName": "rpvms_OneTrustAssessmentName",
+        "displayName": "Name",
+        "description": "Auto: OneTrust - {VendorName}",
+        "maxLength": 200
+      },
+      "columns": [
+        {
+          "schemaName": "rpvms_Type",
+          "logicalName": "rpvms_type",
+          "displayName": "Type",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        },
+        {
+          "schemaName": "rpvms_ProductService",
+          "logicalName": "rpvms_productservice",
+          "displayName": "Product/Service",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 300
+        },
+        {
+          "schemaName": "rpvms_Classification",
+          "logicalName": "rpvms_classification",
+          "displayName": "Classification",
+          "requiredLevel": "None",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_classification"
+        },
+        {
+          "schemaName": "rpvms_Criticality",
+          "logicalName": "rpvms_criticality",
+          "displayName": "Criticality",
+          "requiredLevel": "None",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_criticalitylevel"
+        },
+        {
+          "schemaName": "rpvms_ePHI",
+          "logicalName": "rpvms_ephi",
+          "displayName": "ePHI",
+          "requiredLevel": "None",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_yesnona"
+        },
+        {
+          "schemaName": "rpvms_Integrations",
+          "logicalName": "rpvms_integrations",
+          "displayName": "Integrations",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 500
+        },
+        {
+          "schemaName": "rpvms_SystemAccess",
+          "logicalName": "rpvms_systemaccess",
+          "displayName": "System Access",
+          "requiredLevel": "None",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_systemaccess"
+        }
+      ]
+    },
+    {
+      "schemaName": "rpvms_ServiceNowAssessment",
+      "displayName": "ServiceNow Assessment",
+      "displayCollectionName": "ServiceNow Assessments",
+      "logicalSingularName": "rpvms_servicenowassessment",
+      "logicalPluralName": "rpvms_servicenowassessments",
+      "entitySetName": "rpvms_servicenowassessments",
+      "tableLogicalName": "rpvms_servicenowassessments",
+      "description": "SN risk + performance assessments (1:M Vendor)",
+      "ownership": "UserOwned",
+      "hasActivities": false,
+      "hasNotes": true,
+      "primaryName": {
+        "schemaName": "rpvms_ServiceNowAssessmentName",
+        "displayName": "SN Number",
+        "description": "From Number",
+        "maxLength": 50
+      },
+      "columns": [
+        {
+          "schemaName": "rpvms_SNNumber1",
+          "logicalName": "rpvms_snnumber1",
+          "displayName": "SN Number 1",
+          "requiredLevel": "None",
+          "description": "From Number_1",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 50
+        },
+        {
+          "schemaName": "rpvms_AssessmentType",
+          "logicalName": "rpvms_assessmenttype",
+          "displayName": "Assessment Type",
+          "requiredLevel": "ApplicationRequired",
+          "description": "Criticality | Performance",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_assessmenttype"
+        },
+        {
+          "schemaName": "rpvms_VendorNameRaw",
+          "logicalName": "rpvms_vendornameraw",
+          "displayName": "Vendor Name (Raw)",
+          "requiredLevel": "None",
+          "description": "Audit",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 200
+        },
+        {
+          "schemaName": "rpvms_CriticalityLevel",
+          "logicalName": "rpvms_criticalitylevel",
+          "displayName": "Criticality Level",
+          "requiredLevel": "None",
+          "description": "PIVOTED from 5 bit flags into single 1-5",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_criticalitylevel"
+        },
+        {
+          "schemaName": "rpvms_ITSponsor",
+          "logicalName": "rpvms_itsponsor",
+          "displayName": "IT Sponsor",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 200
+        },
+        {
+          "schemaName": "rpvms_VendorRepName",
+          "logicalName": "rpvms_vendorrepname",
+          "displayName": "Vendor Rep Name",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 200
+        },
+        {
+          "schemaName": "rpvms_VendorRepEmail",
+          "logicalName": "rpvms_vendorrepemail",
+          "displayName": "Vendor Rep Email",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 200
+        },
+        {
+          "schemaName": "rpvms_VendorRepTitle",
+          "logicalName": "rpvms_vendorreptitle",
+          "displayName": "Vendor Rep Title",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 200
+        },
+        {
+          "schemaName": "rpvms_VendorMailingAddress",
+          "logicalName": "rpvms_vendormailingaddress",
+          "displayName": "Vendor Mailing Address",
+          "requiredLevel": "None",
+          "type": "Memo",
+          "maxLength": 1000
+        },
+        {
+          "schemaName": "rpvms_IsBudgeted",
+          "logicalName": "rpvms_isbudgeted",
+          "displayName": "Is Budgeted",
+          "requiredLevel": "None",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_yesnona"
+        },
+        {
+          "schemaName": "rpvms_BudgetedCostCenter",
+          "logicalName": "rpvms_budgetedcostcenter",
+          "displayName": "Budgeted Cost Center",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        },
+        {
+          "schemaName": "rpvms_ImpactedCostCenter",
+          "logicalName": "rpvms_impactedcostcenter",
+          "displayName": "Impacted Cost Center",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        },
+        {
+          "schemaName": "rpvms_ProductServiceType",
+          "logicalName": "rpvms_productservicetype",
+          "displayName": "Product/Service Type",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 300
+        },
+        {
+          "schemaName": "rpvms_RequestScope",
+          "logicalName": "rpvms_requestscope",
+          "displayName": "Request Scope",
+          "requiredLevel": "None",
+          "description": "Local Practice / RP Dept / Enterprise",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        },
+        {
+          "schemaName": "rpvms_RelatedLocalPractice",
+          "logicalName": "rpvms_relatedlocalpractice",
+          "displayName": "Related Local Practice",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 200
+        },
+        {
+          "schemaName": "rpvms_RelatedRPDepartment",
+          "logicalName": "rpvms_relatedrpdepartment",
+          "displayName": "Related RP Department",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 200
+        },
+        {
+          "schemaName": "rpvms_CostCenterName",
+          "logicalName": "rpvms_costcentername",
+          "displayName": "Cost Center Name",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 200
+        },
+        {
+          "schemaName": "rpvms_CostCenterCode",
+          "logicalName": "rpvms_costcentercode",
+          "displayName": "Cost Center Code",
+          "requiredLevel": "None",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "rpvms_PerfOverallReliability",
+          "logicalName": "rpvms_perfoverallreliability",
+          "displayName": "Perf: Overall Performance",
+          "requiredLevel": "None",
+          "description": "Perf-only field A",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 2000
+        },
+        {
+          "schemaName": "rpvms_PerfIssueHandling",
+          "logicalName": "rpvms_perfissuehandling",
+          "displayName": "Perf: Issue Handling",
+          "requiredLevel": "None",
+          "description": "Perf-only field B",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 2000
+        },
+        {
+          "schemaName": "rpvms_PerfSupportSatisfaction",
+          "logicalName": "rpvms_perfsupportsatisfaction",
+          "displayName": "Perf: Support Satisfaction",
+          "requiredLevel": "None",
+          "description": "Perf-only field C",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 2000
+        },
+        {
+          "schemaName": "rpvms_PerfContractChangeReq",
+          "logicalName": "rpvms_perfcontractchangereq",
+          "displayName": "Perf: Contract Change Request",
+          "requiredLevel": "None",
+          "description": "Perf-only field D",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 2000
+        }
+      ]
+    },
+    {
+      "schemaName": "rpvms_VendorScore",
+      "displayName": "Vendor Score",
+      "displayCollectionName": "Vendor Scores",
+      "logicalSingularName": "rpvms_vendorscore",
+      "logicalPluralName": "rpvms_vendorscores",
+      "entitySetName": "rpvms_vendorscores",
+      "tableLogicalName": "rpvms_vendorscores",
+      "description": "Annual numeric scoring",
+      "ownership": "UserOwned",
+      "hasActivities": false,
+      "hasNotes": true,
+      "primaryName": {
+        "schemaName": "rpvms_VendorScoreName",
+        "displayName": "Name",
+        "description": "Auto: Score {VendorName} {ScoreYear}",
+        "maxLength": 200
+      },
+      "columns": [
+        {
+          "schemaName": "rpvms_ScoreYear",
+          "logicalName": "rpvms_scoreyear",
+          "displayName": "Score Year",
+          "requiredLevel": "ApplicationRequired",
+          "description": "Part of alt key",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "rpvms_CriticalityScore",
+          "logicalName": "rpvms_criticalityscore",
+          "displayName": "Criticality Score",
+          "requiredLevel": "None",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "rpvms_DependencyScore",
+          "logicalName": "rpvms_dependencyscore",
+          "displayName": "Dependency Score",
+          "requiredLevel": "None",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "rpvms_SpendScore",
+          "logicalName": "rpvms_spendscore",
+          "displayName": "Spend Score",
+          "requiredLevel": "None",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "rpvms_ValueScore",
+          "logicalName": "rpvms_valuescore",
+          "displayName": "Value Score",
+          "requiredLevel": "None",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "rpvms_AlignmentScore",
+          "logicalName": "rpvms_alignmentscore",
+          "displayName": "Alignment Score",
+          "requiredLevel": "None",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "rpvms_WeightedScore",
+          "logicalName": "rpvms_weightedscore",
+          "displayName": "Weighted Score",
+          "requiredLevel": "None",
+          "type": "Decimal",
+          "precision": 4
+        },
+        {
+          "schemaName": "rpvms_WtScoreCritDepOnly",
+          "logicalName": "rpvms_wtscorecritdeponly",
+          "displayName": "Wt Score (Crit+Dep Only)",
+          "requiredLevel": "None",
+          "type": "Decimal",
+          "precision": 4
+        },
+        {
+          "schemaName": "rpvms_TopSpendCostCenter",
+          "logicalName": "rpvms_topspendcostcenter",
+          "displayName": "Top Spend Cost Center",
+          "requiredLevel": "None",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "rpvms_Status",
+          "logicalName": "rpvms_status",
+          "displayName": "Status",
+          "requiredLevel": "None",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_vendorstatus"
+        },
+        {
+          "schemaName": "rpvms_Comment",
+          "logicalName": "rpvms_comment",
+          "displayName": "Comment",
+          "requiredLevel": "None",
+          "type": "Memo",
+          "maxLength": 4000
+        }
+      ]
+    },
+    {
+      "schemaName": "rpvms_VendorBudget",
+      "displayName": "Vendor Budget",
+      "displayCollectionName": "Vendor Budgets",
+      "logicalSingularName": "rpvms_vendorbudget",
+      "logicalPluralName": "rpvms_vendorbudgets",
+      "entitySetName": "rpvms_vendorbudgets",
+      "tableLogicalName": "rpvms_vendorbudgets",
+      "description": "Annual spend + budget rating",
+      "ownership": "UserOwned",
+      "hasActivities": false,
+      "hasNotes": true,
+      "primaryName": {
+        "schemaName": "rpvms_VendorBudgetName",
+        "displayName": "Name",
+        "description": "Auto: Budget {VendorName} {BudgetYear}",
+        "maxLength": 200
+      },
+      "columns": [
+        {
+          "schemaName": "rpvms_BudgetYear",
+          "logicalName": "rpvms_budgetyear",
+          "displayName": "Budget Year",
+          "requiredLevel": "ApplicationRequired",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "rpvms_Rating",
+          "logicalName": "rpvms_rating",
+          "displayName": "Rating",
+          "requiredLevel": "None",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "rpvms_Description",
+          "logicalName": "rpvms_description",
+          "displayName": "Description",
+          "requiredLevel": "None",
+          "type": "Memo",
+          "maxLength": 2000
+        },
+        {
+          "schemaName": "rpvms_SupplierSpend",
+          "logicalName": "rpvms_supplierspend",
+          "displayName": "Supplier Spend",
+          "requiredLevel": "None",
+          "type": "Money"
+        },
+        {
+          "schemaName": "rpvms_PctOfTotalSpend",
+          "logicalName": "rpvms_pctoftotalspend",
+          "displayName": "% of Total Spend",
+          "requiredLevel": "None",
+          "description": "Precision 4",
+          "type": "Decimal",
+          "precision": 4
+        },
+        {
+          "schemaName": "rpvms_QuintileRating",
+          "logicalName": "rpvms_quintilerating",
+          "displayName": "Quintile Rating",
+          "requiredLevel": "None",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_quintilerating"
+        }
+      ]
+    },
+    {
+      "schemaName": "rpvms_VendorRateCard",
+      "displayName": "Vendor Rate Card",
+      "displayCollectionName": "Vendor Rate Cards",
+      "logicalSingularName": "rpvms_vendorratecard",
+      "logicalPluralName": "rpvms_vendorratecards",
+      "entitySetName": "rpvms_vendorratecards",
+      "tableLogicalName": "rpvms_vendorratecards",
+      "description": "Contractor hourly rate cards",
+      "ownership": "UserOwned",
+      "hasActivities": false,
+      "hasNotes": true,
+      "primaryName": {
+        "schemaName": "rpvms_VendorRateCardName",
+        "displayName": "Name",
+        "description": "Auto: {VendorName} - {NormalizedPosition}",
+        "maxLength": 250
+      },
+      "columns": [
+        {
+          "schemaName": "rpvms_RateCardYear",
+          "logicalName": "rpvms_ratecardyear",
+          "displayName": "Rate Card Year",
+          "requiredLevel": "None",
+          "type": "Integer"
+        },
+        {
+          "schemaName": "rpvms_OriginalPosition",
+          "logicalName": "rpvms_originalposition",
+          "displayName": "Original Position",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 300
+        },
+        {
+          "schemaName": "rpvms_NormalizedPosition",
+          "logicalName": "rpvms_normalizedposition",
+          "displayName": "Normalized Position",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 200
+        },
+        {
+          "schemaName": "rpvms_PositionCategory",
+          "logicalName": "rpvms_positioncategory",
+          "displayName": "Position Category",
+          "requiredLevel": "None",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        },
+        {
+          "schemaName": "rpvms_LocationType",
+          "logicalName": "rpvms_locationtype",
+          "displayName": "Location Type",
+          "requiredLevel": "None",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_locationtype"
+        },
+        {
+          "schemaName": "rpvms_ExperienceLevel",
+          "logicalName": "rpvms_experiencelevel",
+          "displayName": "Experience Level",
+          "requiredLevel": "None",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_experiencelevel"
+        },
+        {
+          "schemaName": "rpvms_ExperienceYears",
+          "logicalName": "rpvms_experienceyears",
+          "displayName": "Experience Years",
+          "requiredLevel": "None",
+          "description": "String range like '3-5' from source",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 50
+        },
+        {
+          "schemaName": "rpvms_MinRate",
+          "logicalName": "rpvms_minrate",
+          "displayName": "Min Rate",
+          "requiredLevel": "None",
+          "type": "Money"
+        },
+        {
+          "schemaName": "rpvms_MaxRate",
+          "logicalName": "rpvms_maxrate",
+          "displayName": "Max Rate",
+          "requiredLevel": "None",
+          "type": "Money"
+        },
+        {
+          "schemaName": "rpvms_AvgRate",
+          "logicalName": "rpvms_avgrate",
+          "displayName": "Avg Rate",
+          "requiredLevel": "None",
+          "type": "Money"
+        },
+        {
+          "schemaName": "rpvms_Notes",
+          "logicalName": "rpvms_notes",
+          "displayName": "Notes",
+          "requiredLevel": "None",
+          "type": "Memo",
+          "maxLength": 2000
+        },
+        {
+          "schemaName": "rpvms_DemoNotes",
+          "logicalName": "rpvms_demonotes",
+          "displayName": "Demo Notes",
+          "requiredLevel": "None",
+          "type": "Memo",
+          "maxLength": 2000
+        }
+      ]
+    },
+    {
+      "schemaName": "rpvms_VendorProductService",
+      "displayName": "Vendor Product/Service",
+      "displayCollectionName": "Vendor Product/Services",
+      "logicalSingularName": "rpvms_vendorproductservice",
+      "logicalPluralName": "rpvms_vendorproductservices",
+      "entitySetName": "rpvms_vendorproductservices",
+      "tableLogicalName": "rpvms_vendorproductservices",
+      "description": "Catalog of what each vendor offers",
+      "ownership": "UserOwned",
+      "hasActivities": false,
+      "hasNotes": true,
+      "primaryName": {
+        "schemaName": "rpvms_VendorProductServiceName",
+        "displayName": "Product/Service Name",
+        "description": "Primary name for the record",
+        "maxLength": 300
+      },
+      "columns": [
+        {
+          "schemaName": "rpvms_Category",
+          "logicalName": "rpvms_category",
+          "displayName": "Category",
+          "requiredLevel": "None",
+          "description": "From Reseller-VAR Product & Service Names and OneTrust Product/Service",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        }
+      ]
+    },
+    {
+      "schemaName": "rpvms_VendorNameAlias",
+      "displayName": "Vendor Name Alias",
+      "displayCollectionName": "Vendor Name Alias",
+      "logicalSingularName": "rpvms_vendornamealias",
+      "logicalPluralName": "rpvms_vendornamealiases",
+      "entitySetName": "rpvms_vendornamealiases",
+      "tableLogicalName": "rpvms_vendornamealiases",
+      "description": "Curated name variants for dirty-key resolution",
+      "ownership": "UserOwned",
+      "hasActivities": false,
+      "hasNotes": true,
+      "primaryName": {
+        "schemaName": "rpvms_VendorNameAliasName",
+        "displayName": "Alias Name",
+        "description": "Primary name for the record",
+        "maxLength": 300
+      },
+      "columns": [
+        {
+          "schemaName": "rpvms_SourceSystem",
+          "logicalName": "rpvms_sourcesystem",
+          "displayName": "Source System",
+          "requiredLevel": "None",
+          "description": "GL / OneTrust / ServiceNow / Score / RateCard / CSC",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        },
+        {
+          "schemaName": "rpvms_ReviewedBy",
+          "logicalName": "rpvms_reviewedby",
+          "displayName": "Reviewed By",
+          "requiredLevel": "None",
+          "description": "Curation audit",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 200
+        },
+        {
+          "schemaName": "rpvms_ReviewedOn",
+          "logicalName": "rpvms_reviewedon",
+          "displayName": "Reviewed On",
+          "requiredLevel": "None",
+          "type": "DateTime",
+          "format": "DateOnly"
+        }
+      ]
+    }
+  ]
+}

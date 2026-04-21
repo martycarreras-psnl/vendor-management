@@ -1,0 +1,46 @@
+{
+  "rng_seed": 20260421,
+  "currentFiscalYear": 2026,
+  "priorFiscalYears": [2025],
+  "scoreYears": [2025, 2026],
+  "budgetYears": [2026],
+  "rateCardYear": 2026,
+  "rpEntities": [
+    "Radiology Partners LLC",
+    "RP MSO Holdings",
+    "Radiology Partners Imaging"
+  ],
+  "rpLocalPractices": [
+    "Greater Long Beach Radiology",
+    "Singleton Associated Radiologists",
+    "American Radiology Associates",
+    "Central Illinois Radiological",
+    "Desert Radiology",
+    "Radiology Imaging Associates"
+  ],
+  "rpDivisions": ["West", "Central", "East", "Mountain", "South"],
+  "misspellRate": 0.08,
+  "glRowsPerVendorRange": [6, 22],
+  "contractsPerVendorRange": [0, 2],
+  "productsPerVendorRange": [1, 3],
+  "aliasesPerVendorRange": [0, 2],
+  "vendorStatusMix": { "Active": 0.8, "Under Review": 0.15, "Inactive": 0.05 },
+  "glPaymentStatusMix": { "Paid": 0.75, "Unpaid": 0.10, "Partial": 0.05, "Pending": 0.08, "Voided": 0.02 },
+  "glStatusMix": { "Posted": 0.92, "Unposted": 0.04, "In Process": 0.03, "Reversed": 0.01 },
+  "rateCardVendors": [
+    "Herjavec Group", "Logicalis", "Mission Critical Systems", "US Cloud", "R1 RCM", "Nuance Communications", "Microsoft", "Workday"
+  ],
+  "rateCardPositions": [
+    { "original": "Sr. Security Engineer", "normalized": "Senior Security Engineer", "category": "Security Engineering", "minRate": 180, "maxRate": 275 },
+    { "original": "Cloud Architect", "normalized": "Cloud Architect", "category": "Cloud Engineering", "minRate": 200, "maxRate": 310 },
+    { "original": "DevOps Engineer II", "normalized": "DevOps Engineer", "category": "Platform Engineering", "minRate": 150, "maxRate": 235 },
+    { "original": "Data Engineer", "normalized": "Data Engineer", "category": "Data & Analytics", "minRate": 160, "maxRate": 250 },
+    { "original": "Project Manager", "normalized": "Project Manager", "category": "Delivery", "minRate": 140, "maxRate": 215 }
+  ],
+  "budgetDescriptions": [
+    "FY26 approved operating budget",
+    "FY26 baseline with 4% inflation uplift",
+    "FY26 capex-deferred plan",
+    "FY26 renewal-only envelope"
+  ]
+}
