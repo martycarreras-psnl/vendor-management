@@ -2,9 +2,11 @@ import { Link } from 'react-router-dom';
 import { usePortfolioDataset, computeTopVendors } from '@/hooks/vendiq/use-portfolio-dataset';
 import { usePortfolioFilters } from '@/hooks/vendiq/use-portfolio-filters';
 import { FilterSidebar } from '@/components/vendiq/filter-sidebar';
+import { DataGrid, type ColumnDef } from '@/components/vendiq/data-grid';
 import { CriticalityPill } from '@/components/vendiq/criticality-pill';
 import { formatCurrency, daysUntil } from '@/lib/vendiq-format';
 import { cn } from '@/lib/utils';
+import type { TopVendorRow, VendorSupplier } from '@/types/vendiq';
 
 function ExpiringBadge({ dateIso }: { dateIso?: string }) {
   const d = daysUntil(dateIso);
@@ -22,6 +24,12 @@ function ExpiringBadge({ dateIso }: { dateIso?: string }) {
   );
 }
 
+interface VendorRow extends TopVendorRow {
+  primaryOffering?: string;
+  phi?: string;
+  supplierLabel: string;
+}
+
 export default function VendorLookupPage() {
   const dataset = usePortfolioDataset();
   const { filters, setFilters, clear } = usePortfolioFilters();
@@ -33,7 +41,55 @@ export default function VendorLookupPage() {
     return <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">Failed to load vendors.</div>;
   }
 
-  const rows = computeTopVendors(filters, dataset.data, 500);
+  const rawRows = computeTopVendors(filters, dataset.data, 500);
+  const rows: VendorRow[] = rawRows.map((r) => {
+    const vendor = dataset.data!.vendors.find((v) => v.id === r.vendorId);
+    const supplierLinks: VendorSupplier[] = dataset.data!.suppliersByVendor.get(r.vendorId) ?? [];
+    return {
+      ...r,
+      primaryOffering: vendor?.primaryOffering,
+      phi: vendor?.activePhiAccess ?? undefined,
+      supplierLabel: supplierLinks.length > 0
+        ? supplierLinks.map((s) => s.supplierName ?? s.supplierId).join(', ')
+        : '',
+    };
+  });
+
+  const columns: ColumnDef<VendorRow>[] = [
+    {
+      key: 'vendor',
+      header: 'Vendor',
+      accessor: (r) => r.vendorName,
+      render: (r) => (
+        <div>
+          <Link to={`/vendors/${r.vendorId}`} className="font-medium text-primary underline-offset-2 hover:underline">{r.vendorName}</Link>
+          {r.primaryOffering && <div className="text-xs text-muted-foreground">{r.primaryOffering}</div>}
+        </div>
+      ),
+    },
+    { key: 'supplier', header: 'Supplier', accessor: (r) => r.supplierLabel },
+    { key: 'classification', header: 'Classification', accessor: (r) => r.classification ?? '' },
+    { key: 'phi', header: 'PHI', accessor: (r) => r.phi ?? '' },
+    {
+      key: 'criticality',
+      header: 'Criticality',
+      accessor: (r) => r.criticality ?? 0,
+      render: (r) => <CriticalityPill level={r.criticality} />,
+    },
+    {
+      key: 'expiring',
+      header: 'Expiring',
+      accessor: (r) => r.nextExpirationDate ?? '',
+      render: (r) => <ExpiringBadge dateIso={r.nextExpirationDate} />,
+    },
+    {
+      key: 'annualSpend',
+      header: 'Annual Spend',
+      accessor: (r) => r.annualSpend ?? 0,
+      render: (r) => <span className="font-medium">{formatCurrency(r.annualSpend)}</span>,
+      align: 'right',
+    },
+  ];
 
   return (
     <div className="space-y-4">
@@ -43,59 +99,16 @@ export default function VendorLookupPage() {
       </header>
 
       <div className="flex gap-6">
-        {/* Left filter sidebar */}
         <FilterSidebar filters={filters} onChange={setFilters} onClear={clear} />
-
-        {/* Grid */}
         <div className="min-w-0 flex-1 rounded-lg border bg-card shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/40 text-left text-xs uppercase tracking-wider text-muted-foreground">
-                  <th className="px-4 py-2 font-medium">Vendor</th>
-                  <th className="px-4 py-2 font-medium">Supplier</th>
-                  <th className="px-4 py-2 font-medium">Classification</th>
-                  <th className="px-4 py-2 font-medium">PHI</th>
-                  <th className="px-4 py-2 font-medium">Criticality</th>
-                  <th className="px-4 py-2 font-medium">Expiring</th>
-                  <th className="px-4 py-2 text-right font-medium">Annual Spend</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.length === 0 && (
-                  <tr>
-                    <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
-                      No matches. If a vendor appears under a different name in source systems, check <em>Vendor Name Alias</em>.
-                    </td>
-                  </tr>
-                )}
-                {rows.map((r) => {
-                  const vendor = dataset.data!.vendors.find((v) => v.id === r.vendorId);
-                  const supplierLinks = dataset.data!.suppliersByVendor.get(r.vendorId) ?? [];
-                  return (
-                    <tr key={r.vendorId} className="border-b last:border-0 hover:bg-muted/40">
-                      <td className="px-4 py-2 font-medium">
-                        <Link to={`/vendors/${r.vendorId}`} className="text-primary underline-offset-2 hover:underline">{r.vendorName}</Link>
-                        {vendor?.primaryOffering && (
-                          <div className="text-xs text-muted-foreground">{vendor.primaryOffering}</div>
-                        )}
-                      </td>
-                      <td className="px-4 py-2 text-muted-foreground">
-                        {supplierLinks.length > 0
-                          ? supplierLinks.map((s) => s.supplierName ?? s.supplierId).join(', ')
-                          : '—'}
-                      </td>
-                      <td className="px-4 py-2 text-muted-foreground">{r.classification ?? '—'}</td>
-                      <td className="px-4 py-2 text-muted-foreground">{vendor?.activePhiAccess ?? '—'}</td>
-                      <td className="px-4 py-2"><CriticalityPill level={r.criticality} /></td>
-                      <td className="px-4 py-2"><ExpiringBadge dateIso={r.nextExpirationDate} /></td>
-                      <td className="px-4 py-2 text-right tabular-nums">{formatCurrency(r.annualSpend)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <DataGrid
+            columns={columns}
+            data={rows}
+            keyFn={(r) => r.vendorId}
+            emptyMessage="No matches. If a vendor appears under a different name in source systems, check Vendor Name Alias."
+            pageSize={50}
+            defaultSort={{ key: 'annualSpend', dir: 'desc' }}
+          />
         </div>
       </div>
     </div>

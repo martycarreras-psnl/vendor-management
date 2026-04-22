@@ -9,6 +9,7 @@ import { useVendiq } from '@/services/vendiq/provider-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { DataGrid } from '@/components/vendiq/data-grid';
 import { formatDate, daysUntil } from '@/lib/vendiq-format';
 import { cn } from '@/lib/utils';
 import type {
@@ -272,36 +273,22 @@ export default function ContractDetailsPage() {
         {parties.length === 0 ? (
           <p className="text-sm text-muted-foreground">No contract parties linked.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/40 text-left text-xs uppercase tracking-wider text-muted-foreground">
-                  <th className="px-4 py-2 font-medium">Party Name</th>
-                  <th className="px-4 py-2 font-medium">Slot</th>
-                  <th className="px-4 py-2 font-medium">Type</th>
-                  <th className="px-4 py-2 font-medium">Vendor</th>
-                  <th className="px-4 py-2 font-medium">Supplier</th>
-                </tr>
-              </thead>
-              <tbody>
-                {parties.map((p) => (
-                  <tr key={p.id} className="border-b last:border-0">
-                    <td className="px-4 py-2 font-medium">{p.partyName}</td>
-                    <td className="px-4 py-2 text-muted-foreground">{p.partySlot}</td>
-                    <td className="px-4 py-2">{p.partyTargetType}</td>
-                    <td className="px-4 py-2">
-                      {p.vendorId ? (
-                        <Link to={`/vendors/${p.vendorId}`} className="text-primary hover:underline">
-                          {p.vendorName ?? p.vendorId}
-                        </Link>
-                      ) : '—'}
-                    </td>
-                    <td className="px-4 py-2">{p.supplierName ?? '—'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataGrid
+            columns={[
+              { key: 'partyName', header: 'Party Name', accessor: (p) => p.partyName },
+              { key: 'slot', header: 'Slot', accessor: (p) => p.partySlot },
+              { key: 'type', header: 'Type', accessor: (p) => p.partyTargetType },
+              {
+                key: 'vendor', header: 'Vendor', accessor: (p) => p.vendorName ?? '',
+                render: (p) => p.vendorId
+                  ? <Link to={`/vendors/${p.vendorId}`} className="text-primary hover:underline">{p.vendorName ?? p.vendorId}</Link>
+                  : <span>—</span>,
+              },
+              { key: 'supplier', header: 'Supplier', accessor: (p) => p.supplierName ?? '' },
+            ]}
+            data={parties}
+            keyFn={(p) => p.id}
+          />
         )}
       </section>
     </div>

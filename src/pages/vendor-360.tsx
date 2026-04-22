@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useVendiq } from '@/services/vendiq/provider-context';
 import { CriticalityPill } from '@/components/vendiq/criticality-pill';
 import { AdjustCriticalityDialog } from '@/components/vendiq/adjust-criticality-dialog';
+import { DataGrid, type ColumnDef } from '@/components/vendiq/data-grid';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -533,38 +534,19 @@ function VReadOnly({ label, value }: { label: string; value?: string }) {
 
 function ContractsTab({ bundle }: { bundle: VendorBundle }) {
   if (bundle.contracts.length === 0) return <EmptyState message="No contracts linked to this vendor via ContractParty." />;
-  const sorted = [...bundle.contracts].sort((a, b) => (a.expirationDate || '').localeCompare(b.expirationDate || ''));
+  const cols: ColumnDef<Contract>[] = [
+    { key: 'contract', header: 'Contract', accessor: (c) => c.contractName, render: (c) => <Link to={`/contracts/${c.id}`} className="font-medium text-primary hover:underline">{c.contractName}</Link> },
+    { key: 'type', header: 'Type', accessor: (c) => c.contractType ?? '' },
+    { key: 'status', header: 'Status', accessor: (c) => c.contractStatus ?? '' },
+    { key: 'effective', header: 'Effective', accessor: (c) => c.effectiveDate ?? '', render: (c) => <span className="tabular-nums">{formatDate(c.effectiveDate)}</span> },
+    { key: 'expiration', header: 'Expiration', accessor: (c) => c.expirationDate ?? '', render: (c) => <span className="tabular-nums">{formatDate(c.expirationDate)}</span> },
+    { key: 'notice', header: 'Notice', accessor: (c) => c.noticeDate ?? '', render: (c) => <span className="tabular-nums">{formatDate(c.noticeDate)}</span> },
+    { key: 'autoRenew', header: 'Auto-Renew', accessor: (c) => c.autoRenew ?? '' },
+  ];
   return (
     <SectionCard title={`Contracts · ${bundle.contracts.length}`}>
-      <div className="overflow-x-auto -mx-5 px-5">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-muted/30 text-left text-xs uppercase tracking-wider text-muted-foreground">
-              <th className="px-4 py-2.5 font-medium">Contract</th>
-              <th className="px-4 py-2.5 font-medium">Type</th>
-              <th className="px-4 py-2.5 font-medium">Status</th>
-              <th className="px-4 py-2.5 font-medium">Effective</th>
-              <th className="px-4 py-2.5 font-medium">Expiration</th>
-              <th className="px-4 py-2.5 font-medium">Notice</th>
-              <th className="px-4 py-2.5 font-medium">Auto-Renew</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sorted.map((c) => (
-              <tr key={c.id} className="border-b last:border-0 transition-colors hover:bg-muted/30">
-                <td className="px-4 py-2.5 font-medium">
-                  <Link to={`/contracts/${c.id}`} className="text-primary hover:underline">{c.contractName}</Link>
-                </td>
-                <td className="px-4 py-2.5 text-muted-foreground">{c.contractType ?? '—'}</td>
-                <td className="px-4 py-2.5">{c.contractStatus ?? '—'}</td>
-                <td className="px-4 py-2.5 tabular-nums">{formatDate(c.effectiveDate)}</td>
-                <td className="px-4 py-2.5 tabular-nums">{formatDate(c.expirationDate)}</td>
-                <td className="px-4 py-2.5 tabular-nums">{formatDate(c.noticeDate)}</td>
-                <td className="px-4 py-2.5">{c.autoRenew ?? '—'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="-mx-5 px-0">
+        <DataGrid columns={cols} data={bundle.contracts} keyFn={(c) => c.id} defaultSort={{ key: 'expiration', dir: 'asc' }} />
       </div>
     </SectionCard>
   );
@@ -572,33 +554,17 @@ function ContractsTab({ bundle }: { bundle: VendorBundle }) {
 
 function SuppliersTab({ bundle }: { bundle: VendorBundle }) {
   if (bundle.vendorSuppliers.length === 0) return <EmptyState message="No supplier linkage on file." />;
+  const cols: ColumnDef<VendorSupplier>[] = [
+    { key: 'supplier', header: 'Supplier', accessor: (vs) => vs.supplierName ?? vs.supplierId },
+    { key: 'relationship', header: 'Relationship', accessor: (vs) => vs.relationshipType, render: (vs) => <span className="rounded-full border px-2 py-0.5 text-xs">{vs.relationshipType}</span> },
+    { key: 'products', header: 'Products / Services', accessor: (vs) => vs.productsServicesCovered ?? '' },
+    { key: 'from', header: 'Effective From', accessor: (vs) => vs.effectiveFrom ?? '', render: (vs) => <span className="tabular-nums">{formatDate(vs.effectiveFrom)}</span> },
+    { key: 'to', header: 'Effective To', accessor: (vs) => vs.effectiveTo ?? '', render: (vs) => <span className="tabular-nums">{formatDate(vs.effectiveTo)}</span> },
+  ];
   return (
     <SectionCard title={`Suppliers · ${bundle.vendorSuppliers.length}`}>
-      <div className="overflow-x-auto -mx-5 px-5">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-muted/30 text-left text-xs uppercase tracking-wider text-muted-foreground">
-              <th className="px-4 py-2.5 font-medium">Supplier</th>
-              <th className="px-4 py-2.5 font-medium">Relationship</th>
-              <th className="px-4 py-2.5 font-medium">Products / Services</th>
-              <th className="px-4 py-2.5 font-medium">Effective From</th>
-              <th className="px-4 py-2.5 font-medium">Effective To</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bundle.vendorSuppliers.map((vs) => (
-              <tr key={vs.id} className="border-b last:border-0 transition-colors hover:bg-muted/30">
-                <td className="px-4 py-2.5 font-medium">{vs.supplierName ?? vs.supplierId}</td>
-                <td className="px-4 py-2.5">
-                  <span className="rounded-full border px-2 py-0.5 text-xs">{vs.relationshipType}</span>
-                </td>
-                <td className="px-4 py-2.5 text-muted-foreground">{vs.productsServicesCovered ?? '—'}</td>
-                <td className="px-4 py-2.5 tabular-nums">{formatDate(vs.effectiveFrom)}</td>
-                <td className="px-4 py-2.5 tabular-nums">{formatDate(vs.effectiveTo)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="-mx-5 px-0">
+        <DataGrid columns={cols} data={bundle.vendorSuppliers} keyFn={(vs) => vs.id} />
       </div>
     </SectionCard>
   );
@@ -670,35 +636,19 @@ function ProductsTab({ bundle }: { bundle: VendorBundle }) {
 
 function RateCardsTab({ bundle }: { bundle: VendorBundle }) {
   if (bundle.rateCards.length === 0) return <EmptyState message="No rate cards on file." />;
+  const cols: ColumnDef<VendorRateCard>[] = [
+    { key: 'year', header: 'Year', accessor: (rc) => rc.rateCardYear ?? '' },
+    { key: 'position', header: 'Position', accessor: (rc) => rc.normalizedPosition ?? rc.originalPosition ?? '' },
+    { key: 'level', header: 'Level', accessor: (rc) => rc.experienceLevel ?? '' },
+    { key: 'location', header: 'Location', accessor: (rc) => rc.locationType ?? '' },
+    { key: 'min', header: 'Min', accessor: (rc) => rc.minRate ?? 0, render: (rc) => <span>{formatCurrency(rc.minRate)}</span>, align: 'right' },
+    { key: 'avg', header: 'Avg', accessor: (rc) => rc.avgRate ?? 0, render: (rc) => <span>{formatCurrency(rc.avgRate)}</span>, align: 'right' },
+    { key: 'max', header: 'Max', accessor: (rc) => rc.maxRate ?? 0, render: (rc) => <span>{formatCurrency(rc.maxRate)}</span>, align: 'right' },
+  ];
   return (
     <SectionCard title={`Rate Cards · ${bundle.rateCards.length}`}>
-      <div className="overflow-x-auto -mx-5 px-5">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-muted/30 text-left text-xs uppercase tracking-wider text-muted-foreground">
-              <th className="px-4 py-2.5 font-medium">Year</th>
-              <th className="px-4 py-2.5 font-medium">Position</th>
-              <th className="px-4 py-2.5 font-medium">Level</th>
-              <th className="px-4 py-2.5 font-medium">Location</th>
-              <th className="px-4 py-2.5 text-right font-medium">Min</th>
-              <th className="px-4 py-2.5 text-right font-medium">Avg</th>
-              <th className="px-4 py-2.5 text-right font-medium">Max</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bundle.rateCards.map((rc) => (
-              <tr key={rc.id} className="border-b last:border-0 transition-colors hover:bg-muted/30">
-                <td className="px-4 py-2.5">{rc.rateCardYear ?? '—'}</td>
-                <td className="px-4 py-2.5">{rc.normalizedPosition ?? rc.originalPosition ?? '—'}</td>
-                <td className="px-4 py-2.5">{rc.experienceLevel ?? '—'}</td>
-                <td className="px-4 py-2.5">{rc.locationType ?? '—'}</td>
-                <td className="px-4 py-2.5 text-right tabular-nums">{formatCurrency(rc.minRate)}</td>
-                <td className="px-4 py-2.5 text-right tabular-nums">{formatCurrency(rc.avgRate)}</td>
-                <td className="px-4 py-2.5 text-right tabular-nums">{formatCurrency(rc.maxRate)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="-mx-5 px-0">
+        <DataGrid columns={cols} data={bundle.rateCards} keyFn={(rc) => rc.id} pageSize={50} />
       </div>
     </SectionCard>
   );
@@ -706,36 +656,19 @@ function RateCardsTab({ bundle }: { bundle: VendorBundle }) {
 
 function ScoresTab({ bundle }: { bundle: VendorBundle }) {
   if (bundle.scores.length === 0) return <EmptyState message="No scores on file." />;
-  const sorted = [...bundle.scores].sort((a, b) => (b.scoreYear || '').localeCompare(a.scoreYear || ''));
+  const cols: ColumnDef<VendorScore>[] = [
+    { key: 'year', header: 'Year', accessor: (s) => s.scoreYear, render: (s) => <span className="font-medium">FY {s.scoreYear}</span> },
+    { key: 'criticality', header: 'Criticality', accessor: (s) => s.criticalityScore ?? 0, render: (s) => <span>{s.criticalityScore?.toFixed(2) ?? '—'}</span>, align: 'right' },
+    { key: 'dependency', header: 'Dependency', accessor: (s) => s.dependencyScore ?? 0, render: (s) => <span>{s.dependencyScore?.toFixed(2) ?? '—'}</span>, align: 'right' },
+    { key: 'spend', header: 'Spend', accessor: (s) => s.spendScore ?? 0, render: (s) => <span>{s.spendScore?.toFixed(2) ?? '—'}</span>, align: 'right' },
+    { key: 'value', header: 'Value', accessor: (s) => s.valueScore ?? 0, render: (s) => <span>{s.valueScore?.toFixed(2) ?? '—'}</span>, align: 'right' },
+    { key: 'alignment', header: 'Alignment', accessor: (s) => s.alignmentScore ?? 0, render: (s) => <span>{s.alignmentScore?.toFixed(2) ?? '—'}</span>, align: 'right' },
+    { key: 'weighted', header: 'Weighted', accessor: (s) => s.weightedScore ?? 0, render: (s) => <span>{s.weightedScore?.toFixed(2) ?? '—'}</span>, align: 'right' },
+  ];
   return (
     <SectionCard title={`Vendor Scores · ${bundle.scores.length}`}>
-      <div className="overflow-x-auto -mx-5 px-5">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-muted/30 text-left text-xs uppercase tracking-wider text-muted-foreground">
-              <th className="px-4 py-2.5 font-medium">Year</th>
-              <th className="px-4 py-2.5 text-right font-medium">Criticality</th>
-              <th className="px-4 py-2.5 text-right font-medium">Dependency</th>
-              <th className="px-4 py-2.5 text-right font-medium">Spend</th>
-              <th className="px-4 py-2.5 text-right font-medium">Value</th>
-              <th className="px-4 py-2.5 text-right font-medium">Alignment</th>
-              <th className="px-4 py-2.5 text-right font-medium">Weighted</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sorted.map((s) => (
-              <tr key={s.id} className="border-b last:border-0 transition-colors hover:bg-muted/30">
-                <td className="px-4 py-2.5 font-medium">FY {s.scoreYear}</td>
-                <td className="px-4 py-2.5 text-right tabular-nums">{s.criticalityScore?.toFixed(2) ?? '—'}</td>
-                <td className="px-4 py-2.5 text-right tabular-nums">{s.dependencyScore?.toFixed(2) ?? '—'}</td>
-                <td className="px-4 py-2.5 text-right tabular-nums">{s.spendScore?.toFixed(2) ?? '—'}</td>
-                <td className="px-4 py-2.5 text-right tabular-nums">{s.valueScore?.toFixed(2) ?? '—'}</td>
-                <td className="px-4 py-2.5 text-right tabular-nums">{s.alignmentScore?.toFixed(2) ?? '—'}</td>
-                <td className="px-4 py-2.5 text-right tabular-nums">{s.weightedScore?.toFixed(2) ?? '—'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="-mx-5 px-0">
+        <DataGrid columns={cols} data={bundle.scores} keyFn={(s) => s.id} defaultSort={{ key: 'year', dir: 'desc' }} />
       </div>
     </SectionCard>
   );

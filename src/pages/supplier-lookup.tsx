@@ -5,6 +5,7 @@ import { useVendiq } from '@/services/vendiq/provider-context';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
+import { DataGrid, type ColumnDef } from '@/components/vendiq/data-grid';
 import { cn } from '@/lib/utils';
 import type { Supplier, VendorSupplier, Contract } from '@/types/vendiq';
 
@@ -71,6 +72,17 @@ function CheckItem({ checked, onChange, label, count }: { checked: boolean; onCh
 
 const TIN_TYPES = ['EIN', 'SSN', 'ITIN', 'Foreign', 'Unknown'];
 
+interface SupplierRow {
+  id: string;
+  supplierName: string;
+  supplierCategory?: string;
+  taxId?: string;
+  tinType?: string;
+  isReseller?: boolean;
+  vendorCount: number;
+  contractCount: number;
+}
+
 export default function SupplierLookupPage() {
   const dataset = useSupplierDataset();
   const [filters, setFilters] = useState<Filters>({
@@ -80,7 +92,7 @@ export default function SupplierLookupPage() {
     tinTypes: new Set(),
   });
 
-  const rows = useMemo(() => {
+  const rows = useMemo<SupplierRow[]>(() => {
     const suppliers = dataset.data?.suppliers ?? [];
     const q = filters.query.trim().toLowerCase();
     return suppliers
@@ -88,7 +100,16 @@ export default function SupplierLookupPage() {
       .filter((s) => !filters.resellersOnly || s.isReseller === true)
       .filter((s) => !filters.nonResellersOnly || s.isReseller !== true)
       .filter((s) => filters.tinTypes.size === 0 || (s.tinType && filters.tinTypes.has(s.tinType)))
-      .sort((a, b) => (a.supplierName ?? '').localeCompare(b.supplierName ?? ''));
+      .map((s) => ({
+        id: s.id,
+        supplierName: s.supplierName,
+        supplierCategory: s.supplierCategory,
+        taxId: s.taxId,
+        tinType: s.tinType,
+        isReseller: s.isReseller,
+        vendorCount: (dataset.data!.linksBySupplier.get(s.id) ?? []).length,
+        contractCount: (dataset.data!.contractsBySupplier.get(s.id) ?? []).length,
+      }));
   }, [dataset.data, filters]);
 
   const resellerCount = useMemo(
@@ -119,6 +140,32 @@ export default function SupplierLookupPage() {
   const totalSuppliers = dataset.data.suppliers.length;
   const filtersActive =
     filters.query.length > 0 || filters.resellersOnly || filters.nonResellersOnly || filters.tinTypes.size > 0;
+
+  const columns: ColumnDef<SupplierRow>[] = [
+    {
+      key: 'supplier', header: 'Supplier', accessor: (r) => r.supplierName,
+      render: (r) => (
+        <Link to={`/suppliers/${r.id}`} className="font-medium text-primary underline-offset-2 hover:underline">
+          {r.supplierName || '(unnamed)'}
+        </Link>
+      ),
+    },
+    { key: 'category', header: 'Category', accessor: (r) => r.supplierCategory ?? '' },
+    { key: 'taxId', header: 'Tax ID', accessor: (r) => r.taxId ?? '', render: (r) => <span className="font-mono text-xs">{r.taxId ?? '—'}</span> },
+    { key: 'tinType', header: 'TIN Type', accessor: (r) => r.tinType ?? '' },
+    {
+      key: 'reseller', header: 'Reseller',
+      accessor: (r) => r.isReseller === true ? 'Yes' : r.isReseller === false ? 'No' : '',
+      render: (r) =>
+        r.isReseller === true ? (
+          <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold', 'bg-primary/10 text-primary')}>Reseller</span>
+        ) : r.isReseller === false ? (
+          <span className="text-muted-foreground">No</span>
+        ) : null,
+    },
+    { key: 'vendors', header: '# Vendors', accessor: (r) => r.vendorCount, align: 'right' },
+    { key: 'contracts', header: '# Contracts', accessor: (r) => r.contractCount, align: 'right' },
+  ];
 
   return (
     <div className="space-y-4">
@@ -174,59 +221,14 @@ export default function SupplierLookupPage() {
         </aside>
 
         <div className="min-w-0 flex-1 rounded-lg border bg-card shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/40 text-left text-xs uppercase tracking-wider text-muted-foreground">
-                  <th className="px-4 py-2 font-medium">Supplier</th>
-                  <th className="px-4 py-2 font-medium">Category</th>
-                  <th className="px-4 py-2 font-medium">Tax ID</th>
-                  <th className="px-4 py-2 font-medium">TIN Type</th>
-                  <th className="px-4 py-2 font-medium">Reseller</th>
-                  <th className="px-4 py-2 text-right font-medium"># Vendors</th>
-                  <th className="px-4 py-2 text-right font-medium"># Contracts</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.length === 0 && (
-                  <tr>
-                    <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
-                      No suppliers match the current filters.
-                    </td>
-                  </tr>
-                )}
-                {rows.map((s) => {
-                  const links = dataset.data!.linksBySupplier.get(s.id) ?? [];
-                  const contracts = dataset.data!.contractsBySupplier.get(s.id) ?? [];
-                  return (
-                    <tr key={s.id} className="border-b last:border-0 hover:bg-muted/40">
-                      <td className="px-4 py-2 font-medium">
-                        <Link to={`/suppliers/${s.id}`} className="text-primary underline-offset-2 hover:underline">
-                          {s.supplierName || '(unnamed)'}
-                        </Link>
-                      </td>
-                      <td className="px-4 py-2 text-muted-foreground">{s.supplierCategory ?? '—'}</td>
-                      <td className="px-4 py-2 font-mono text-xs text-muted-foreground">{s.taxId ?? '—'}</td>
-                      <td className="px-4 py-2 text-muted-foreground">{s.tinType ?? '—'}</td>
-                      <td className="px-4 py-2">
-                        {s.isReseller === true ? (
-                          <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold', 'bg-primary/10 text-primary')}>
-                            Reseller
-                          </span>
-                        ) : s.isReseller === false ? (
-                          <span className="text-muted-foreground">No</span>
-                        ) : (
-                          <span className="text-muted-foreground">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-2 text-right tabular-nums">{links.length}</td>
-                      <td className="px-4 py-2 text-right tabular-nums">{contracts.length}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <DataGrid
+            columns={columns}
+            data={rows}
+            keyFn={(r) => r.id}
+            pageSize={50}
+            defaultSort={{ key: 'supplier', dir: 'asc' }}
+            emptyMessage="No suppliers match the current filters."
+          />
         </div>
       </div>
     </div>

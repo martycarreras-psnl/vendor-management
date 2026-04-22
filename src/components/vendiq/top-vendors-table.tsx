@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { CriticalityPill } from '@/components/vendiq/criticality-pill';
+import { DataGrid, type ColumnDef } from '@/components/vendiq/data-grid';
 import { formatCurrency, formatDate, daysUntil } from '@/lib/vendiq-format';
 import { cn } from '@/lib/utils';
 import type { TopVendorRow, QuintileRating } from '@/types/vendiq';
@@ -75,66 +76,54 @@ function RatingBadge({ rating }: { rating?: QuintileRating }) {
 }
 
 export function TopVendorsTable({ rows, title = 'Top Vendors by Annual Spend' }: { rows: TopVendorRow[]; title?: string }) {
+  const columns: ColumnDef<TopVendorRow>[] = [
+    {
+      key: 'vendor', header: 'Vendor', accessor: (r) => r.vendorName,
+      render: (r) => {
+        const initial = (r.vendorName || '?').charAt(0).toUpperCase();
+        return (
+          <Link to={`/vendors/${r.vendorId}`} className="flex items-center gap-2 font-medium hover:underline">
+            <span className={cn('inline-flex h-7 w-7 items-center justify-center rounded-md text-xs font-bold text-white', avatarColor(r.vendorName))}>
+              {initial}
+            </span>
+            <span>{r.vendorName}</span>
+          </Link>
+        );
+      },
+    },
+    { key: 'classification', header: 'Classification', accessor: (r) => r.classification ?? '' },
+    { key: 'criticality', header: 'Criticality', accessor: (r) => r.criticality ?? 0, render: (r) => <CriticalityPill level={r.criticality} /> },
+    { key: 'dependency', header: 'Dependency', accessor: (r) => r.dependencyScore ?? 0, render: (r) => <DependencyBar score={r.dependencyScore} /> },
+    { key: 'rating', header: 'Rating', accessor: (r) => r.quintileRating ?? '', render: (r) => <RatingBadge rating={r.quintileRating} /> },
+    { key: 'annualSpend', header: 'Annual Spend', accessor: (r) => r.annualSpend ?? 0, render: (r) => <span className="font-medium">{formatCurrency(r.annualSpend)}</span>, align: 'right' },
+    {
+      key: 'nextExpiration', header: 'Next Expiration', accessor: (r) => r.nextExpirationDate ?? '',
+      render: (r) => (
+        <div className="flex items-center gap-2">
+          <span className="tabular-nums text-muted-foreground">{formatDate(r.nextExpirationDate)}</span>
+          <DaysPill dateIso={r.nextExpirationDate} />
+        </div>
+      ),
+    },
+    { key: 'noticeDate', header: 'Notice Date', accessor: (r) => r.nextNoticeDate ?? '', render: (r) => <span className="tabular-nums text-muted-foreground">{formatDate(r.nextNoticeDate)}</span> },
+  ];
+
   return (
     <div className="rounded-lg border bg-card shadow-sm">
       <div className="flex items-baseline justify-between border-b p-4">
         <div>
           <h3 className="text-sm font-semibold">{title}</h3>
-          <p className="text-xs text-muted-foreground">Sorted descending · click any row for Vendor 360</p>
+          <p className="text-xs text-muted-foreground">Click any column header to sort · click any row for Vendor 360</p>
         </div>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-muted/40 text-left text-xs uppercase tracking-wider text-muted-foreground">
-              <th className="px-4 py-2 font-medium">Vendor</th>
-              <th className="px-4 py-2 font-medium">Classification</th>
-              <th className="px-4 py-2 font-medium">Criticality</th>
-              <th className="px-4 py-2 font-medium">Dependency</th>
-              <th className="px-4 py-2 font-medium">Rating</th>
-              <th className="px-4 py-2 text-right font-medium">Annual Spend</th>
-              <th className="px-4 py-2 font-medium">Next Expiration</th>
-              <th className="px-4 py-2 font-medium">Notice Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.length === 0 && (
-              <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
-                  No vendors found. Check filters on the Vendors page; aliases may differ.
-                </td>
-              </tr>
-            )}
-            {rows.map((r) => {
-              const initial = (r.vendorName || '?').charAt(0).toUpperCase();
-              return (
-                <tr key={r.vendorId} className="border-b last:border-0 hover:bg-muted/40">
-                  <td className="px-4 py-2">
-                    <Link to={`/vendors/${r.vendorId}`} className="flex items-center gap-2 font-medium hover:underline">
-                      <span className={cn('inline-flex h-7 w-7 items-center justify-center rounded-md text-xs font-bold text-white', avatarColor(r.vendorName))}>
-                        {initial}
-                      </span>
-                      <span>{r.vendorName}</span>
-                    </Link>
-                  </td>
-                  <td className="px-4 py-2 text-muted-foreground">{r.classification ?? '—'}</td>
-                  <td className="px-4 py-2"><CriticalityPill level={r.criticality} /></td>
-                  <td className="px-4 py-2"><DependencyBar score={r.dependencyScore} /></td>
-                  <td className="px-4 py-2"><RatingBadge rating={r.quintileRating} /></td>
-                  <td className="px-4 py-2 text-right tabular-nums font-medium">{formatCurrency(r.annualSpend)}</td>
-                  <td className="px-4 py-2">
-                    <div className="flex items-center gap-2">
-                      <span className="tabular-nums text-muted-foreground">{formatDate(r.nextExpirationDate)}</span>
-                      <DaysPill dateIso={r.nextExpirationDate} />
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 tabular-nums text-muted-foreground">{formatDate(r.nextNoticeDate)}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      <DataGrid
+        columns={columns}
+        data={rows}
+        keyFn={(r) => r.vendorId}
+        defaultSort={{ key: 'annualSpend', dir: 'desc' }}
+        pageSize={25}
+        emptyMessage="No vendors found. Check filters on the Vendors page; aliases may differ."
+      />
     </div>
   );
 }

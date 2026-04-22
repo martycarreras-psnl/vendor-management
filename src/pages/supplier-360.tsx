@@ -8,6 +8,7 @@ import { useVendiq } from '@/services/vendiq/provider-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { DataGrid, type ColumnDef } from '@/components/vendiq/data-grid';
 import { formatCurrency, formatDate } from '@/lib/vendiq-format';
 import { cn } from '@/lib/utils';
 import type {
@@ -385,37 +386,20 @@ function SBool({ label, value, field, editing, onUpdate }: {
 
 function VendorsTab({ bundle }: { bundle: SupplierBundle }) {
   if (bundle.vendorSuppliers.length === 0) return <EmptyState message="No vendor linkage on file." />;
+  const cols: ColumnDef<VendorSupplier>[] = [
+    {
+      key: 'vendor', header: 'Vendor', accessor: (vs) => vs.vendorName ?? vs.vendorId,
+      render: (vs) => <Link to={`/vendors/${vs.vendorId}`} className="font-medium text-primary hover:underline">{vs.vendorName ?? vs.vendorId}</Link>,
+    },
+    { key: 'relationship', header: 'Relationship', accessor: (vs) => vs.relationshipType, render: (vs) => <span className="rounded-full border px-2 py-0.5 text-xs">{vs.relationshipType}</span> },
+    { key: 'products', header: 'Products / Services', accessor: (vs) => vs.productsServicesCovered ?? '' },
+    { key: 'from', header: 'Effective From', accessor: (vs) => vs.effectiveFrom ?? '', render: (vs) => <span className="tabular-nums">{formatDate(vs.effectiveFrom)}</span> },
+    { key: 'to', header: 'Effective To', accessor: (vs) => vs.effectiveTo ?? '', render: (vs) => <span className="tabular-nums">{formatDate(vs.effectiveTo)}</span> },
+  ];
   return (
     <SectionCard title={`Vendors · ${bundle.vendorSuppliers.length}`}>
-      <div className="overflow-x-auto -mx-5 px-5">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-muted/30 text-left text-xs uppercase tracking-wider text-muted-foreground">
-              <th className="px-4 py-2.5 font-medium">Vendor</th>
-              <th className="px-4 py-2.5 font-medium">Relationship</th>
-              <th className="px-4 py-2.5 font-medium">Products / Services</th>
-              <th className="px-4 py-2.5 font-medium">Effective From</th>
-              <th className="px-4 py-2.5 font-medium">Effective To</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bundle.vendorSuppliers.map((vs) => (
-              <tr key={vs.id} className="border-b last:border-0 transition-colors hover:bg-muted/30">
-                <td className="px-4 py-2.5 font-medium">
-                  <Link to={`/vendors/${vs.vendorId}`} className="text-primary hover:underline">
-                    {vs.vendorName ?? vs.vendorId}
-                  </Link>
-                </td>
-                <td className="px-4 py-2.5">
-                  <span className="rounded-full border px-2 py-0.5 text-xs">{vs.relationshipType}</span>
-                </td>
-                <td className="px-4 py-2.5 text-muted-foreground">{vs.productsServicesCovered ?? '—'}</td>
-                <td className="px-4 py-2.5 tabular-nums">{formatDate(vs.effectiveFrom)}</td>
-                <td className="px-4 py-2.5 tabular-nums">{formatDate(vs.effectiveTo)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="-mx-5 px-0">
+        <DataGrid columns={cols} data={bundle.vendorSuppliers} keyFn={(vs) => vs.id} />
       </div>
     </SectionCard>
   );
@@ -425,36 +409,18 @@ function VendorsTab({ bundle }: { bundle: SupplierBundle }) {
 
 function ContractsTab({ bundle }: { bundle: SupplierBundle }) {
   if (bundle.contracts.length === 0) return <EmptyState message="No contracts linked to this supplier." />;
-  const sorted = [...bundle.contracts].sort((a, b) => (a.expirationDate || '').localeCompare(b.expirationDate || ''));
+  const cols: ColumnDef<Contract>[] = [
+    { key: 'contract', header: 'Contract', accessor: (c) => c.contractName, render: (c) => <Link to={`/contracts/${c.id}`} className="font-medium text-primary hover:underline">{c.contractName}</Link> },
+    { key: 'type', header: 'Type', accessor: (c) => c.contractType ?? '' },
+    { key: 'status', header: 'Status', accessor: (c) => c.contractStatus ?? '' },
+    { key: 'effective', header: 'Effective', accessor: (c) => c.effectiveDate ?? '', render: (c) => <span className="tabular-nums">{formatDate(c.effectiveDate)}</span> },
+    { key: 'expiration', header: 'Expiration', accessor: (c) => c.expirationDate ?? '', render: (c) => <span className="tabular-nums">{formatDate(c.expirationDate)}</span> },
+    { key: 'autoRenew', header: 'Auto-Renew', accessor: (c) => c.autoRenew ?? '' },
+  ];
   return (
     <SectionCard title={`Contracts · ${bundle.contracts.length}`}>
-      <div className="overflow-x-auto -mx-5 px-5">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-muted/30 text-left text-xs uppercase tracking-wider text-muted-foreground">
-              <th className="px-4 py-2.5 font-medium">Contract</th>
-              <th className="px-4 py-2.5 font-medium">Type</th>
-              <th className="px-4 py-2.5 font-medium">Status</th>
-              <th className="px-4 py-2.5 font-medium">Effective</th>
-              <th className="px-4 py-2.5 font-medium">Expiration</th>
-              <th className="px-4 py-2.5 font-medium">Auto-Renew</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sorted.map((c) => (
-              <tr key={c.id} className="border-b last:border-0 transition-colors hover:bg-muted/30">
-                <td className="px-4 py-2.5 font-medium">
-                  <Link to={`/contracts/${c.id}`} className="text-primary hover:underline">{c.contractName}</Link>
-                </td>
-                <td className="px-4 py-2.5 text-muted-foreground">{c.contractType ?? '—'}</td>
-                <td className="px-4 py-2.5">{c.contractStatus ?? '—'}</td>
-                <td className="px-4 py-2.5 tabular-nums">{formatDate(c.effectiveDate)}</td>
-                <td className="px-4 py-2.5 tabular-nums">{formatDate(c.expirationDate)}</td>
-                <td className="px-4 py-2.5">{c.autoRenew ?? '—'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="-mx-5 px-0">
+        <DataGrid columns={cols} data={bundle.contracts} keyFn={(c) => c.id} defaultSort={{ key: 'expiration', dir: 'asc' }} />
       </div>
     </SectionCard>
   );
@@ -462,105 +428,29 @@ function ContractsTab({ bundle }: { bundle: SupplierBundle }) {
 
 // ---- GL TRANSACTIONS TAB ----
 
-const GL_PAGE_SIZE = 50;
-
 function GLTab({ bundle }: { bundle: SupplierBundle }) {
-  const [page, setPage] = useState(0);
-
   if (bundle.glTransactions.length === 0) return <EmptyState message="No GL transactions on file." />;
 
-  const sorted = [...bundle.glTransactions].sort((a, b) =>
-    (b.accountingDate || '').localeCompare(a.accountingDate || ''),
-  );
+  const totalNet = bundle.glTransactions.reduce((acc, gl) => acc + (gl.netAmount ?? 0), 0);
 
-  const totalNet = sorted.reduce((acc, gl) => acc + (gl.netAmount ?? 0), 0);
-  const totalPages = Math.ceil(sorted.length / GL_PAGE_SIZE);
-  const pageRows = sorted.slice(page * GL_PAGE_SIZE, (page + 1) * GL_PAGE_SIZE);
-  const rangeStart = page * GL_PAGE_SIZE + 1;
-  const rangeEnd = Math.min((page + 1) * GL_PAGE_SIZE, sorted.length);
+  const cols: ColumnDef<GLTransaction>[] = [
+    { key: 'fiscalYear', header: 'Fiscal Year', accessor: (gl) => gl.fiscalYear ?? '' },
+    { key: 'accountingDate', header: 'Accounting Date', accessor: (gl) => gl.accountingDate ?? '', render: (gl) => <span className="tabular-nums">{formatDate(gl.accountingDate)}</span> },
+    { key: 'ledgerAccount', header: 'Ledger Account', accessor: (gl) => gl.ledgerAccount ?? '' },
+    { key: 'status', header: 'Status', accessor: (gl) => gl.status ?? '' },
+    { key: 'debit', header: 'Debit', accessor: (gl) => gl.debitAmount ?? 0, render: (gl) => <span>{formatCurrency(gl.debitAmount)}</span>, align: 'right' },
+    { key: 'credit', header: 'Credit', accessor: (gl) => gl.creditAmount ?? 0, render: (gl) => <span>{formatCurrency(gl.creditAmount)}</span>, align: 'right' },
+    { key: 'net', header: 'Net', accessor: (gl) => gl.netAmount ?? 0, render: (gl) => <span className="font-medium">{formatCurrency(gl.netAmount)}</span>, align: 'right' },
+  ];
 
   return (
     <SectionCard title={`GL Transactions · ${bundle.glTransactions.length}`}>
       <div className="mb-3 text-sm text-muted-foreground">
         Total net amount: <span className="font-semibold text-foreground">{formatCurrency(totalNet)}</span>
       </div>
-      <div className="overflow-x-auto -mx-5 px-5">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-muted/30 text-left text-xs uppercase tracking-wider text-muted-foreground">
-              <th className="px-4 py-2.5 font-medium">Fiscal Year</th>
-              <th className="px-4 py-2.5 font-medium">Accounting Date</th>
-              <th className="px-4 py-2.5 font-medium">Ledger Account</th>
-              <th className="px-4 py-2.5 font-medium">Status</th>
-              <th className="px-4 py-2.5 text-right font-medium">Debit</th>
-              <th className="px-4 py-2.5 text-right font-medium">Credit</th>
-              <th className="px-4 py-2.5 text-right font-medium">Net</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pageRows.map((gl) => (
-              <tr key={gl.id} className="border-b last:border-0 transition-colors hover:bg-muted/30">
-                <td className="px-4 py-2.5">{gl.fiscalYear ?? '—'}</td>
-                <td className="px-4 py-2.5 tabular-nums">{formatDate(gl.accountingDate)}</td>
-                <td className="px-4 py-2.5 text-muted-foreground">{gl.ledgerAccount ?? '—'}</td>
-                <td className="px-4 py-2.5">{gl.status ?? '—'}</td>
-                <td className="px-4 py-2.5 text-right tabular-nums">{formatCurrency(gl.debitAmount)}</td>
-                <td className="px-4 py-2.5 text-right tabular-nums">{formatCurrency(gl.creditAmount)}</td>
-                <td className="px-4 py-2.5 text-right tabular-nums font-medium">{formatCurrency(gl.netAmount)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="-mx-5 px-0">
+        <DataGrid columns={cols} data={bundle.glTransactions} keyFn={(gl) => gl.id} pageSize={50} defaultSort={{ key: 'accountingDate', dir: 'desc' }} />
       </div>
-      {/* Pagination controls */}
-      {totalPages > 1 && (
-        <div className="mt-3 flex items-center justify-between border-t pt-3">
-          <span className="text-xs text-muted-foreground tabular-nums">
-            {rangeStart}–{rangeEnd} of {sorted.length}
-          </span>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-7 px-2 text-xs"
-              disabled={page === 0}
-              onClick={() => setPage(0)}
-            >
-              First
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-7 px-2 text-xs"
-              disabled={page === 0}
-              onClick={() => setPage((p) => p - 1)}
-            >
-              Prev
-            </Button>
-            <span className="px-2 text-xs tabular-nums text-muted-foreground">
-              {page + 1} / {totalPages}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-7 px-2 text-xs"
-              disabled={page >= totalPages - 1}
-              onClick={() => setPage((p) => p + 1)}
-            >
-              Next
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-7 px-2 text-xs"
-              disabled={page >= totalPages - 1}
-              onClick={() => setPage(totalPages - 1)}
-            >
-              Last
-            </Button>
-          </div>
-        </div>
-      )}
     </SectionCard>
   );
 }
