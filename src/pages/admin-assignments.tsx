@@ -86,6 +86,12 @@ export default function AdminAssignmentsPage() {
     [currentAssignmentsQ.data],
   );
 
+  const vendorNameById = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const v of dataset.data?.vendors ?? []) m.set(v.id, v.vendorName);
+    return m;
+  }, [dataset.data?.vendors]);
+
   const vendorsFiltered: Vendor[] = useMemo(() => {
     const all = dataset.data?.vendors ?? [];
     const q = search.trim().toLowerCase();
@@ -197,7 +203,7 @@ export default function AdminAssignmentsPage() {
               {(currentAssignmentsQ.data ?? []).map((a) => (
                 <li key={a.id} className="flex items-center justify-between py-2 text-sm">
                   <div>
-                    <span className="font-medium">{a.vendorName ?? a.vendorId}</span>
+                    <span className="font-medium">{a.vendorName ?? vendorNameById.get(a.vendorId) ?? 'Unknown vendor'}</span>
                     {a.reviewDueDate && (
                       <span className="ml-2 text-xs text-muted-foreground">due {formatDate(a.reviewDueDate)}</span>
                     )}
