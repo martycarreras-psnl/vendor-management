@@ -50,7 +50,7 @@ export default function VendorLookupPage() {
       primaryOffering: vendor?.primaryOffering,
       phi: vendor?.activePhiAccess ?? undefined,
       supplierLabel: supplierLinks.length > 0
-        ? supplierLinks.map((s) => s.supplierName ?? s.supplierId).join(', ')
+        ? supplierLinks.map((s) => s.supplierName || '(unknown)').join(', ')
         : '',
     };
   });

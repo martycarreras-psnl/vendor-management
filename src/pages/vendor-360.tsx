@@ -555,7 +555,7 @@ function ContractsTab({ bundle }: { bundle: VendorBundle }) {
 function SuppliersTab({ bundle }: { bundle: VendorBundle }) {
   if (bundle.vendorSuppliers.length === 0) return <EmptyState message="No supplier linkage on file." />;
   const cols: ColumnDef<VendorSupplier>[] = [
-    { key: 'supplier', header: 'Supplier', accessor: (vs) => vs.supplierName ?? vs.supplierId },
+    { key: 'supplier', header: 'Supplier', accessor: (vs) => vs.supplierName ?? '' },
     { key: 'relationship', header: 'Relationship', accessor: (vs) => vs.relationshipType, render: (vs) => <span className="rounded-full border px-2 py-0.5 text-xs">{vs.relationshipType}</span> },
     { key: 'products', header: 'Products / Services', accessor: (vs) => vs.productsServicesCovered ?? '' },
     { key: 'from', header: 'Effective From', accessor: (vs) => vs.effectiveFrom ?? '', render: (vs) => <span className="tabular-nums">{formatDate(vs.effectiveFrom)}</span> },

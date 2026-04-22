@@ -388,8 +388,8 @@ function VendorsTab({ bundle }: { bundle: SupplierBundle }) {
   if (bundle.vendorSuppliers.length === 0) return <EmptyState message="No vendor linkage on file." />;
   const cols: ColumnDef<VendorSupplier>[] = [
     {
-      key: 'vendor', header: 'Vendor', accessor: (vs) => vs.vendorName ?? vs.vendorId,
-      render: (vs) => <Link to={`/vendors/${vs.vendorId}`} className="font-medium text-primary hover:underline">{vs.vendorName ?? vs.vendorId}</Link>,
+      key: 'vendor', header: 'Vendor', accessor: (vs) => vs.vendorName ?? '',
+      render: (vs) => <Link to={`/vendors/${vs.vendorId}`} className="font-medium text-primary hover:underline">{vs.vendorName || '(unknown vendor)'}</Link>,
     },
     { key: 'relationship', header: 'Relationship', accessor: (vs) => vs.relationshipType, render: (vs) => <span className="rounded-full border px-2 py-0.5 text-xs">{vs.relationshipType}</span> },
     { key: 'products', header: 'Products / Services', accessor: (vs) => vs.productsServicesCovered ?? '' },

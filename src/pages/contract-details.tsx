@@ -281,7 +281,7 @@ export default function ContractDetailsPage() {
               {
                 key: 'vendor', header: 'Vendor', accessor: (p) => p.vendorName ?? '',
                 render: (p) => p.vendorId
-                  ? <Link to={`/vendors/${p.vendorId}`} className="text-primary hover:underline">{p.vendorName ?? p.vendorId}</Link>
+                  ? <Link to={`/vendors/${p.vendorId}`} className="text-primary hover:underline">{p.vendorName || '(unknown vendor)'}</Link>
                   : <span>—</span>,
               },
               { key: 'supplier', header: 'Supplier', accessor: (p) => p.supplierName ?? '' },
