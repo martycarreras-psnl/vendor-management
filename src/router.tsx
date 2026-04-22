@@ -11,6 +11,7 @@ import RiskDashboardPage from "@/pages/risk-dashboard"
 import ChatPage from "@/pages/chat"
 import SettingsPage from "@/pages/settings"
 import NotFoundPage from "@/pages/not-found"
+import ErrorBoundaryPage from "@/pages/error-boundary"
 
 // Hash routing keeps all app state in the URL fragment (e.g. #/vendors/123),
 // which is robust against the Power Apps host that doesn't serve SPA fallback
@@ -19,7 +20,7 @@ export const router = createHashRouter([
   {
     path: "/",
     element: <AppShell />,
-    errorElement: <NotFoundPage />,
+    errorElement: <ErrorBoundaryPage />,
     children: [
       { index: true, element: <PortfolioPage /> },
       { path: "portfolio", element: <Navigate to="/" replace /> },
