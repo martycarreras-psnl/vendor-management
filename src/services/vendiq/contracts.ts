@@ -22,6 +22,7 @@ import type {
   PromptSuggestion,
   Reviewer,
   VPVendorAssignment,
+  ReviewQueueItem,
   ScoreStatus,
 } from '@/types/vendiq';
 
@@ -106,12 +107,28 @@ export interface ReviewerRepository {
   getById(id: string): Promise<Reviewer | null>;
 }
 
+export interface AssignmentStatusCounts {
+  notStarted: number;
+  draft: number;
+  approved: number;
+  rejected: number;
+  overdue: number;
+  total: number;
+}
+
 export interface AssignmentRepository {
   list(options?: ListOptions): Promise<VPVendorAssignment[]>;
   /** Active assignments for a reviewer in a given cycle year. */
   listForReviewer(reviewerId: string, cycleYear: number): Promise<VPVendorAssignment[]>;
   /** Active assignments for a vendor in a given cycle year (used by admin to see current owners). */
   listForVendor(vendorId: string, cycleYear: number): Promise<VPVendorAssignment[]>;
+  /**
+   * Active assignments for a reviewer joined to the vendor + current-year score + prior-year score.
+   * Powers the `/reviews` queue grid.
+   */
+  listVendorsForReviewer(reviewerId: string, cycleYear: number): Promise<ReviewQueueItem[]>;
+  /** Aggregate counts of a reviewer's queue by review status (and overdue). */
+  countsByStatus(reviewerId: string, cycleYear: number): Promise<AssignmentStatusCounts>;
   /** Bulk create assignments. Skips duplicates by (Reviewer, Vendor, CycleYear). */
   assignVendors(input: {
     reviewerId: string;

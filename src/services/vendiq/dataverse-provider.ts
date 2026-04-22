@@ -56,6 +56,7 @@ import type {
   PromptSuggestion,
   Reviewer,
   VPVendorAssignment,
+  ReviewQueueItem,
   ScoreStatus,
 } from '@/types/vendiq';
 
@@ -64,6 +65,7 @@ import type {
   VendIqDataProvider,
   VendorScoreCreateInput,
   VendorScorePatch,
+  AssignmentStatusCounts,
 } from '@/services/vendiq/contracts';
 import {
   parseDecimal,
@@ -949,6 +951,62 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
         }),
       ) || [];
       return res.map(mapVPVendorAssignment);
+    },
+    async listVendorsForReviewer(reviewerId: string, cycleYear: number): Promise<ReviewQueueItem[]> {
+      const rows = await assignments.listForReviewer(reviewerId, cycleYear);
+      if (rows.length === 0) return [];
+      const vendorIds = Array.from(new Set(rows.map((r) => r.vendorId).filter(Boolean)));
+
+      // Batch-load vendors + current-year + prior-year scores.
+      const [vendorRes, currentScoreRes, priorScoreRes] = await Promise.all([
+        Rpvms_vendorsService.getAll({
+          filter: vendorIds.map((id) => `rpvms_vendorid eq ${id}`).join(' or '),
+        }),
+        Rpvms_vendorscoresService.getAll({
+          filter: `(${vendorIds.map((id) => `_rpvms_vendorid_value eq ${id}`).join(' or ')}) and rpvms_scoreyear eq ${cycleYear}`,
+        }),
+        Rpvms_vendorscoresService.getAll({
+          filter: `(${vendorIds.map((id) => `_rpvms_vendorid_value eq ${id}`).join(' or ')}) and rpvms_scoreyear eq ${cycleYear - 1}`,
+        }),
+      ]);
+      const vendors = (unwrap(vendorRes) || []).map(mapVendor);
+      const currentScores = (unwrap(currentScoreRes) || []).map(mapVendorScore);
+      const priorScores = (unwrap(priorScoreRes) || []).map(mapVendorScore);
+
+      const vendorById = new Map(vendors.map((v) => [v.id, v]));
+      const currentByVendor = new Map(currentScores.map((s) => [s.vendorId, s]));
+      const priorByVendor = new Map(priorScores.map((s) => [s.vendorId, s]));
+
+      return rows.map((assignment) => ({
+        assignment,
+        vendor: vendorById.get(assignment.vendorId) ?? ({ id: assignment.vendorId, vendorName: assignment.vendorName ?? '' } as Vendor),
+        currentScore: currentByVendor.get(assignment.vendorId) ?? null,
+        priorScore: priorByVendor.get(assignment.vendorId) ?? null,
+      }));
+    },
+    async countsByStatus(reviewerId: string, cycleYear: number): Promise<AssignmentStatusCounts> {
+      const items = await assignments.listVendorsForReviewer(reviewerId, cycleYear);
+      const now = Date.now();
+      const counts: AssignmentStatusCounts = {
+        notStarted: 0,
+        draft: 0,
+        approved: 0,
+        rejected: 0,
+        overdue: 0,
+        total: items.length,
+      };
+      for (const it of items) {
+        const status = it.currentScore?.reviewStatus ?? 'NotStarted';
+        if (status === 'NotStarted') counts.notStarted++;
+        else if (status === 'Draft') counts.draft++;
+        else if (status === 'Approved') counts.approved++;
+        else if (status === 'Rejected') counts.rejected++;
+        const due = it.assignment.reviewDueDate ? Date.parse(it.assignment.reviewDueDate) : NaN;
+        if (!Number.isNaN(due) && due < now && status !== 'Approved' && status !== 'Rejected') {
+          counts.overdue++;
+        }
+      }
+      return counts;
     },
     async assignVendors(input: {
       reviewerId: string;
