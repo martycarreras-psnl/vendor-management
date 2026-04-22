@@ -38,11 +38,13 @@ export interface VendorRepository {
 export interface SupplierRepository {
   list(options?: ListOptions): Promise<Supplier[]>;
   getById(id: string): Promise<Supplier | null>;
+  update(id: string, input: Partial<Supplier>): Promise<Supplier>;
 }
 
 export interface VendorSupplierRepository {
   list(options?: ListOptions): Promise<VendorSupplier[]>;
   listByVendor(vendorId: string): Promise<VendorSupplier[]>;
+  listBySupplier(supplierId: string): Promise<VendorSupplier[]>;
 }
 
 export interface ContractRepository {
@@ -55,6 +57,7 @@ export interface ContractRepository {
 export interface ContractPartyRepository {
   list(options?: ListOptions): Promise<ContractParty[]>;
   listByVendor(vendorId: string): Promise<ContractParty[]>;
+  listBySupplier(supplierId: string): Promise<ContractParty[]>;
   listByContract(contractId: string): Promise<ContractParty[]>;
 }
 

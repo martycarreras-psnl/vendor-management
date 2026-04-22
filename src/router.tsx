@@ -5,6 +5,8 @@ import ContractExpirationPage from "@/pages/contract-expiration"
 import ContractDetailsPage from "@/pages/contract-details"
 import VendorLookupPage from "@/pages/vendor-lookup"
 import Vendor360Page from "@/pages/vendor-360"
+import SupplierLookupPage from "@/pages/supplier-lookup"
+import Supplier360Page from "@/pages/supplier-360"
 import RiskDashboardPage from "@/pages/risk-dashboard"
 import ChatPage from "@/pages/chat"
 import SettingsPage from "@/pages/settings"
@@ -23,6 +25,8 @@ export const router = createHashRouter([
       { path: "portfolio", element: <Navigate to="/" replace /> },
       { path: "vendors", element: <VendorLookupPage /> },
       { path: "vendors/:vendorId", element: <Vendor360Page /> },
+      { path: "suppliers", element: <SupplierLookupPage /> },
+      { path: "suppliers/:supplierId", element: <Supplier360Page /> },
       { path: "contracts", element: <ContractExpirationPage /> },
       { path: "contracts/:contractId", element: <ContractDetailsPage /> },
       { path: "risk", element: <RiskDashboardPage /> },

@@ -77,8 +77,10 @@ import {
   writeContractStatus,
   writeContractType,
   writeCommercialRole,
+  writeIsReseller,
   writeIsVar,
   writeSNCriticality,
+  writeTinType,
   writeVendorClassification,
   writeVendorPhi,
   writeVendorStatus,
@@ -404,6 +406,16 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
         return null;
       }
     },
+    async update(id: string, input: Partial<Supplier>): Promise<Supplier> {
+      const payload: Record<string, unknown> = {};
+      if (input.supplierName !== undefined) payload.rpvms_suppliername = input.supplierName;
+      if (input.supplierCategory !== undefined) payload.rpvms_suppliercategory = input.supplierCategory;
+      if (input.taxId !== undefined) payload.rpvms_taxid = input.taxId;
+      if (input.tinType !== undefined) payload.rpvms_tintype = writeTinType(input.tinType);
+      if (input.isReseller !== undefined) payload.rpvms_isreseller = writeIsReseller(input.isReseller);
+      const res = unwrap(await Rpvms_suppliersService.update(id, payload as never));
+      return mapSupplier(res);
+    },
   };
 
   const vendorSuppliers = {
@@ -414,6 +426,12 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
     async listByVendor(vendorId: string): Promise<VendorSupplier[]> {
       const res = unwrap(
         await Rpvms_vendorsuppliersService.getAll({ filter: `_rpvms_vendorid_value eq ${vendorId}` }),
+      ) || [];
+      return res.map(mapVendorSupplier);
+    },
+    async listBySupplier(supplierId: string): Promise<VendorSupplier[]> {
+      const res = unwrap(
+        await Rpvms_vendorsuppliersService.getAll({ filter: `_rpvms_supplierid_value eq ${supplierId}` }),
       ) || [];
       return res.map(mapVendorSupplier);
     },
@@ -473,6 +491,12 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
     async listByVendor(vendorId: string): Promise<ContractParty[]> {
       const res = unwrap(
         await Rpvms_contractpartiesService.getAll({ filter: `_rpvms_vendorid_value eq ${vendorId}` }),
+      ) || [];
+      return res.map(mapContractParty);
+    },
+    async listBySupplier(supplierId: string): Promise<ContractParty[]> {
+      const res = unwrap(
+        await Rpvms_contractpartiesService.getAll({ filter: `_rpvms_supplierid_value eq ${supplierId}` }),
       ) || [];
       return res.map(mapContractParty);
     },

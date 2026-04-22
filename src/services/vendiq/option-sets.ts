@@ -23,7 +23,7 @@ import type {
   Rpvms_servicenowassessmentsrpvms_criticalitylevel,
   Rpvms_servicenowassessmentsrpvms_isbudgeted,
 } from '@/generated/models/Rpvms_servicenowassessmentsModel';
-import type { Rpvms_suppliersrpvms_tintype } from '@/generated/models/Rpvms_suppliersModel';
+import type { Rpvms_suppliersrpvms_tintype, Rpvms_suppliersrpvms_isreseller } from '@/generated/models/Rpvms_suppliersModel';
 import type { Rpvms_vendorbudgetsrpvms_quintilerating } from '@/generated/models/Rpvms_vendorbudgetsModel';
 import type { Rpvms_vendorratecardsrpvms_experiencelevel, Rpvms_vendorratecardsrpvms_locationtype } from '@/generated/models/Rpvms_vendorratecardsModel';
 import type {
@@ -149,10 +149,17 @@ export function writeIsVar(v: boolean | undefined): Rpvms_vendorsrpvms_isvar | u
 export function readTinType(v: Rpvms_suppliersrpvms_tintype | undefined): TINType | undefined {
   return lookup(SupplierTinTypeMap, v as string | undefined) as TINType | undefined;
 }
+export function writeTinType(v: TINType | undefined): Rpvms_suppliersrpvms_tintype | undefined {
+  return reverseLookup(SupplierTinTypeMap, v) as Rpvms_suppliersrpvms_tintype | undefined;
+}
 export function readIsReseller(v: string | undefined): boolean | undefined {
   const s = lookup(SupplierIsResellerMap, v);
   if (!s) return undefined;
   return s === 'Yes';
+}
+export function writeIsReseller(v: boolean | undefined): Rpvms_suppliersrpvms_isreseller | undefined {
+  if (v === undefined) return undefined;
+  return reverseLookup(SupplierIsResellerMap, v ? 'Yes' : 'No') as Rpvms_suppliersrpvms_isreseller | undefined;
 }
 
 // ---- Contract ----

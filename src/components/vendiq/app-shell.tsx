@@ -2,6 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
+  Truck,
   FileText,
   ShieldCheck,
   Sparkles,
@@ -17,6 +18,7 @@ import vendiqIconMarkup from '@/assets/vendiq_icon.svg?raw';
 const NAV_ITEMS = [
   { to: '/', label: 'Home', icon: LayoutDashboard, end: true },
   { to: '/vendors', label: 'Vendors', icon: Users, end: false },
+  { to: '/suppliers', label: 'Suppliers', icon: Truck, end: false },
   { to: '/contracts', label: 'Contracts', icon: FileText, end: false },
   { to: '/risk', label: 'Risk', icon: ShieldCheck, end: false },
   { to: '/chat', label: 'Ask vendIQ', icon: Sparkles, end: false },
