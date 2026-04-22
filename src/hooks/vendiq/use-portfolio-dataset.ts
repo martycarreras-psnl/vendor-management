@@ -43,7 +43,7 @@ export function usePortfolioDataset() {
       // Fetch the primary collections in parallel. We preload ContractParty,
       // VendorSupplier, and ServiceNowAssessment so the dashboard KPIs and
       // TopVendors rows can join accurately without N+1 calls.
-      const [vendors, contracts, budgets, scores, vendorSuppliers, contractParties, snAssessments] = await Promise.all([
+      const [vendors, contracts, budgets, scores, vendorSuppliers, contractParties, snAssessments, suppliers] = await Promise.all([
         provider.vendors.list({ top: 5000 }),
         provider.contracts.list({ top: 5000 }),
         provider.vendorBudgets.list({ top: 5000 }),
@@ -51,7 +51,12 @@ export function usePortfolioDataset() {
         provider.vendorSuppliers.list({ top: 5000 }),
         provider.contractParties.list({ top: 5000 }),
         provider.serviceNowAssessments.list({ top: 5000 }),
+        provider.suppliers.list({ top: 5000 }),
       ]);
+
+      // Build a supplier name lookup so VendorSupplier rows that lack the
+      // expanded lookup name can be enriched (avoids showing GUIDs).
+      const supplierNameById = new Map(suppliers.map((s) => [s.id, s.supplierName]));
 
       const budgetsByVendorAllYears = new Map<string, VendorBudget[]>();
       for (const b of budgets) {
@@ -110,6 +115,10 @@ export function usePortfolioDataset() {
       const suppliersByVendor = new Map<string, VendorSupplier[]>();
       for (const vs of vendorSuppliers) {
         if (!vs.supplierId || !vs.vendorId) continue;
+        // Enrich supplier name from the suppliers table when the lookup name is missing.
+        if (!vs.supplierName) {
+          vs.supplierName = supplierNameById.get(vs.supplierId);
+        }
         const arr = supplierToVendors.get(vs.supplierId) ?? [];
         arr.push(vs.vendorId);
         supplierToVendors.set(vs.supplierId, arr);
