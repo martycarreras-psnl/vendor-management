@@ -73,6 +73,7 @@ function useVendor360(vendorId: string) {
         oneTrust,
         sn,
         currentCriticality,
+        suppliers,
       ] = await Promise.all([
         provider.vendors.getById(vendorId),
         provider.contractParties.listByVendor(vendorId),
@@ -85,7 +86,16 @@ function useVendor360(vendorId: string) {
         provider.oneTrustAssessments.listByVendor(vendorId),
         provider.serviceNowAssessments.listByVendor(vendorId),
         provider.getVendorCriticality(vendorId),
+        provider.suppliers.list({ top: 5000 }),
       ]);
+
+      // Enrich supplier names so we never display blanks
+      const supplierNameById = new Map(suppliers.map((s) => [s.id, s.supplierName]));
+      for (const vs of vendorSuppliers) {
+        if (!vs.supplierName) {
+          vs.supplierName = supplierNameById.get(vs.supplierId);
+        }
+      }
 
       // Load contracts: the Vendor ↔ Contract linkage is via ContractParty; for any
       // contract-party row pointing at a contract we haven't loaded, fetch it.
