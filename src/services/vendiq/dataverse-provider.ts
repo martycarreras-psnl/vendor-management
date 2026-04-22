@@ -897,26 +897,19 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
       }
     },
     async list(): Promise<Reviewer[]> {
-      // Distinct systemusers that have at least one active assignment row.
-      const assignments = unwrap(
-        await Rpvms_vpvendorassignmentsService.getAll({
-          filter: 'rpvms_isactive eq 1',
-          select: ['_rpvms_reviewer_value'],
-        }),
-      ) || [];
-      const distinctIds = Array.from(
-        new Set(assignments.map((a) => a._rpvms_reviewer_value).filter((v): v is string => !!v)),
-      );
-      if (distinctIds.length === 0) return [];
-      // Page-friendly: build an `or` filter chunked at 50 ids per request.
-      const chunks: string[][] = [];
-      for (let i = 0; i < distinctIds.length; i += 50) chunks.push(distinctIds.slice(i, i + 50));
-      const out: Reviewer[] = [];
-      for (const chunk of chunks) {
-        const filter = chunk.map((id) => `systemuserid eq ${id}`).join(' or ');
-        const res = unwrap(await SystemusersService.getAll({ filter })) || [];
-        out.push(...res.map(mapSystemuser));
-      }
+      // All enabled, non-system systemusers. Admins need the full list here so
+      // they can bootstrap assignments for reviewers who have never been
+      // assigned before. (`isdisabled eq false` + `accessmode eq 0` filters out
+      // disabled accounts and application/non-interactive users.)
+      const res =
+        unwrap(
+          await SystemusersService.getAll({
+            filter: 'isdisabled eq false and accessmode eq 0',
+            select: ['systemuserid', 'firstname', 'lastname', 'internalemailaddress', 'title', 'isdisabled'],
+            top: 500,
+          }),
+        ) || [];
+      const out = res.map(mapSystemuser);
       out.sort((a, b) => a.fullName.localeCompare(b.fullName));
       return out;
     },
