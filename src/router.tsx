@@ -9,6 +9,7 @@ import SupplierLookupPage from "@/pages/supplier-lookup"
 import Supplier360Page from "@/pages/supplier-360"
 import RiskDashboardPage from "@/pages/risk-dashboard"
 import ChatPage from "@/pages/chat"
+import PromptSuggestionsPage from "@/pages/prompt-suggestions"
 import SettingsPage from "@/pages/settings"
 import NotFoundPage from "@/pages/not-found"
 import ErrorBoundaryPage from "@/pages/error-boundary"
@@ -32,6 +33,7 @@ export const router = createHashRouter([
       { path: "contracts/:contractId", element: <ContractDetailsPage /> },
       { path: "risk", element: <RiskDashboardPage /> },
       { path: "chat", element: <ChatPage /> },
+      { path: "prompt-suggestions", element: <PromptSuggestionsPage /> },
       { path: "settings", element: <SettingsPage /> },
       { path: "*", element: <NotFoundPage /> },
     ],

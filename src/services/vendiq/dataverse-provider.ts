@@ -14,6 +14,7 @@ import { Rpvms_vendorproductservicesService } from '@/generated/services/Rpvms_v
 import { Rpvms_vendornamealiasesService } from '@/generated/services/Rpvms_vendornamealiasesService';
 import { Rpvms_onetrustassessmentsService } from '@/generated/services/Rpvms_onetrustassessmentsService';
 import { Rpvms_servicenowassessmentsService } from '@/generated/services/Rpvms_servicenowassessmentsService';
+import { Rpvms_promptsuggestionsService } from '@/generated/services/Rpvms_promptsuggestionsService';
 
 import type { Rpvms_vendors } from '@/generated/models/Rpvms_vendorsModel';
 import type { Rpvms_suppliers } from '@/generated/models/Rpvms_suppliersModel';
@@ -28,6 +29,7 @@ import type { Rpvms_vendorproductservices } from '@/generated/models/Rpvms_vendo
 import type { Rpvms_vendornamealiases } from '@/generated/models/Rpvms_vendornamealiasesModel';
 import type { Rpvms_onetrustassessments } from '@/generated/models/Rpvms_onetrustassessmentsModel';
 import type { Rpvms_servicenowassessments } from '@/generated/models/Rpvms_servicenowassessmentsModel';
+import type { Rpvms_promptsuggestions } from '@/generated/models/Rpvms_promptsuggestionsModel';
 
 import type {
   Vendor,
@@ -46,6 +48,7 @@ import type {
   ConnectivityStatus,
   AdjustCriticalityInput,
   CriticalityLevel,
+  PromptSuggestion,
 } from '@/types/vendiq';
 
 import type { ListOptions, VendIqDataProvider } from '@/services/vendiq/contracts';
@@ -330,6 +333,18 @@ function mapSN(r: Rpvms_servicenowassessments): ServiceNowAssessment {
     perfSupportSatisfaction: r.rpvms_perfsupportsatisfaction,
     perfContractChangeReq: r.rpvms_perfcontractchangereq,
     perfIssueHandling: r.rpvms_perfissuehandling,
+    createdOn: r.createdon,
+    modifiedOn: r.modifiedon,
+  };
+}
+
+function mapPromptSuggestion(r: Rpvms_promptsuggestions): PromptSuggestion {
+  return {
+    id: r.rpvms_promptsuggestionid,
+    promptText: r.rpvms_prompttext,
+    category: r.rpvms_category,
+    sortOrder: r.rpvms_sortorder != null ? Number(r.rpvms_sortorder) : undefined,
+    isActive: r.rpvms_isactive === 1 || (r.rpvms_isactive as unknown) === true,
     createdOn: r.createdon,
     modifiedOn: r.modifiedon,
   };
@@ -707,6 +722,52 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
     },
   };
 
+  const promptSuggestions = {
+    async list(options?: ListOptions): Promise<PromptSuggestion[]> {
+      const res = unwrap(await Rpvms_promptsuggestionsService.getAll(toIGetAllOptions(options))) || [];
+      return res.map(mapPromptSuggestion);
+    },
+    async listActive(): Promise<PromptSuggestion[]> {
+      const res = unwrap(
+        await Rpvms_promptsuggestionsService.getAll({
+          filter: 'rpvms_isactive eq true',
+          orderBy: ['rpvms_sortorder asc'],
+        }),
+      ) || [];
+      return res.map(mapPromptSuggestion);
+    },
+    async getById(id: string): Promise<PromptSuggestion | null> {
+      try {
+        const res = unwrap(await Rpvms_promptsuggestionsService.get(id));
+        return res ? mapPromptSuggestion(res) : null;
+      } catch {
+        return null;
+      }
+    },
+    async create(input: { promptText: string; category?: string; sortOrder?: number; isActive?: boolean }): Promise<PromptSuggestion> {
+      const payload: Record<string, unknown> = {
+        rpvms_prompttext: input.promptText,
+      };
+      if (input.category !== undefined) payload.rpvms_category = input.category;
+      if (input.sortOrder !== undefined) payload.rpvms_sortorder = input.sortOrder;
+      if (input.isActive !== undefined) payload.rpvms_isactive = input.isActive;
+      const res = unwrap(await Rpvms_promptsuggestionsService.create(payload as never));
+      return mapPromptSuggestion(res);
+    },
+    async update(id: string, input: Partial<PromptSuggestion>): Promise<PromptSuggestion> {
+      const payload: Record<string, unknown> = {};
+      if (input.promptText !== undefined) payload.rpvms_prompttext = input.promptText;
+      if (input.category !== undefined) payload.rpvms_category = input.category;
+      if (input.sortOrder !== undefined) payload.rpvms_sortorder = input.sortOrder;
+      if (input.isActive !== undefined) payload.rpvms_isactive = input.isActive;
+      const res = unwrap(await Rpvms_promptsuggestionsService.update(id, payload as never));
+      return mapPromptSuggestion(res);
+    },
+    async remove(id: string): Promise<void> {
+      await Rpvms_promptsuggestionsService.delete(id);
+    },
+  };
+
   const connectivity = {
     async probe(): Promise<ConnectivityStatus> {
       const startedAt = performance.now();
@@ -746,6 +807,7 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
     vendorNameAliases,
     oneTrustAssessments,
     serviceNowAssessments,
+    promptSuggestions,
     connectivity,
     async getVendorCriticality(vendorId: string): Promise<CriticalityLevel | undefined> {
       const latest = await serviceNowAssessments.latestCriticalityByVendor(vendorId);

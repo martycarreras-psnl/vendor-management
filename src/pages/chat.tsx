@@ -2,12 +2,14 @@ import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 
 import { Send, MessageSquarePlus, Sparkles, Bot, User, ChevronRight } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { useVendiq } from '@/services/vendiq/provider-context';
 import { useCopilotChat, type ChatMessage } from '@/providers/copilot-chat-provider';
 
-const SUGGESTIONS = [
+const FALLBACK_SUGGESTIONS = [
   'Which contracts are expiring in the next 90 days?',
   'Show me my highest-spend vendors this year',
   'Which vendors have PHI and no SIG assessment?',
@@ -181,8 +183,19 @@ function renderMessageGroups(messages: ChatMessage[]): ReactNode[] {
 
 export default function ChatPage() {
   const { messages, sendMessage, newChat, isLoading, agentName } = useCopilotChat();
+  const provider = useVendiq();
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Load active prompt suggestions from Dataverse, fallback to hardcoded
+  const suggestionsQuery = useQuery({
+    queryKey: ['vendiq', 'promptSuggestions', 'active'],
+    queryFn: () => provider.promptSuggestions.listActive(),
+    staleTime: 5 * 60_000,
+  });
+  const suggestions = suggestionsQuery.data && suggestionsQuery.data.length > 0
+    ? suggestionsQuery.data.map((s) => s.promptText)
+    : FALLBACK_SUGGESTIONS;
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -244,7 +257,7 @@ export default function ChatPage() {
                 </p>
               </div>
               <div className="grid w-full max-w-2xl gap-2 sm:grid-cols-2">
-                {SUGGESTIONS.map((s) => (
+                {suggestions.map((s) => (
                   <button
                     key={s}
                     type="button"

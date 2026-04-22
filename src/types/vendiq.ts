@@ -379,3 +379,13 @@ export interface TopVendorRow {
   nextExpirationDate?: string;
   nextNoticeDate?: string;
 }
+
+export interface PromptSuggestion {
+  id: string;
+  promptText: string;
+  category?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+  createdOn?: string;
+  modifiedOn?: string;
+}

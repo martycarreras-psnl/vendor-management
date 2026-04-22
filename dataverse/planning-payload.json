@@ -1400,6 +1400,59 @@
         "description": "Primary name for the record",
         "maxLength": 300
       }
+    },
+    {
+      "schemaName": "rpvms_PromptSuggestion",
+      "displayName": "Prompt Suggestion",
+      "displayCollectionName": "Prompt Suggestions",
+      "logicalSingularName": "rpvms_promptsuggestion",
+      "logicalPluralName": "rpvms_promptsuggestions",
+      "entitySetName": "rpvms_promptsuggestions",
+      "tableLogicalName": "rpvms_promptsuggestions",
+      "description": "Managed prompt suggestions shown in the vendIQ chat interface",
+      "ownership": "UserOwned",
+      "ownershipType": "UserOwned",
+      "isActivity": false,
+      "hasActivities": false,
+      "hasNotes": false,
+      "columns": [
+        {
+          "schemaName": "rpvms_Category",
+          "logicalName": "rpvms_category",
+          "displayName": "Category",
+          "requiredLevel": "None",
+          "description": "Optional category for grouping (e.g. Risk, Spend, Contracts)",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        },
+        {
+          "schemaName": "rpvms_SortOrder",
+          "logicalName": "rpvms_sortorder",
+          "displayName": "Sort Order",
+          "requiredLevel": "None",
+          "description": "Display order (lower = first)",
+          "type": "Integer",
+          "minValue": 0,
+          "maxValue": 9999
+        },
+        {
+          "schemaName": "rpvms_IsActive",
+          "logicalName": "rpvms_isactive",
+          "displayName": "Is Active",
+          "requiredLevel": "None",
+          "description": "Only active prompts are shown in the chat UI",
+          "type": "Boolean"
+        }
+      ],
+      "primaryName": {
+        "schemaName": "rpvms_PromptText",
+        "logicalName": "rpvms_prompttext",
+        "displayName": "Prompt Text",
+        "requiredLevel": "ApplicationRequired",
+        "maxLength": 500,
+        "description": "The suggestion text displayed to the user"
+      }
     }
   ],
   "relationships": [

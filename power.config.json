@@ -80,6 +80,10 @@
         "vendornamealias": {
           "entitySetName": "rpvms_vendornamealiases",
           "logicalName": "rpvms_vendornamealias"
+        },
+        "promptsuggestions": {
+          "entitySetName": "rpvms_promptsuggestions",
+          "logicalName": "rpvms_promptsuggestion"
         }
       },
       "environmentVariableName": ""

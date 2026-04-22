@@ -6,6 +6,7 @@ import {
   FileText,
   ShieldCheck,
   Sparkles,
+  MessageSquareText,
   Settings,
   Search,
   AppWindow,
@@ -22,6 +23,7 @@ const NAV_ITEMS = [
   { to: '/contracts', label: 'Contracts', icon: FileText, end: false },
   { to: '/risk', label: 'Risk', icon: ShieldCheck, end: false },
   { to: '/chat', label: 'Ask vendIQ', icon: Sparkles, end: false },
+  { to: '/prompt-suggestions', label: 'Prompt Suggestions', icon: MessageSquareText, end: false },
   { to: '/settings', label: 'Settings', icon: Settings, end: false },
 ];
 

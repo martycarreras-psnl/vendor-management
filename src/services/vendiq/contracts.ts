@@ -19,6 +19,7 @@ import type {
   ConnectivityStatus,
   AdjustCriticalityInput,
   CriticalityLevel,
+  PromptSuggestion,
 } from '@/types/vendiq';
 
 export interface ListOptions {
@@ -126,7 +127,17 @@ export interface VendIqDataProvider {
   vendorNameAliases: VendorNameAliasRepository;
   oneTrustAssessments: OneTrustAssessmentRepository;
   serviceNowAssessments: ServiceNowAssessmentRepository;
+  promptSuggestions: PromptSuggestionRepository;
   connectivity: ConnectivityRepository;
   /** Convenience: derive current criticality for a vendor from the latest SN assessment. */
   getVendorCriticality(vendorId: string): Promise<CriticalityLevel | undefined>;
+}
+
+export interface PromptSuggestionRepository {
+  list(options?: ListOptions): Promise<PromptSuggestion[]>;
+  listActive(): Promise<PromptSuggestion[]>;
+  getById(id: string): Promise<PromptSuggestion | null>;
+  create(input: { promptText: string; category?: string; sortOrder?: number; isActive?: boolean }): Promise<PromptSuggestion>;
+  update(id: string, input: Partial<PromptSuggestion>): Promise<PromptSuggestion>;
+  remove(id: string): Promise<void>;
 }

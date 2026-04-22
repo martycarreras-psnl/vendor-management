@@ -11,6 +11,7 @@ export * as Rpvms_contractpartiesModel from './models/Rpvms_contractpartiesModel
 export * as Rpvms_contractsModel from './models/Rpvms_contractsModel';
 export * as Rpvms_gltransactionsModel from './models/Rpvms_gltransactionsModel';
 export * as Rpvms_onetrustassessmentsModel from './models/Rpvms_onetrustassessmentsModel';
+export * as Rpvms_promptsuggestionsModel from './models/Rpvms_promptsuggestionsModel';
 export * as Rpvms_servicenowassessmentsModel from './models/Rpvms_servicenowassessmentsModel';
 export * as Rpvms_suppliersModel from './models/Rpvms_suppliersModel';
 export * as Rpvms_vendorbudgetsModel from './models/Rpvms_vendorbudgetsModel';
@@ -28,6 +29,7 @@ export * from './services/Rpvms_contractpartiesService';
 export * from './services/Rpvms_contractsService';
 export * from './services/Rpvms_gltransactionsService';
 export * from './services/Rpvms_onetrustassessmentsService';
+export * from './services/Rpvms_promptsuggestionsService';
 export * from './services/Rpvms_servicenowassessmentsService';
 export * from './services/Rpvms_suppliersService';
 export * from './services/Rpvms_vendorbudgetsService';
