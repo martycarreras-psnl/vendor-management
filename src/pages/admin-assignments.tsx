@@ -21,8 +21,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { CriticalityPill } from '@/components/vendiq/criticality-pill';
+import { DataGrid, type ColumnDef } from '@/components/vendiq/data-grid';
 import { formatDate, formatCurrency } from '@/lib/vendiq-format';
-import { cn } from '@/lib/utils';
 import type { Vendor } from '@/types/vendiq';
 
 export default function AdminAssignmentsPage() {
@@ -33,10 +33,10 @@ export default function AdminAssignmentsPage() {
   const dataset = usePortfolioDataset();
 
   const [reviewerId, setReviewerId] = useState<string>('');
-  const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [dueDate, setDueDate] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
+  const [hideAssigned, setHideAssigned] = useState<boolean>(true);
 
   const currentAssignmentsQ = useQuery({
     queryKey: ['vendiq', 'assignments', 'forReviewer', reviewerId, cycleYear],
@@ -94,10 +94,9 @@ export default function AdminAssignmentsPage() {
 
   const vendorsFiltered: Vendor[] = useMemo(() => {
     const all = dataset.data?.vendors ?? [];
-    const q = search.trim().toLowerCase();
-    const base = q ? all.filter((v) => v.vendorName.toLowerCase().includes(q)) : all;
+    const base = hideAssigned ? all.filter((v) => !assignedVendorIds.has(v.id)) : all;
     return [...base].sort((a, b) => a.vendorName.localeCompare(b.vendorName));
-  }, [dataset.data?.vendors, search]);
+  }, [dataset.data?.vendors, hideAssigned, assignedVendorIds]);
 
   if (!isAdmin) {
     return (
@@ -223,94 +222,142 @@ export default function AdminAssignmentsPage() {
         </section>
       )}
 
-      {/* Vendor selector */}
-      <section className="rounded-lg border bg-card shadow-sm">
-        <div className="flex flex-wrap items-center gap-3 border-b p-3">
-          <Input
-            placeholder="Search vendors…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="max-w-sm"
-          />
-          <Button variant="outline" size="sm" onClick={toggleAll}>
-            {selected.size === vendorsFiltered.length && vendorsFiltered.length > 0
-              ? 'Clear all'
-              : 'Select all visible'}
-          </Button>
-        </div>
-        {dataset.isLoading ? (
-          <div className="p-8 text-center text-muted-foreground">Loading vendors…</div>
-        ) : (
-          <div className="max-h-[520px] overflow-auto">
-            <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-muted/50 text-xs uppercase text-muted-foreground">
-                <tr>
-                  <th className="w-10 px-3 py-2"></th>
-                  <th className="px-3 py-2 text-left">Vendor</th>
-                  <th className="px-3 py-2 text-left">Classification</th>
-                  <th className="px-3 py-2 text-left">Criticality</th>
-                  <th className="px-3 py-2 text-right">Annual Spend</th>
-                  <th className="px-3 py-2 text-left">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {vendorsFiltered.map((v) => {
-                  const isSelected = selected.has(v.id);
-                  const already = assignedVendorIds.has(v.id);
-                  const crit = dataset.data?.criticalityByVendor.get(v.id);
-                  const budget = dataset.data?.budgetsByVendor.get(v.id);
-                  return (
-                    <tr
-                      key={v.id}
-                      className={cn(
-                        'border-t hover:bg-muted/30',
-                        isSelected && 'bg-primary/5',
-                        already && 'opacity-70',
-                      )}
-                    >
-                      <td className="px-3 py-2">
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={() => toggleOne(v.id)}
-                          aria-label={`Select ${v.vendorName}`}
-                        />
-                      </td>
-                      <td className="px-3 py-2">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{v.vendorName}</span>
-                          {already && (
-                            <span className="inline-flex items-center rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-800">
-                              assigned
-                            </span>
-                          )}
-                        </div>
-                        {v.primaryOffering && (
-                          <div className="text-xs text-muted-foreground">{v.primaryOffering}</div>
-                        )}
-                      </td>
-                      <td className="px-3 py-2">{v.classification ?? '—'}</td>
-                      <td className="px-3 py-2">
-                        {crit ? <CriticalityPill level={crit} /> : <span className="text-muted-foreground">—</span>}
-                      </td>
-                      <td className="px-3 py-2 text-right tabular-nums">
-                        {budget?.supplierSpend !== undefined ? formatCurrency(budget.supplierSpend) : '—'}
-                      </td>
-                      <td className="px-3 py-2">{v.status ?? '—'}</td>
-                    </tr>
-                  );
-                })}
-                {vendorsFiltered.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="p-8 text-center text-muted-foreground">
-                      No vendors match “{search}”.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+      {/* Vendor selector — only after reviewer is picked */}
+      {reviewerId && (
+        <section className="rounded-lg border bg-card shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b p-3">
+            <label className="inline-flex items-center gap-2 text-sm">
+              <Checkbox
+                checked={hideAssigned}
+                onCheckedChange={(v) => setHideAssigned(v === true)}
+                aria-label="Hide already assigned vendors"
+              />
+              <span>Hide vendors already assigned to this reviewer</span>
+            </label>
+            <Button variant="outline" size="sm" onClick={toggleAll}>
+              {selected.size === vendorsFiltered.length && vendorsFiltered.length > 0
+                ? 'Clear all'
+                : 'Select all shown'}
+            </Button>
           </div>
-        )}
-      </section>
+          {dataset.isLoading ? (
+            <div className="p-8 text-center text-muted-foreground">Loading vendors…</div>
+          ) : (
+            <DataGrid
+              columns={buildVendorColumns({
+                selected,
+                toggleOne,
+                assignedVendorIds,
+                criticalityByVendor: dataset.data?.criticalityByVendor,
+                budgetsByVendor: dataset.data?.budgetsByVendor,
+              })}
+              data={vendorsFiltered}
+              keyFn={(v) => v.id}
+              pageSize={50}
+              defaultSort={{ key: 'vendor', dir: 'asc' }}
+              emptyMessage={
+                hideAssigned
+                  ? 'No unassigned vendors. Uncheck "Hide already assigned" to see the full list.'
+                  : 'No vendors match the current filters.'
+              }
+            />
+          )}
+        </section>
+      )}
     </div>
   );
+}
+
+interface VendorColArgs {
+  selected: Set<string>;
+  toggleOne: (id: string) => void;
+  assignedVendorIds: Set<string>;
+  criticalityByVendor?: Map<string, number>;
+  budgetsByVendor?: Map<string, { supplierSpend?: number }>;
+}
+
+function buildVendorColumns({
+  selected,
+  toggleOne,
+  assignedVendorIds,
+  criticalityByVendor,
+  budgetsByVendor,
+}: VendorColArgs): ColumnDef<Vendor>[] {
+  return [
+    {
+      key: 'select',
+      header: '',
+      accessor: (v) => selected.has(v.id),
+      sortable: false,
+      filterable: false,
+      render: (v) => (
+        <Checkbox
+          checked={selected.has(v.id)}
+          onCheckedChange={() => toggleOne(v.id)}
+          aria-label={`Select ${v.vendorName}`}
+        />
+      ),
+    },
+    {
+      key: 'vendor',
+      header: 'Vendor',
+      accessor: (v) => v.vendorName,
+      render: (v) => (
+        <div>
+          <div className="font-medium">{v.vendorName}</div>
+          {v.primaryOffering && (
+            <div className="text-xs text-muted-foreground">{v.primaryOffering}</div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'classification',
+      header: 'Classification',
+      accessor: (v) => v.classification ?? '',
+    },
+    {
+      key: 'criticality',
+      header: 'Criticality',
+      accessor: (v) => criticalityByVendor?.get(v.id) ?? 0,
+      render: (v) => {
+        const c = criticalityByVendor?.get(v.id);
+        return c ? <CriticalityPill level={c as 1 | 2 | 3 | 4 | 5} /> : <span className="text-muted-foreground">—</span>;
+      },
+      filterType: 'select',
+      filterOptions: ['1', '2', '3', '4', '5'],
+    },
+    {
+      key: 'spend',
+      header: 'Annual Spend',
+      accessor: (v) => budgetsByVendor?.get(v.id)?.supplierSpend ?? 0,
+      render: (v) => {
+        const s = budgetsByVendor?.get(v.id)?.supplierSpend;
+        return s !== undefined ? (
+          <span className="tabular-nums">{formatCurrency(s)}</span>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        );
+      },
+      align: 'right',
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      accessor: (v) => v.status ?? '',
+    },
+    {
+      key: 'assigned',
+      header: 'Assigned',
+      accessor: (v) => assignedVendorIds.has(v.id),
+      render: (v) =>
+        assignedVendorIds.has(v.id) ? (
+          <span className="inline-flex items-center rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-800">
+            assigned
+          </span>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
+    },
+  ];
 }
