@@ -20,6 +20,23 @@ export default function PortfolioPage() {
   // Dashboard shows the unfiltered aggregate view; filtering happens on Vendor 360 / Contracts pages.
   const emptyFilters = useMemo(() => ({}), []);
 
+  // Build a contractId -> approximate annual spend map for treemap sizing.
+  // Must be above early returns to satisfy React's rules of hooks.
+  const vendorSpendByContract = useMemo(() => {
+    const ctx = dataset.data;
+    if (!ctx) return new Map<string, number>();
+    const map = new Map<string, number>();
+    const spendByVendor = (vid: string) => ctx.budgetsByVendor.get(vid)?.supplierSpend ?? 0;
+    const vendorContractIndex = ctx.contractsByVendor;
+    for (const [vid, contracts] of vendorContractIndex) {
+      const spend = spendByVendor(vid);
+      for (const c of contracts) {
+        map.set(c.id, (map.get(c.id) ?? 0) + spend);
+      }
+    }
+    return map;
+  }, [dataset.data]);
+
   if (dataset.isLoading) {
     return <div className="flex h-64 items-center justify-center text-muted-foreground">Loading portfolio data…</div>;
   }
@@ -36,23 +53,6 @@ export default function PortfolioPage() {
   const kpis = computeKpis(emptyFilters, ctx);
   const topVendors = computeTopVendors(emptyFilters, ctx, 10);
   const buckets = computeExpirationBuckets(emptyFilters, ctx);
-
-  // Build a contractId -> approximate annual spend map for treemap sizing.
-  // For contracts linked via ContractParty we look up the vendor's budget;
-  // for contracts linked only by supplier we sum budgets across linked vendors.
-  const vendorSpendByContract = useMemo(() => {
-    const map = new Map<string, number>();
-    const spendByVendor = (vid: string) => ctx.budgetsByVendor.get(vid)?.supplierSpend ?? 0;
-    // Pre-index vendor -> contracts we already have
-    const vendorContractIndex = ctx.contractsByVendor;
-    for (const [vid, contracts] of vendorContractIndex) {
-      const spend = spendByVendor(vid);
-      for (const c of contracts) {
-        map.set(c.id, (map.get(c.id) ?? 0) + spend);
-      }
-    }
-    return map;
-  }, [ctx]);
 
   // Donut: breakdown of contracts in 0-90d window by contractStatus.
   const windowContracts = [...buckets['0-30'], ...buckets['31-60'], ...buckets['61-90']];
