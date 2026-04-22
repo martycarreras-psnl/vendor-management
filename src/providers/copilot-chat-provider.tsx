@@ -92,15 +92,6 @@ export function CopilotChatProvider({
     savePersisted(messages, conversationId);
   }, [messages, conversationId]);
 
-  // Drip-feed state: keeps isLoading true while interim messages are being revealed
-  const [isDripping, setIsDripping] = useState(false);
-  const dripTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
-
-  // Clean up drip timers on unmount
-  useEffect(() => {
-    return () => { dripTimers.current.forEach(clearTimeout); };
-  }, []);
-
   const mutation = useMutation({
     mutationFn: async (message: string) => {
       return invokeAgent(message, { agentName, conversationId: conversationIdRef.current });
@@ -109,70 +100,33 @@ export function CopilotChatProvider({
       if (result.conversationId && result.conversationId !== conversationIdRef.current) {
         setConversationId(result.conversationId);
       }
-      const replies =
-        result.responses.length > 0
-          ? result.responses
-          : result.lastResponse
-          ? [result.lastResponse]
-          : [];
-      if (replies.length === 0) {
-        setMessages((prev) => [
-          ...prev,
-          { id: makeId(), role: 'agent', content: '(No response from the agent.)', timestamp: new Date() },
-        ]);
-        return;
-      }
-
-      // Single response → show immediately
-      if (replies.length === 1) {
-        setMessages((prev) => [
-          ...prev,
-          { id: makeId(), role: 'agent', content: replies[0], timestamp: new Date() },
-        ]);
-        return;
-      }
-
-      // Multiple responses → drip-feed with staggered delays
-      // Clear any previous drip timers
-      dripTimers.current.forEach(clearTimeout);
-      dripTimers.current = [];
-      setIsDripping(true);
-
-      const INTERIM_DELAY = 600; // ms between each interim step
-      const FINAL_DELAY = 400;   // ms after last interim before final answer
-
-      replies.forEach((content, i) => {
-        const isLast = i === replies.length - 1;
-        const delay = isLast
-          ? (replies.length - 1) * INTERIM_DELAY + FINAL_DELAY
-          : i * INTERIM_DELAY;
-
-        const timer = setTimeout(() => {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: makeId(),
-              role: 'agent' as const,
-              content,
-              timestamp: new Date(),
-              isInterim: !isLast,
-            },
-          ]);
-          if (isLast) {
-            setIsDripping(false);
-          }
-        }, delay);
-        dripTimers.current.push(timer);
-      });
+      // Use the last response only — skip interim messages
+      const reply = result.lastResponse
+        ?? (result.responses.length > 0 ? result.responses[result.responses.length - 1] : null);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: makeId(),
+          role: 'agent' as const,
+          content: reply ?? '(No response from the agent.)',
+          timestamp: new Date(),
+        },
+      ]);
     },
     onError: (err) => {
-      setIsDripping(false);
+      const raw = err instanceof Error ? err.message : String(err);
+      // Try to extract a readable message from JSON error payloads
+      let display = raw;
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed?.error?.message) display = parsed.error.message;
+      } catch { /* not JSON, use as-is */ }
       setMessages((prev) => [
         ...prev,
         {
           id: makeId(),
           role: 'agent',
-          content: `Error: ${err instanceof Error ? err.message : String(err)}`,
+          content: `Sorry, something went wrong: ${display}`,
           timestamp: new Date(),
         },
       ]);
@@ -208,13 +162,13 @@ export function CopilotChatProvider({
     () => ({
       messages,
       conversationId,
-      isLoading: mutation.isPending || isDripping,
+      isLoading: mutation.isPending,
       error: mutation.error,
       agentName,
       sendMessage,
       newChat,
     }),
-    [messages, conversationId, mutation.isPending, isDripping, mutation.error, agentName, sendMessage, newChat],
+    [messages, conversationId, mutation.isPending, mutation.error, agentName, sendMessage, newChat],
   );
 
   return <CopilotChatContext.Provider value={value}>{children}</CopilotChatContext.Provider>;

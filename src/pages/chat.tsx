@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
-import { Send, MessageSquarePlus, Sparkles, Bot, User, ChevronRight } from 'lucide-react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { Send, MessageSquarePlus, Sparkles, Bot, User } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useQuery } from '@tanstack/react-query';
@@ -59,53 +59,11 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
   );
 }
 
-/** Collapsible chain-of-thought block for interim messages before the final answer. */
-function ThinkingSteps({ steps }: { steps: ChatMessage[] }) {
-  const [expanded, setExpanded] = useState(false);
-  if (steps.length === 0) return null;
-  return (
-    <div className="ml-11 mb-1">
-      <button
-        type="button"
-        onClick={() => setExpanded((v) => !v)}
-        className="group inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
-      >
-        <ChevronRight className={cn('h-3 w-3 transition-transform', expanded && 'rotate-90')} />
-        <span className="font-medium">Thought for a moment</span>
-        <span className="opacity-60">· {steps.length} step{steps.length !== 1 ? 's' : ''}</span>
-      </button>
-      {expanded && (
-        <div className="mt-1 space-y-1 border-l-2 border-muted pl-3">
-          {steps.map((s) => (
-            <div key={s.id} className="rounded-md bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-              <MarkdownContent content={s.content} compact />
-              <div className="mt-0.5 text-[10px] opacity-50">{formatTime(s.timestamp)}</div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/** Groups consecutive agent messages into interim (thinking) + final answer. */
-function AgentResponseGroup({ messages: msgs }: { messages: ChatMessage[] }) {
-  const interims = msgs.filter((m) => m.isInterim);
-  const final = msgs.find((m) => !m.isInterim) ?? msgs[msgs.length - 1];
-  return (
-    <>
-      {interims.length > 0 && <ThinkingSteps steps={interims} />}
-      <MessageBubble msg={final} />
-    </>
-  );
-}
-
-function MarkdownContent({ content, compact }: { content: string; compact?: boolean }) {
+function MarkdownContent({ content }: { content: string }) {
   return (
     <div
       className={cn(
-        'break-words leading-relaxed',
-        compact ? 'text-xs' : 'text-sm',
+        'break-words text-sm leading-relaxed',
         '[&_p]:my-1.5 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0',
         '[&_ul]:my-1.5 [&_ul]:list-disc [&_ul]:pl-5',
         '[&_ol]:my-1.5 [&_ol]:list-decimal [&_ol]:pl-5',
@@ -154,31 +112,6 @@ function TypingIndicator() {
       </div>
     </div>
   );
-}
-
-/**
- * Group messages so consecutive agent messages are rendered together:
- * interim messages become collapsible "thinking" steps, final message gets the bubble.
- */
-function renderMessageGroups(messages: ChatMessage[]): ReactNode[] {
-  const groups: ReactNode[] = [];
-  let i = 0;
-  while (i < messages.length) {
-    const msg = messages[i];
-    if (msg.role === 'user') {
-      groups.push(<MessageBubble key={msg.id} msg={msg} />);
-      i++;
-    } else {
-      // Collect consecutive agent messages
-      const agentBatch: ChatMessage[] = [];
-      while (i < messages.length && messages[i].role === 'agent') {
-        agentBatch.push(messages[i]);
-        i++;
-      }
-      groups.push(<AgentResponseGroup key={agentBatch[0].id} messages={agentBatch} />);
-    }
-  }
-  return groups;
 }
 
 export default function ChatPage() {
@@ -271,7 +204,9 @@ export default function ChatPage() {
             </div>
           ) : (
             <>
-              {renderMessageGroups(messages)}
+              {messages.map((m) => (
+                <MessageBubble key={m.id} msg={m} />
+              ))}
               {isLoading ? <TypingIndicator /> : null}
             </>
           )}
