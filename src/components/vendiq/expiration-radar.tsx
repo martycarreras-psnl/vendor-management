@@ -93,7 +93,7 @@ function BucketRow({
         <div className="font-semibold">{meta.label}</div>
         <div className="text-muted-foreground">{contracts.length} contract{contracts.length === 1 ? '' : 's'}</div>
       </button>
-      <div className="flex min-h-[56px] flex-1 gap-1 overflow-hidden rounded-md">
+      <div className="flex min-h-[68px] flex-1 gap-1 overflow-hidden rounded-md">
         {labeled.length === 0 ? (
           <div className="flex w-full items-center justify-center rounded-md border bg-muted/30 px-3 text-xs text-muted-foreground">
             No contracts in this window
@@ -113,11 +113,14 @@ function BucketRow({
                     meta.color,
                     meta.text,
                   )}
-                  title={`${c.vendorName ?? c.supplierName ?? c.contractName}${spend ? ` · ${formatCurrency(spend)}` : ''}`}
+                  title={`${c.vendorName ?? c.supplierName ?? c.contractName}${c.documentId ? ` · ${c.documentId}` : ''}${spend ? ` · ${formatCurrency(spend)}` : ''}`}
                 >
                   <div className="truncate text-[11px] font-semibold leading-tight">
                     {c.vendorName ?? c.supplierName ?? c.contractName}
                   </div>
+                  {c.documentId && (
+                    <div className="truncate text-[10px] opacity-85">{c.documentId}</div>
+                  )}
                   {spend !== undefined && (
                     <div className="truncate text-[10px] opacity-85">{formatCurrency(spend)}</div>
                   )}
