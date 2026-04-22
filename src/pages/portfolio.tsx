@@ -13,18 +13,6 @@ import {
 import { formatCompactNumber, formatCurrency } from '@/lib/vendiq-format';
 import type { ContractStatus } from '@/types/vendiq';
 
-// Deterministic PRNG so sparklines are stable across renders without real history.
-function seedSeries(seed: number, n = 10, base = 100, jitter = 0.12): number[] {
-  let x = Math.sin(seed) * 10000;
-  const out: number[] = [];
-  for (let i = 0; i < n; i++) {
-    x = (Math.sin(x * 1.1 + i) * 10000) % 1;
-    const frac = Math.abs(x);
-    out.push(base * (1 - jitter / 2 + frac * jitter));
-  }
-  return out;
-}
-
 export default function PortfolioPage() {
   const navigate = useNavigate();
   const dataset = usePortfolioDataset();
@@ -74,12 +62,6 @@ export default function PortfolioPage() {
     return acc;
   }, {});
 
-  // Sparklines: deterministic series based on value magnitude (real time-series TBD).
-  const activeTrend = seedSeries(kpis.activeVendors || 1, 10, kpis.activeVendors || 1);
-  const spendTrend = seedSeries((kpis.annualSpendYtd || 1) / 1e6, 10, kpis.annualSpendYtd || 1);
-  const expiringTrend = seedSeries(kpis.expiring90dCount || 1, 10, kpis.expiring90dCount || 1);
-  const riskTrend = seedSeries(kpis.criticalAtRiskCount || 1, 10, kpis.criticalAtRiskCount || 1);
-
   return (
     <div className="space-y-4">
       <header>
@@ -95,30 +77,24 @@ export default function PortfolioPage() {
           value={formatCompactNumber(kpis.activeVendors)}
           sublabel="Status = Active"
           accent="primary"
-          trend={activeTrend}
         />
         <KpiCard
           label={`Annual Spend (FY${ctx.fiscalYear} YTD)`}
           value={formatCurrency(kpis.annualSpendYtd)}
           sublabel={`FY ${kpis.fiscalYear} budgets`}
           accent="signal-green"
-          trend={spendTrend}
-          trendDirection="up"
         />
         <KpiCard
           label="Contracts Expiring · 90 days"
           value={formatCompactNumber(kpis.expiring90dCount)}
           sublabel={`${buckets['0-30'].length} critical`}
           accent="signal-amber"
-          trend={expiringTrend}
         />
         <KpiCard
           label="Critical Vendors at Risk"
           value={formatCompactNumber(kpis.criticalAtRiskCount)}
           sublabel="Contract ≤90d × Criticality ≥4"
           accent="signal-red"
-          trend={riskTrend}
-          trendDirection="down"
         />
       </section>
 
