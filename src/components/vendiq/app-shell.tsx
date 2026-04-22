@@ -13,7 +13,7 @@ import { ConnectivityPill } from '@/components/vendiq/connectivity-pill';
 import { ModeToggle } from '@/components/mode-toggle';
 import { Input } from '@/components/ui/input';
 import { useState, type KeyboardEvent } from 'react';
-import vendiqIcon from '@/assets/vendiq_icon.svg';
+import vendiqIconMarkup from '@/assets/vendiq_icon.svg?raw';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Home', icon: LayoutDashboard, end: true },
@@ -40,7 +40,11 @@ export function AppShell() {
       {/* Sidebar */}
       <aside className="flex min-h-dvh flex-col border-r bg-sidebar text-sidebar-foreground">
         <div className="flex h-14 items-center gap-2 border-b border-sidebar-border px-4">
-          <img src={vendiqIcon} alt="VendIQ" className="h-8 w-8 rounded object-contain" />
+          <span
+            className="inline-flex h-8 w-8 items-center justify-center [&>svg]:h-8 [&>svg]:w-8 [&>svg]:rounded"
+            aria-label="VendIQ"
+            dangerouslySetInnerHTML={{ __html: vendiqIconMarkup }}
+          />
           <div>
             <div className="text-sm font-semibold leading-tight">VendIQ</div>
             <div className="text-[10px] uppercase tracking-wider opacity-70">Radiology Partners</div>
