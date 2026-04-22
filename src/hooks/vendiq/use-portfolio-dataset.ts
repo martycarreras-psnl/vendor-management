@@ -184,6 +184,15 @@ export function matchesFilters(
     const b = ctx.budgetsByVendor.get(vendor.id);
     if (!b?.quintileRating || !filters.ratings.includes(b.quintileRating)) return false;
   }
+  if (filters.expiringWithinDays !== undefined) {
+    const window = filters.expiringWithinDays;
+    const vendorContracts = ctx.contractsByVendor.get(vendor.id) ?? [];
+    const hasExpiring = vendorContracts.some((c) => {
+      const d = daysUntil(c.expirationDate);
+      return d !== undefined && d >= 0 && d <= window;
+    });
+    if (!hasExpiring) return false;
+  }
   return true;
 }
 
@@ -202,26 +211,25 @@ export function computeKpis(filters: PortfolioFilters, ctx: PortfolioDataset): K
     if (b?.supplierSpend) annualSpendYtd += b.supplierSpend;
   }
 
-  // Contracts expiring in 90 days whose supplier links to a filtered vendor.
-  // (Contract linkage via ContractParty is not loaded in the dashboard dataset for v1;
-  // we approximate by keeping all contracts expiring ≤90d and filtering later where possible.)
+  // Contracts expiring in 90 days (capped by the "expiring within" filter if set).
+  const windowCap = filters.expiringWithinDays ?? 90;
   let expiring90d = 0;
   let criticalAtRisk = 0;
   for (const c of ctx.contracts) {
     const days = daysUntil(c.expirationDate);
     if (days === undefined) continue;
-    if (days < 0 || days > 90) continue;
+    if (days < 0 || days > windowCap) continue;
     expiring90d += 1;
   }
   // Critical-at-risk: any filtered vendor with criticality >= 4 that has at least
-  // one expiring contract in the 0-90d window (via ContractParty or supplier bridge).
+  // one expiring contract within the selected window.
   for (const vid of vendorIds) {
     const crit = ctx.criticalityByVendor.get(vid) ?? 0;
     if (crit < 4) continue;
     const vendorContracts = ctx.contractsByVendor.get(vid) ?? [];
     const hasExpiring = vendorContracts.some((c) => {
       const d = daysUntil(c.expirationDate);
-      return d !== undefined && d >= 0 && d <= 90;
+      return d !== undefined && d >= 0 && d <= windowCap;
     });
     if (hasExpiring) criticalAtRisk += 1;
   }
@@ -299,10 +307,12 @@ export function computeExpirationBuckets(
   };
   // Apply a text-name filter to the contract itself for now (vendor-link not preloaded).
   const searchNeedle = filters.searchText?.trim().toLowerCase();
+  const windowCap = filters.expiringWithinDays;
   for (const c of ctx.contracts) {
     const days = daysUntil(c.expirationDate);
     const b = expirationBucket(days);
     if (!b) continue;
+    if (windowCap !== undefined && (days === undefined || days > windowCap)) continue;
     if (searchNeedle) {
       const hay = `${c.contractName ?? ''} ${c.supplierName ?? ''} ${c.contractingEntityName ?? ''}`.toLowerCase();
       if (!hay.includes(searchNeedle)) continue;
