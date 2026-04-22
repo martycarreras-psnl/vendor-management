@@ -1,10 +1,8 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
   Truck,
-  FileText,
-  ShieldCheck,
   ClipboardCheck,
   UserCog,
   Sparkles,
@@ -12,31 +10,66 @@ import {
   Settings,
   Search,
   AppWindow,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ConnectivityPill } from '@/components/vendiq/connectivity-pill';
 import { useIsVPAdmin } from '@/hooks/vendiq/use-vp-review-context';
-import { useState, type KeyboardEvent } from 'react';
+import { useState, useEffect, type KeyboardEvent } from 'react';
 import vendiqIconMarkup from '@/assets/vendiq_icon.svg?raw';
 
-const NAV_ITEMS = [
+interface NavItem {
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  end?: boolean;
+  adminOnly?: boolean;
+  children?: NavItem[];
+}
+
+const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'Home', icon: LayoutDashboard, end: true },
-  { to: '/vendors', label: 'Vendors', icon: Users, end: false },
-  { to: '/suppliers', label: 'Suppliers', icon: Truck, end: false },
-  { to: '/contracts', label: 'Contracts', icon: FileText, end: false },
-  { to: '/risk', label: 'Risk', icon: ShieldCheck, end: false },
-  { to: '/reviews', label: 'My Reviews', icon: ClipboardCheck, end: false },
-  { to: '/admin/assignments', label: 'VP Assignments', icon: UserCog, end: false, adminOnly: true },
-  { to: '/chat', label: 'Ask vendIQ', icon: Sparkles, end: false },
-  { to: '/prompt-suggestions', label: 'Prompt Suggestions', icon: MessageSquareText, end: false },
-  { to: '/settings', label: 'Settings', icon: Settings, end: false },
+  { to: '/reviews', label: 'My Reviews', icon: ClipboardCheck },
+  { to: '/vendors', label: 'Vendors', icon: Users },
+  { to: '/suppliers', label: 'Suppliers', icon: Truck },
+  { to: '/chat', label: 'Ask vendIQ', icon: Sparkles },
+  {
+    to: '/settings',
+    label: 'Settings',
+    icon: Settings,
+    children: [
+      { to: '/admin/assignments', label: 'VP Assignments', icon: UserCog, adminOnly: true },
+      { to: '/prompt-suggestions', label: 'Prompt Suggestions', icon: MessageSquareText },
+    ],
+  },
 ];
+
+function filterItems(items: NavItem[], isAdmin: boolean): NavItem[] {
+  return items
+    .filter((i) => !i.adminOnly || isAdmin)
+    .map((i) => (i.children ? { ...i, children: filterItems(i.children, isAdmin) } : i));
+}
 
 export function AppShell() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchText, setSearchText] = useState('');
   const isAdmin = useIsVPAdmin();
-  const navItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin);
+  const navItems = filterItems(NAV_ITEMS, isAdmin);
+
+  // Track which parent items are expanded. Auto-expand when a child route is active.
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  useEffect(() => {
+    const next: Record<string, boolean> = { ...expanded };
+    for (const item of navItems) {
+      if (item.children?.some((c) => location.pathname.startsWith(c.to))) {
+        next[item.to] = true;
+      }
+    }
+    setExpanded(next);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
 
   function onSearchKey(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter' && searchText.trim().length > 0) {
@@ -91,6 +124,65 @@ export function AppShell() {
           <nav className="flex-1 p-2 pt-3">
             {navItems.map((item) => {
               const Icon = item.icon;
+              const hasChildren = !!item.children && item.children.length > 0;
+              if (hasChildren) {
+                const isOpen = !!expanded[item.to];
+                const Chev = isOpen ? ChevronDown : ChevronRight;
+                return (
+                  <div key={item.to}>
+                    <button
+                      type="button"
+                      onClick={() => setExpanded((s) => ({ ...s, [item.to]: !s[item.to] }))}
+                      className={cn(
+                        'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                        'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                      )}
+                      aria-expanded={isOpen}
+                    >
+                      <Icon className="h-4 w-4" aria-hidden />
+                      <span className="flex-1 text-left">{item.label}</span>
+                      <Chev className="h-3.5 w-3.5 opacity-70" aria-hidden />
+                    </button>
+                    {isOpen && (
+                      <div className="ml-4 mt-0.5 flex flex-col gap-0.5 border-l border-sidebar-border pl-2">
+                        <NavLink
+                          to={item.to}
+                          end
+                          className={({ isActive }) =>
+                            cn(
+                              'flex items-center gap-2 rounded-md px-3 py-1.5 text-xs transition-colors',
+                              'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                              isActive && 'bg-sidebar-accent text-sidebar-accent-foreground',
+                            )
+                          }
+                        >
+                          General
+                        </NavLink>
+                        {item.children!.map((child) => {
+                          const CIcon = child.icon;
+                          return (
+                            <NavLink
+                              key={child.to}
+                              to={child.to}
+                              end={child.end}
+                              className={({ isActive }) =>
+                                cn(
+                                  'flex items-center gap-2 rounded-md px-3 py-1.5 text-xs transition-colors',
+                                  'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                                  isActive && 'bg-sidebar-accent text-sidebar-accent-foreground',
+                                )
+                              }
+                            >
+                              <CIcon className="h-3.5 w-3.5" aria-hidden />
+                              {child.label}
+                            </NavLink>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
               return (
                 <NavLink
                   key={item.to}
