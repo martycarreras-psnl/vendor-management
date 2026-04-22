@@ -10,6 +10,7 @@ import Supplier360Page from "@/pages/supplier-360"
 import RiskDashboardPage from "@/pages/risk-dashboard"
 import ReviewsPage from "@/pages/reviews"
 import VendorScoreWizardPage from "@/pages/vendor-score-wizard"
+import AdminAssignmentsPage from "@/pages/admin-assignments"
 import ChatPage from "@/pages/chat"
 import PromptSuggestionsPage from "@/pages/prompt-suggestions"
 import SettingsPage from "@/pages/settings"
@@ -36,6 +37,7 @@ export const router = createHashRouter([
       { path: "risk", element: <RiskDashboardPage /> },
       { path: "reviews", element: <ReviewsPage /> },
       { path: "reviews/:assignmentId/score", element: <VendorScoreWizardPage /> },
+      { path: "admin/assignments", element: <AdminAssignmentsPage /> },
       { path: "chat", element: <ChatPage /> },
       { path: "prompt-suggestions", element: <PromptSuggestionsPage /> },
       { path: "settings", element: <SettingsPage /> },

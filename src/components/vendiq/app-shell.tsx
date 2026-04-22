@@ -6,6 +6,7 @@ import {
   FileText,
   ShieldCheck,
   ClipboardCheck,
+  UserCog,
   Sparkles,
   MessageSquareText,
   Settings,
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ConnectivityPill } from '@/components/vendiq/connectivity-pill';
+import { useIsVPAdmin } from '@/hooks/vendiq/use-vp-review-context';
 import { useState, type KeyboardEvent } from 'react';
 import vendiqIconMarkup from '@/assets/vendiq_icon.svg?raw';
 
@@ -24,6 +26,7 @@ const NAV_ITEMS = [
   { to: '/contracts', label: 'Contracts', icon: FileText, end: false },
   { to: '/risk', label: 'Risk', icon: ShieldCheck, end: false },
   { to: '/reviews', label: 'My Reviews', icon: ClipboardCheck, end: false },
+  { to: '/admin/assignments', label: 'VP Assignments', icon: UserCog, end: false, adminOnly: true },
   { to: '/chat', label: 'Ask vendIQ', icon: Sparkles, end: false },
   { to: '/prompt-suggestions', label: 'Prompt Suggestions', icon: MessageSquareText, end: false },
   { to: '/settings', label: 'Settings', icon: Settings, end: false },
@@ -32,6 +35,8 @@ const NAV_ITEMS = [
 export function AppShell() {
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState('');
+  const isAdmin = useIsVPAdmin();
+  const navItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin);
 
   function onSearchKey(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter' && searchText.trim().length > 0) {
@@ -84,7 +89,7 @@ export function AppShell() {
         {/* Expanded sidebar */}
         <aside className="flex w-56 shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground">
           <nav className="flex-1 p-2 pt-3">
-            {NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const Icon = item.icon;
               return (
                 <NavLink
