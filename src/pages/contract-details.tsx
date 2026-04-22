@@ -8,7 +8,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useVendiq } from '@/services/vendiq/provider-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { DataverseFieldLabel, useDataverseFieldRequired } from '@/components/ui/dataverse-field-label';
+import { toDataverseFieldName } from '@/lib/dataverse-field-name';
 import { DataGrid } from '@/components/vendiq/data-grid';
 import { formatDate, daysUntil } from '@/lib/vendiq-format';
 import { cn } from '@/lib/utils';
@@ -318,6 +319,12 @@ function StatusBadge({ status }: { status?: ContractStatus }) {
   return <span className={cn('rounded-full border px-2 py-0.5 text-xs font-medium', tone)}>{status}</span>;
 }
 
+// All editable helpers below are bound to the `rpvms_contracts` table. Each
+// domain key is auto-mapped to its Dataverse logical column name via
+// `toDataverseFieldName`. Label text, asterisk, and aria-required come from
+// live Dataverse metadata.
+const CONTRACT_TABLE = 'rpvms_contracts';
+
 function Field({
   label,
   value,
@@ -335,21 +342,30 @@ function Field({
   multiline?: boolean;
   className?: string;
 }) {
+  const logical = toDataverseFieldName(field as string);
+  const required = useDataverseFieldRequired(CONTRACT_TABLE, logical);
   return (
     <div className={className}>
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <DataverseFieldLabel
+        tableLogicalName={CONTRACT_TABLE}
+        fieldLogicalName={logical}
+        fallback={label}
+        className="text-xs text-muted-foreground"
+      />
       {editing ? (
         multiline ? (
           <textarea
             className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
             rows={3}
             value={(value as string) ?? ''}
+            aria-required={required || undefined}
             onChange={(e) => onUpdate(field, e.target.value || undefined)}
           />
         ) : (
           <Input
             className="mt-1"
             value={(value as string) ?? ''}
+            aria-required={required || undefined}
             onChange={(e) => onUpdate(field, e.target.value || undefined)}
           />
         )
@@ -373,16 +389,24 @@ function DateField({
   editing: boolean;
   onUpdate: (field: keyof Contract, value: unknown) => void;
 }) {
+  const logical = toDataverseFieldName(field as string);
+  const required = useDataverseFieldRequired(CONTRACT_TABLE, logical);
   // Normalize ISO date to YYYY-MM-DD for the input type=date
   const inputValue = value ? value.slice(0, 10) : '';
   return (
     <div>
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <DataverseFieldLabel
+        tableLogicalName={CONTRACT_TABLE}
+        fieldLogicalName={logical}
+        fallback={label}
+        className="text-xs text-muted-foreground"
+      />
       {editing ? (
         <Input
           className="mt-1"
           type="date"
           value={inputValue}
+          aria-required={required || undefined}
           onChange={(e) => onUpdate(field, e.target.value ? `${e.target.value}T00:00:00Z` : undefined)}
         />
       ) : (
@@ -410,13 +434,21 @@ function SelectField<T extends string>({
   displayFn?: (v: T) => string;
 }) {
   const display = displayFn ?? ((v: T) => v);
+  const logical = toDataverseFieldName(field as string);
+  const required = useDataverseFieldRequired(CONTRACT_TABLE, logical);
   return (
     <div>
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <DataverseFieldLabel
+        tableLogicalName={CONTRACT_TABLE}
+        fieldLogicalName={logical}
+        fallback={label}
+        className="text-xs text-muted-foreground"
+      />
       {editing ? (
         <select
           className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
           value={value ?? ''}
+          aria-required={required || undefined}
           onChange={(e) => onUpdate(field, (e.target.value || undefined) as T | undefined)}
         >
           <option value="">—</option>

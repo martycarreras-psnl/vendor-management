@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { DataverseFieldLabel } from '@/components/ui/dataverse-field-label';
 import { CRITICALITY_META } from '@/components/vendiq/criticality-pill';
 import type { CriticalityLevel } from '@/types/vendiq';
 import { cn } from '@/lib/utils';
@@ -89,13 +90,18 @@ export function AdjustCriticalityDialog({
             </div>
           </div>
           <div>
-            <label htmlFor="adjust-crit-comment" className="mb-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Reason / comment <span className="text-signal-red">*</span>
-            </label>
+            <DataverseFieldLabel
+              htmlFor="adjust-crit-comment"
+              required
+              className="mb-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+            >
+              Reason / comment
+            </DataverseFieldLabel>
             <Textarea
               id="adjust-crit-comment"
               placeholder="Document rationale (required, minimum 10 characters)…"
               value={comment}
+              aria-required
               onChange={(e) => setComment(e.target.value)}
               rows={3}
             />

@@ -75,3 +75,27 @@ These are enforced by the detailed instruction files but must be respected even 
 If the user's request is ambiguous about whether they want a Code App or a generic web app, **ask**. Do not silently produce a generic app. The entire value of this template is its Code-App specificity.
 
 If a requested pattern conflicts with a rule in this file or in `.github/instructions/`, surface the conflict to the user and propose the Code-App-compliant alternative rather than silently ignoring the rule.
+
+## Form Field Pattern (REQUIRED — Dataverse Metadata-Backed Labels)
+
+Every editable field whose value is written to Dataverse **must** use the shared `DataverseFieldLabel` primitive from [src/components/ui/dataverse-field-label.tsx](src/components/ui/dataverse-field-label.tsx). This is how the app stays consistent with Dataverse's `RequiredLevel` setting without per-field hardcoding.
+
+Rules (non-negotiable):
+
+1. **Never** render a plain `<Label>`, `<label>`, or hardcoded `*` asterisk for a Dataverse-bound field. Use `<DataverseFieldLabel tableLogicalName="..." fieldLogicalName="..." fallback="..." />`.
+2. Domain-model keys auto-map to Dataverse logical names via [src/lib/dataverse-field-name.ts](src/lib/dataverse-field-name.ts) (`toDataverseFieldName`). The convention is `rpvms_` + key.toLowerCase(). Pass an explicit `fieldLogicalName` only for out-of-convention columns.
+3. Set `aria-required={required || undefined}` on the input/select/textarea using `useDataverseFieldRequired(table, field)` from the same module.
+4. For client-only fields that are not Dataverse-backed (e.g. dialog comments written into a computed assessment), use `<DataverseFieldLabel required>...</DataverseFieldLabel>` — still go through the primitive so the visual indicator stays consistent.
+5. When writing a form mutation, guard Business-Required fields client-side using the metadata (see `prompt-suggestions.tsx` `saveMutation` for the canonical pattern). The Web API does not enforce `ApplicationRequired` — the app must.
+6. When adding a new Dataverse table to the app, register its `getMetadata` call in `fieldMetadataServiceRegistry` inside [src/services/vendiq/dataverse-provider.ts](src/services/vendiq/dataverse-provider.ts). Without that entry, metadata lookups for that table return `null`.
+
+Examples of correctly-wired forms:
+
+- [src/pages/vendor-360.tsx](src/pages/vendor-360.tsx) — `VField`, `VSelect`, `VBool`, `VReadOnly` helpers
+- [src/pages/contract-details.tsx](src/pages/contract-details.tsx) — `Field`, `DateField`, `SelectField` helpers
+- [src/pages/supplier-360.tsx](src/pages/supplier-360.tsx) — `SField`, `SSelect`, `SBool` helpers
+- [src/pages/prompt-suggestions.tsx](src/pages/prompt-suggestions.tsx) — inline form with required-guard on submit
+- [src/components/vendiq/adjust-criticality-dialog.tsx](src/components/vendiq/adjust-criticality-dialog.tsx) — client-only `required` mode
+
+Do not ask the user whether to apply this pattern. It is the default for every editable Dataverse-bound field in this repo, forever.
+

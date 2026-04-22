@@ -10,7 +10,8 @@ import { AdjustCriticalityDialog } from '@/components/vendiq/adjust-criticality-
 import { DataGrid, type ColumnDef } from '@/components/vendiq/data-grid';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { DataverseFieldLabel, useDataverseFieldRequired } from '@/components/ui/dataverse-field-label';
+import { toDataverseFieldName } from '@/lib/dataverse-field-name';
 import { formatCurrency, formatDate } from '@/lib/vendiq-format';
 import { useCurrentUserRoles } from '@/hooks/vendiq/use-current-user-roles';
 import { cn } from '@/lib/utils';
@@ -476,15 +477,33 @@ function ScoreLine({ label, value }: { label: string; value: number | undefined 
 }
 
 // ---- Editable field components ----
+// All editable helpers are bound to the `rpvms_vendors` table. Each domain key
+// (e.g. `primaryOffering`) is auto-mapped to its Dataverse logical column name
+// (`rpvms_primaryoffering`) via `toDataverseFieldName`. The asterisk + aria
+// required state come from live Dataverse metadata.
+const VENDOR_TABLE = 'rpvms_vendors';
+
 function VField({ label, value, field, editing, onUpdate, className }: {
   label: string; value?: string; field: keyof Vendor; editing: boolean;
   onUpdate: (f: keyof Vendor, v: unknown) => void; className?: string;
 }) {
+  const logical = toDataverseFieldName(field as string);
+  const required = useDataverseFieldRequired(VENDOR_TABLE, logical);
   return (
     <div className={className}>
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <DataverseFieldLabel
+        tableLogicalName={VENDOR_TABLE}
+        fieldLogicalName={logical}
+        fallback={label}
+        className="text-xs text-muted-foreground"
+      />
       {editing ? (
-        <Input className="mt-1" value={(value as string) ?? ''} onChange={(e) => onUpdate(field, e.target.value || undefined)} />
+        <Input
+          className="mt-1"
+          value={(value as string) ?? ''}
+          aria-required={required || undefined}
+          onChange={(e) => onUpdate(field, e.target.value || undefined)}
+        />
       ) : (
         <div className="mt-1 text-sm font-medium">{(value as string) || '—'}</div>
       )}
@@ -497,11 +516,23 @@ function VSelect<T extends string>({ label, value, field, options, editing, onUp
   onUpdate: (f: keyof Vendor, v: unknown) => void; displayFn?: (v: T) => string;
 }) {
   const display = displayFn ?? ((v: T) => v);
+  const logical = toDataverseFieldName(field as string);
+  const required = useDataverseFieldRequired(VENDOR_TABLE, logical);
   return (
     <div>
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <DataverseFieldLabel
+        tableLogicalName={VENDOR_TABLE}
+        fieldLogicalName={logical}
+        fallback={label}
+        className="text-xs text-muted-foreground"
+      />
       {editing ? (
-        <select className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm" value={value ?? ''} onChange={(e) => onUpdate(field, (e.target.value || undefined) as T | undefined)}>
+        <select
+          className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
+          value={value ?? ''}
+          aria-required={required || undefined}
+          onChange={(e) => onUpdate(field, (e.target.value || undefined) as T | undefined)}
+        >
           <option value="">—</option>
           {options.map((o) => <option key={o} value={o}>{display(o)}</option>)}
         </select>
@@ -516,11 +547,23 @@ function VBool({ label, value, field, editing, onUpdate }: {
   label: string; value?: boolean; field: keyof Vendor; editing: boolean;
   onUpdate: (f: keyof Vendor, v: unknown) => void;
 }) {
+  const logical = toDataverseFieldName(field as string);
+  const required = useDataverseFieldRequired(VENDOR_TABLE, logical);
   return (
     <div>
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <DataverseFieldLabel
+        tableLogicalName={VENDOR_TABLE}
+        fieldLogicalName={logical}
+        fallback={label}
+        className="text-xs text-muted-foreground"
+      />
       {editing ? (
-        <select className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm" value={value === undefined ? '' : value ? 'true' : 'false'} onChange={(e) => onUpdate(field, e.target.value === '' ? undefined : e.target.value === 'true')}>
+        <select
+          className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
+          value={value === undefined ? '' : value ? 'true' : 'false'}
+          aria-required={required || undefined}
+          onChange={(e) => onUpdate(field, e.target.value === '' ? undefined : e.target.value === 'true')}
+        >
           <option value="">—</option>
           <option value="true">Yes</option>
           <option value="false">No</option>
@@ -532,10 +575,16 @@ function VBool({ label, value, field, editing, onUpdate }: {
   );
 }
 
-function VReadOnly({ label, value }: { label: string; value?: string }) {
+function VReadOnly({ label, value, field }: { label: string; value?: string; field?: keyof Vendor }) {
+  const logical = field ? toDataverseFieldName(field as string) : undefined;
   return (
     <div>
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <DataverseFieldLabel
+        tableLogicalName={logical ? VENDOR_TABLE : undefined}
+        fieldLogicalName={logical}
+        fallback={label}
+        className="text-xs text-muted-foreground"
+      />
       <div className="mt-1 text-sm">{value || '—'}</div>
     </div>
   );

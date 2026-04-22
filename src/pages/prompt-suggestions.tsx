@@ -6,7 +6,6 @@ import { useVendiq } from '@/services/vendiq/provider-context';
 import { DataGrid, type ColumnDef } from '@/components/vendiq/data-grid';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { DataverseFieldLabel } from '@/components/ui/dataverse-field-label';
 import { Plus, Pencil, Trash2, X, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -197,7 +196,12 @@ export default function PromptSuggestionsPage() {
               />
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Category</Label>
+              <DataverseFieldLabel
+                tableLogicalName="rpvms_promptsuggestions"
+                fieldLogicalName="rpvms_category"
+                fallback="Category"
+                className="text-xs text-muted-foreground"
+              />
               <Input
                 className="mt-1"
                 value={form.category}
@@ -206,7 +210,12 @@ export default function PromptSuggestionsPage() {
               />
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Sort Order</Label>
+              <DataverseFieldLabel
+                tableLogicalName="rpvms_promptsuggestions"
+                fieldLogicalName="rpvms_sortorder"
+                fallback="Sort Order"
+                className="text-xs text-muted-foreground"
+              />
               <Input
                 className="mt-1"
                 type="number"
@@ -215,7 +224,12 @@ export default function PromptSuggestionsPage() {
               />
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Active</Label>
+              <DataverseFieldLabel
+                tableLogicalName="rpvms_promptsuggestions"
+                fieldLogicalName="rpvms_isactive"
+                fallback="Active"
+                className="text-xs text-muted-foreground"
+              />
               <select
                 className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
                 value={form.isActive ? 'true' : 'false'}

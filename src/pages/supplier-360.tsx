@@ -7,7 +7,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useVendiq } from '@/services/vendiq/provider-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { DataverseFieldLabel, useDataverseFieldRequired } from '@/components/ui/dataverse-field-label';
+import { toDataverseFieldName } from '@/lib/dataverse-field-name';
 import { DataGrid, type ColumnDef } from '@/components/vendiq/data-grid';
 import { formatCurrency, formatDate } from '@/lib/vendiq-format';
 import { cn } from '@/lib/utils';
@@ -325,16 +326,31 @@ function OverviewTab({ bundle, supplierId }: { bundle: SupplierBundle; supplierI
 }
 
 // ---- Editable field components ----
+// All helpers below are bound to the `rpvms_suppliers` table. Labels, asterisk,
+// and aria-required are driven by live Dataverse metadata.
+const SUPPLIER_TABLE = 'rpvms_suppliers';
 
 function SField({ label, value, field, editing, onUpdate }: {
   label: string; value?: string; field: keyof Supplier; editing: boolean;
   onUpdate: (f: keyof Supplier, v: unknown) => void;
 }) {
+  const logical = toDataverseFieldName(field as string);
+  const required = useDataverseFieldRequired(SUPPLIER_TABLE, logical);
   return (
     <div>
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <DataverseFieldLabel
+        tableLogicalName={SUPPLIER_TABLE}
+        fieldLogicalName={logical}
+        fallback={label}
+        className="text-xs text-muted-foreground"
+      />
       {editing ? (
-        <Input className="mt-1" value={(value as string) ?? ''} onChange={(e) => onUpdate(field, e.target.value || undefined)} />
+        <Input
+          className="mt-1"
+          value={(value as string) ?? ''}
+          aria-required={required || undefined}
+          onChange={(e) => onUpdate(field, e.target.value || undefined)}
+        />
       ) : (
         <div className="mt-1 text-sm font-medium">{(value as string) || '—'}</div>
       )}
@@ -346,11 +362,23 @@ function SSelect<T extends string>({ label, value, field, options, editing, onUp
   label: string; value?: T; field: keyof Supplier; options: T[]; editing: boolean;
   onUpdate: (f: keyof Supplier, v: unknown) => void;
 }) {
+  const logical = toDataverseFieldName(field as string);
+  const required = useDataverseFieldRequired(SUPPLIER_TABLE, logical);
   return (
     <div>
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <DataverseFieldLabel
+        tableLogicalName={SUPPLIER_TABLE}
+        fieldLogicalName={logical}
+        fallback={label}
+        className="text-xs text-muted-foreground"
+      />
       {editing ? (
-        <select className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm" value={value ?? ''} onChange={(e) => onUpdate(field, (e.target.value || undefined) as T | undefined)}>
+        <select
+          className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
+          value={value ?? ''}
+          aria-required={required || undefined}
+          onChange={(e) => onUpdate(field, (e.target.value || undefined) as T | undefined)}
+        >
           <option value="">—</option>
           {options.map((o) => <option key={o} value={o}>{o}</option>)}
         </select>
@@ -365,11 +393,23 @@ function SBool({ label, value, field, editing, onUpdate }: {
   label: string; value?: boolean; field: keyof Supplier; editing: boolean;
   onUpdate: (f: keyof Supplier, v: unknown) => void;
 }) {
+  const logical = toDataverseFieldName(field as string);
+  const required = useDataverseFieldRequired(SUPPLIER_TABLE, logical);
   return (
     <div>
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <DataverseFieldLabel
+        tableLogicalName={SUPPLIER_TABLE}
+        fieldLogicalName={logical}
+        fallback={label}
+        className="text-xs text-muted-foreground"
+      />
       {editing ? (
-        <select className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm" value={value === undefined ? '' : value ? 'true' : 'false'} onChange={(e) => onUpdate(field, e.target.value === '' ? undefined : e.target.value === 'true')}>
+        <select
+          className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
+          value={value === undefined ? '' : value ? 'true' : 'false'}
+          aria-required={required || undefined}
+          onChange={(e) => onUpdate(field, e.target.value === '' ? undefined : e.target.value === 'true')}
+        >
           <option value="">—</option>
           <option value="true">Yes</option>
           <option value="false">No</option>
