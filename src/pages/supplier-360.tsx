@@ -37,13 +37,22 @@ function useSupplier360(supplierId: string) {
     queryKey: ['vendiq', 'supplier360', supplierId],
     enabled: !!supplierId,
     queryFn: async () => {
-      const [supplier, vendorSuppliers, contracts, contractParties, glTransactions] = await Promise.all([
+      const [supplier, vendorSuppliers, contracts, contractParties, glTransactions, vendors] = await Promise.all([
         provider.suppliers.getById(supplierId),
         provider.vendorSuppliers.listBySupplier(supplierId),
         provider.contracts.listBySupplier(supplierId),
         provider.contractParties.listBySupplier(supplierId),
         provider.glTransactions.listBySupplier(supplierId),
+        provider.vendors.list({ top: 5000 }),
       ]);
+
+      // Enrich vendor names so we never display raw GUIDs
+      const vendorNameById = new Map(vendors.map((v) => [v.id, v.vendorName]));
+      for (const vs of vendorSuppliers) {
+        if (!vs.vendorName) {
+          vs.vendorName = vendorNameById.get(vs.vendorId);
+        }
+      }
 
       return { supplier, vendorSuppliers, contracts, contractParties, glTransactions };
     },
