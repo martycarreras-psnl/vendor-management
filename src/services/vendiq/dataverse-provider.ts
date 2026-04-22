@@ -110,6 +110,14 @@ import {
 
 // ---- Mapping helpers ----
 
+/** Normalize any ISO date-ish string to 'YYYY-MM-DD' for Edm.Date (DateOnly) fields. */
+function toDateOnly(v: string | undefined | null): string | undefined {
+  if (v == null || v === '') return undefined;
+  // If already 'YYYY-MM-DD', keep it; otherwise slice the first 10 chars of ISO.
+  const s = String(v);
+  return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : s.slice(0, 10);
+}
+
 function mapVendor(r: Rpvms_vendors): Vendor {
   return {
     id: r.rpvms_vendorid,
@@ -537,10 +545,10 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
       if (input.contractType !== undefined) payload.rpvms_contracttype = writeContractType(input.contractType);
       if (input.subContractType !== undefined) payload.rpvms_subcontracttype = input.subContractType;
       if (input.contractStatus !== undefined) payload.rpvms_contractstatus = writeContractStatus(input.contractStatus);
-      if (input.dateSigned !== undefined) payload.rpvms_datesigned = input.dateSigned;
-      if (input.effectiveDate !== undefined) payload.rpvms_effectivedate = input.effectiveDate;
-      if (input.expirationDate !== undefined) payload.rpvms_expirationdate = input.expirationDate;
-      if (input.noticeDate !== undefined) payload.rpvms_noticedate = input.noticeDate;
+      if (input.dateSigned !== undefined) payload.rpvms_datesigned = toDateOnly(input.dateSigned);
+      if (input.effectiveDate !== undefined) payload.rpvms_effectivedate = toDateOnly(input.effectiveDate);
+      if (input.expirationDate !== undefined) payload.rpvms_expirationdate = toDateOnly(input.expirationDate);
+      if (input.noticeDate !== undefined) payload.rpvms_noticedate = toDateOnly(input.noticeDate);
       if (input.autoRenew !== undefined) payload.rpvms_autorenew = writeYesNoNA(input.autoRenew);
       if (input.autoRenewalDetails !== undefined) payload.rpvms_autorenewaldetails = input.autoRenewalDetails;
       if (input.amended !== undefined) payload.rpvms_amended = writeYesNoNA(input.amended);
@@ -1027,7 +1035,7 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
           'rpvms_VendorId@odata.bind': vendorBind(vendorId),
           rpvms_isactive: true as unknown as Rpvms_vpvendorassignmentsrpvms_isactive,
         };
-        if (input.reviewDueDate) payload.rpvms_reviewduedate = input.reviewDueDate;
+        if (input.reviewDueDate) payload.rpvms_reviewduedate = toDateOnly(input.reviewDueDate);
         if (input.assignedById) payload['rpvms_AssignedBy@odata.bind'] = systemuserBind(input.assignedById);
         if (input.notes) payload.rpvms_notes = input.notes;
         const res = unwrap(await Rpvms_vpvendorassignmentsService.create(payload as never));
