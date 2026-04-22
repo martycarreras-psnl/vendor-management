@@ -84,6 +84,14 @@
         "promptsuggestions": {
           "entitySetName": "rpvms_promptsuggestions",
           "logicalName": "rpvms_promptsuggestion"
+        },
+        "vpvendorassignments": {
+          "entitySetName": "rpvms_vpvendorassignments",
+          "logicalName": "rpvms_vpvendorassignment"
+        },
+        "users": {
+          "entitySetName": "systemusers",
+          "logicalName": "systemuser"
         }
       },
       "environmentVariableName": ""

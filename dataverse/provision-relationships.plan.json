@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-21T03:17:34.067Z",
+  "generatedAt": "2026-04-22T18:34:47.408Z",
   "sourcePlan": "dataverse/planning-payload.json",
   "relationships": [
     {
@@ -189,6 +189,48 @@
       "lookupLogicalName": "rpvms_vendorid",
       "lookupDisplayName": "Vendor",
       "requiredLevel": "ApplicationRequired",
+      "cascadeConfiguration": "Referential"
+    },
+    {
+      "type": "ManyToOne",
+      "schemaName": "rpvms_VPVendorAssignment_Reviewer",
+      "fromTable": "rpvms_vpvendorassignment",
+      "toTable": "systemuser",
+      "referencingEntity": "rpvms_vpvendorassignment",
+      "referencedEntity": "systemuser",
+      "lookupSchemaName": "rpvms_Reviewer",
+      "lookupLogicalName": "rpvms_reviewer",
+      "lookupDisplayName": "Reviewer",
+      "lookupDescription": "Vice President assigned to review the vendor.",
+      "requiredLevel": "ApplicationRequired",
+      "cascadeConfiguration": "Referential"
+    },
+    {
+      "type": "ManyToOne",
+      "schemaName": "rpvms_VPVendorAssignment_Vendor",
+      "fromTable": "rpvms_vpvendorassignment",
+      "toTable": "rpvms_vendor",
+      "referencingEntity": "rpvms_vpvendorassignment",
+      "referencedEntity": "rpvms_vendor",
+      "lookupSchemaName": "rpvms_VendorId",
+      "lookupLogicalName": "rpvms_vendorid",
+      "lookupDisplayName": "Vendor",
+      "lookupDescription": "Vendor being reviewed in this cycle.",
+      "requiredLevel": "ApplicationRequired",
+      "cascadeConfiguration": "Referential"
+    },
+    {
+      "type": "ManyToOne",
+      "schemaName": "rpvms_VPVendorAssignment_AssignedBy",
+      "fromTable": "rpvms_vpvendorassignment",
+      "toTable": "systemuser",
+      "referencingEntity": "rpvms_vpvendorassignment",
+      "referencedEntity": "systemuser",
+      "lookupSchemaName": "rpvms_AssignedBy",
+      "lookupLogicalName": "rpvms_assignedby",
+      "lookupDisplayName": "Assigned By",
+      "lookupDescription": "Admin who created this assignment.",
+      "requiredLevel": "None",
       "cascadeConfiguration": "Referential"
     }
   ]

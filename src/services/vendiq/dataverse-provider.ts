@@ -15,6 +15,9 @@ import { Rpvms_vendornamealiasesService } from '@/generated/services/Rpvms_vendo
 import { Rpvms_onetrustassessmentsService } from '@/generated/services/Rpvms_onetrustassessmentsService';
 import { Rpvms_servicenowassessmentsService } from '@/generated/services/Rpvms_servicenowassessmentsService';
 import { Rpvms_promptsuggestionsService } from '@/generated/services/Rpvms_promptsuggestionsService';
+import { Rpvms_vpvendorassignmentsService } from '@/generated/services/Rpvms_vpvendorassignmentsService';
+import { SystemusersService } from '@/generated/services/SystemusersService';
+import { Office365UsersService } from '@/generated/services/Office365UsersService';
 
 import type { Rpvms_vendors } from '@/generated/models/Rpvms_vendorsModel';
 import type { Rpvms_suppliers } from '@/generated/models/Rpvms_suppliersModel';
@@ -30,6 +33,8 @@ import type { Rpvms_vendornamealiases } from '@/generated/models/Rpvms_vendornam
 import type { Rpvms_onetrustassessments } from '@/generated/models/Rpvms_onetrustassessmentsModel';
 import type { Rpvms_servicenowassessments } from '@/generated/models/Rpvms_servicenowassessmentsModel';
 import type { Rpvms_promptsuggestions } from '@/generated/models/Rpvms_promptsuggestionsModel';
+import type { Rpvms_vpvendorassignments } from '@/generated/models/Rpvms_vpvendorassignmentsModel';
+import type { Systemusers } from '@/generated/models/SystemusersModel';
 
 import type {
   Vendor,
@@ -49,9 +54,17 @@ import type {
   AdjustCriticalityInput,
   CriticalityLevel,
   PromptSuggestion,
+  Reviewer,
+  VPVendorAssignment,
+  ScoreStatus,
 } from '@/types/vendiq';
 
-import type { ListOptions, VendIqDataProvider } from '@/services/vendiq/contracts';
+import type {
+  ListOptions,
+  VendIqDataProvider,
+  VendorScoreCreateInput,
+  VendorScorePatch,
+} from '@/services/vendiq/contracts';
 import {
   parseDecimal,
   readCommercialRole,
@@ -88,6 +101,10 @@ import {
   writeVendorPhi,
   writeVendorStatus,
   writeYesNoNA,
+  readScoreStatus,
+  writeScoreStatus,
+  readAssignmentIsActive,
+  writeAssignmentIsActive,
 } from '@/services/vendiq/option-sets';
 
 // ---- Mapping helpers ----
@@ -227,9 +244,41 @@ function mapVendorScore(r: Rpvms_vendorscores): VendorScore {
     alignmentScore: parseDecimal(r.rpvms_alignmentscore as string | undefined),
     weightedScore: parseDecimal(r.rpvms_weightedscore as string | undefined),
     wtScoreCritDepOnly: parseDecimal(r.rpvms_wtscorecritdeponly as string | undefined),
-    topSpendCostCenter: r.rpvms_topspendcostcenter,
+    topSpendCostCenter: r.rpvms_topspendcostcenter == null ? undefined : String(r.rpvms_topspendcostcenter),
     comment: r.rpvms_comment,
     status: readVendorStatus(r.rpvms_status),
+    reviewStatus: readScoreStatus(r.rpvms_reviewstatus),
+    modifiedOn: r.modifiedon,
+    modifiedByName: r.modifiedbyname,
+  };
+}
+
+function mapSystemuser(r: Systemusers): Reviewer {
+  return {
+    id: r.systemuserid,
+    fullName:
+      r.fullname ??
+      (`${r.firstname ?? ''} ${r.lastname ?? ''}`.trim() || r.internalemailaddress || r.systemuserid),
+    email: r.internalemailaddress,
+    jobTitle: r.jobtitle,
+    isDisabled: r.isdisabled === 1 || (r.isdisabled as unknown) === true,
+  };
+}
+
+function mapVPVendorAssignment(r: Rpvms_vpvendorassignments): VPVendorAssignment {
+  return {
+    id: r.rpvms_vpvendorassignmentid,
+    assignmentName: r.rpvms_assignmentname,
+    reviewerId: r._rpvms_reviewer_value ?? '',
+    reviewerName: r.rpvms_reviewername,
+    vendorId: r._rpvms_vendorid_value ?? '',
+    vendorName: r.rpvms_vendoridname,
+    cycleYear: r.rpvms_cycleyear == null ? 0 : Number(r.rpvms_cycleyear),
+    reviewDueDate: r.rpvms_reviewduedate,
+    isActive: readAssignmentIsActive(r.rpvms_isactive) ?? false,
+    assignedById: r._rpvms_assignedby_value,
+    assignedByName: r.rpvms_assignedbyname,
+    notes: r.rpvms_notes,
   };
 }
 
@@ -353,6 +402,10 @@ function mapPromptSuggestion(r: Rpvms_promptsuggestions): PromptSuggestion {
 // Dataverse @odata.bind format: "/rpvms_vendors(<guid>)".
 function vendorBind(id: string): string {
   return `/rpvms_vendors(${id})`;
+}
+
+function systemuserBind(id: string): string {
+  return `/systemusers(${id})`;
 }
 
 // Basic OData $filter escaping for user-supplied strings.
@@ -572,6 +625,61 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
       ) || [];
       return res[0] ? mapVendorScore(res[0]) : null;
     },
+    async getByVendorAndYear(vendorId: string, scoreYear: string | number): Promise<VendorScore | null> {
+      const yr = typeof scoreYear === 'string' ? Number(scoreYear) : scoreYear;
+      const res = unwrap(
+        await Rpvms_vendorscoresService.getAll({
+          filter: `_rpvms_vendorid_value eq ${vendorId} and rpvms_scoreyear eq ${yr}`,
+          top: 1,
+        }),
+      ) || [];
+      return res[0] ? mapVendorScore(res[0]) : null;
+    },
+    async create(input: VendorScoreCreateInput): Promise<VendorScore> {
+      const yr = typeof input.scoreYear === 'string' ? Number(input.scoreYear) : input.scoreYear;
+      const payload: Record<string, unknown> = {
+        rpvms_vendorscorename: `Score ${yr}`,
+        rpvms_scoreyear: String(yr),
+        'rpvms_VendorId@odata.bind': vendorBind(input.vendorId),
+      };
+      if (input.criticalityScore !== undefined) payload.rpvms_criticalityscore = String(input.criticalityScore);
+      if (input.dependencyScore !== undefined) payload.rpvms_dependencyscore = String(input.dependencyScore);
+      if (input.spendScore !== undefined) payload.rpvms_spendscore = String(input.spendScore);
+      if (input.valueScore !== undefined) payload.rpvms_valuescore = String(input.valueScore);
+      if (input.alignmentScore !== undefined) payload.rpvms_alignmentscore = String(input.alignmentScore);
+      if (input.topSpendCostCenter !== undefined) payload.rpvms_topspendcostcenter = input.topSpendCostCenter;
+      if (input.comment !== undefined) payload.rpvms_comment = input.comment;
+      if (input.reviewStatus !== undefined) payload.rpvms_reviewstatus = writeScoreStatus(input.reviewStatus);
+      const res = unwrap(await Rpvms_vendorscoresService.create(payload as never));
+      return mapVendorScore(res);
+    },
+    async update(id: string, patch: VendorScorePatch): Promise<VendorScore> {
+      const payload: Record<string, unknown> = {};
+      if (patch.criticalityScore !== undefined) payload.rpvms_criticalityscore = String(patch.criticalityScore);
+      if (patch.dependencyScore !== undefined) payload.rpvms_dependencyscore = String(patch.dependencyScore);
+      if (patch.spendScore !== undefined) payload.rpvms_spendscore = String(patch.spendScore);
+      if (patch.valueScore !== undefined) payload.rpvms_valuescore = String(patch.valueScore);
+      if (patch.alignmentScore !== undefined) payload.rpvms_alignmentscore = String(patch.alignmentScore);
+      if (patch.topSpendCostCenter !== undefined) payload.rpvms_topspendcostcenter = patch.topSpendCostCenter;
+      if (patch.comment !== undefined) payload.rpvms_comment = patch.comment;
+      if (patch.reviewStatus !== undefined) payload.rpvms_reviewstatus = writeScoreStatus(patch.reviewStatus);
+      const res = unwrap(await Rpvms_vendorscoresService.update(id, payload as never));
+      return mapVendorScore(res);
+    },
+    async setStatus(id: string, status: ScoreStatus, note?: string): Promise<VendorScore> {
+      const payload: Record<string, unknown> = {
+        rpvms_reviewstatus: writeScoreStatus(status),
+      };
+      if (note !== undefined && note.length > 0) {
+        // Append the note to the existing comment with a timestamp prefix.
+        const existing = unwrap(await Rpvms_vendorscoresService.get(id));
+        const stamp = new Date().toISOString().slice(0, 16).replace('T', ' ');
+        const prev = existing?.rpvms_comment ? `${existing.rpvms_comment}\n` : '';
+        payload.rpvms_comment = `${prev}[${stamp} \u2192 ${status}] ${note}`;
+      }
+      const res = unwrap(await Rpvms_vendorscoresService.update(id, payload as never));
+      return mapVendorScore(res);
+    },
   };
 
   const vendorBudgets = {
@@ -768,6 +876,123 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
     },
   };
 
+  const reviewers = {
+    async getCurrent(): Promise<Reviewer | null> {
+      // Resolve via Office 365 MyProfile_V2 \u2192 lookup systemuser by internalemailaddress.
+      try {
+        const profile = unwrap(await Office365UsersService.MyProfile_V2('mail,userPrincipalName'));
+        const email = profile?.mail || profile?.userPrincipalName;
+        if (!email) return null;
+        const res = unwrap(
+          await SystemusersService.getAll({
+            filter: `internalemailaddress eq '${escapeOData(email)}'`,
+            top: 1,
+          }),
+        ) || [];
+        return res[0] ? mapSystemuser(res[0]) : null;
+      } catch {
+        return null;
+      }
+    },
+    async list(): Promise<Reviewer[]> {
+      // Distinct systemusers that have at least one active assignment row.
+      const assignments = unwrap(
+        await Rpvms_vpvendorassignmentsService.getAll({
+          filter: 'rpvms_isactive eq 1',
+          select: ['_rpvms_reviewer_value'],
+        }),
+      ) || [];
+      const distinctIds = Array.from(
+        new Set(assignments.map((a) => a._rpvms_reviewer_value).filter((v): v is string => !!v)),
+      );
+      if (distinctIds.length === 0) return [];
+      // Page-friendly: build an `or` filter chunked at 50 ids per request.
+      const chunks: string[][] = [];
+      for (let i = 0; i < distinctIds.length; i += 50) chunks.push(distinctIds.slice(i, i + 50));
+      const out: Reviewer[] = [];
+      for (const chunk of chunks) {
+        const filter = chunk.map((id) => `systemuserid eq ${id}`).join(' or ');
+        const res = unwrap(await SystemusersService.getAll({ filter })) || [];
+        out.push(...res.map(mapSystemuser));
+      }
+      out.sort((a, b) => a.fullName.localeCompare(b.fullName));
+      return out;
+    },
+    async getById(id: string): Promise<Reviewer | null> {
+      try {
+        const res = unwrap(await SystemusersService.get(id));
+        return res ? mapSystemuser(res) : null;
+      } catch {
+        return null;
+      }
+    },
+  };
+
+  const assignments = {
+    async list(options?: ListOptions): Promise<VPVendorAssignment[]> {
+      const res = unwrap(await Rpvms_vpvendorassignmentsService.getAll(toIGetAllOptions(options))) || [];
+      return res.map(mapVPVendorAssignment);
+    },
+    async listForReviewer(reviewerId: string, cycleYear: number): Promise<VPVendorAssignment[]> {
+      const res = unwrap(
+        await Rpvms_vpvendorassignmentsService.getAll({
+          filter: `_rpvms_reviewer_value eq ${reviewerId} and rpvms_cycleyear eq ${cycleYear} and rpvms_isactive eq 1`,
+          orderBy: ['rpvms_reviewduedate asc'],
+        }),
+      ) || [];
+      return res.map(mapVPVendorAssignment);
+    },
+    async listForVendor(vendorId: string, cycleYear: number): Promise<VPVendorAssignment[]> {
+      const res = unwrap(
+        await Rpvms_vpvendorassignmentsService.getAll({
+          filter: `_rpvms_vendorid_value eq ${vendorId} and rpvms_cycleyear eq ${cycleYear} and rpvms_isactive eq 1`,
+        }),
+      ) || [];
+      return res.map(mapVPVendorAssignment);
+    },
+    async assignVendors(input: {
+      reviewerId: string;
+      vendorIds: string[];
+      cycleYear: number;
+      reviewDueDate?: string;
+      assignedById?: string;
+      notes?: string;
+    }): Promise<VPVendorAssignment[]> {
+      // Filter out vendors already actively assigned to this reviewer/cycle.
+      const existing = unwrap(
+        await Rpvms_vpvendorassignmentsService.getAll({
+          filter: `_rpvms_reviewer_value eq ${input.reviewerId} and rpvms_cycleyear eq ${input.cycleYear} and rpvms_isactive eq 1`,
+          select: ['_rpvms_vendorid_value'],
+        }),
+      ) || [];
+      const existingVendorIds = new Set(existing.map((e) => e._rpvms_vendorid_value).filter((v): v is string => !!v));
+      const todo = input.vendorIds.filter((id) => !existingVendorIds.has(id));
+
+      const created: VPVendorAssignment[] = [];
+      for (const vendorId of todo) {
+        const payload: Record<string, unknown> = {
+          rpvms_assignmentname: `Cycle ${input.cycleYear}`,
+          rpvms_cycleyear: String(input.cycleYear),
+          'rpvms_Reviewer@odata.bind': systemuserBind(input.reviewerId),
+          'rpvms_VendorId@odata.bind': vendorBind(vendorId),
+          rpvms_isactive: writeAssignmentIsActive(true),
+        };
+        if (input.reviewDueDate) payload.rpvms_reviewduedate = input.reviewDueDate;
+        if (input.assignedById) payload['rpvms_AssignedBy@odata.bind'] = systemuserBind(input.assignedById);
+        if (input.notes) payload.rpvms_notes = input.notes;
+        const res = unwrap(await Rpvms_vpvendorassignmentsService.create(payload as never));
+        created.push(mapVPVendorAssignment(res));
+      }
+      return created;
+    },
+    async deactivate(id: string): Promise<void> {
+      await Rpvms_vpvendorassignmentsService.update(id, { rpvms_isactive: writeAssignmentIsActive(false) } as never);
+    },
+    async remove(id: string): Promise<void> {
+      await Rpvms_vpvendorassignmentsService.delete(id);
+    },
+  };
+
   const connectivity = {
     async probe(): Promise<ConnectivityStatus> {
       const startedAt = performance.now();
@@ -808,6 +1033,8 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
     oneTrustAssessments,
     serviceNowAssessments,
     promptSuggestions,
+    reviewers,
+    assignments,
     connectivity,
     async getVendorCriticality(vendorId: string): Promise<CriticalityLevel | undefined> {
       const latest = await serviceNowAssessments.latestCriticalityByVendor(vendorId);

@@ -27,7 +27,7 @@ export class Rpvms_vendorscoresService {
   public static async update(id: string, changedFields: Partial<Omit<Rpvms_vendorscoresBase, 'rpvms_vendorscoreid'>>): Promise<IOperationResult<Rpvms_vendorscores>> {
     const result = await Rpvms_vendorscoresService.client.updateRecordAsync<Partial<Omit<Rpvms_vendorscoresBase, 'rpvms_vendorscoreid'>>, Rpvms_vendorscores>(
       Rpvms_vendorscoresService.dataSourceName,
-      id.toString(),
+      id,
       changedFields
     );
     return result;
@@ -36,13 +36,13 @@ export class Rpvms_vendorscoresService {
   public static async delete(id: string): Promise<void> {
     await Rpvms_vendorscoresService.client.deleteRecordAsync(
       Rpvms_vendorscoresService.dataSourceName,
-      id.toString());
+      id);
   }
 
   public static async get(id: string, options?: IGetOptions): Promise<IOperationResult<Rpvms_vendorscores>> {
     const result = await Rpvms_vendorscoresService.client.retrieveRecordAsync<Rpvms_vendorscores>(
       Rpvms_vendorscoresService.dataSourceName,
-      id.toString(),
+      id,
       options
     );
     return result;

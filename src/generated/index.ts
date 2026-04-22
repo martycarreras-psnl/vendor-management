@@ -21,6 +21,8 @@ export * as Rpvms_vendorratecardsModel from './models/Rpvms_vendorratecardsModel
 export * as Rpvms_vendorsModel from './models/Rpvms_vendorsModel';
 export * as Rpvms_vendorscoresModel from './models/Rpvms_vendorscoresModel';
 export * as Rpvms_vendorsuppliersModel from './models/Rpvms_vendorsuppliersModel';
+export * as Rpvms_vpvendorassignmentsModel from './models/Rpvms_vpvendorassignmentsModel';
+export * as SystemusersModel from './models/SystemusersModel';
 
 // Services
 export * from './services/MicrosoftCopilotStudioService';
@@ -39,3 +41,5 @@ export * from './services/Rpvms_vendorratecardsService';
 export * from './services/Rpvms_vendorsService';
 export * from './services/Rpvms_vendorscoresService';
 export * from './services/Rpvms_vendorsuppliersService';
+export * from './services/Rpvms_vpvendorassignmentsService';
+export * from './services/SystemusersService';

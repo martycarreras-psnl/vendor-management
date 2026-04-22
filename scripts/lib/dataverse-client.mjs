@@ -155,6 +155,7 @@ export function createClient(state, secret, { solutionName, envUrl: envUrlOverri
     get: (url, opts) => request('GET', url, null, opts),
     post: (url, body, opts) => request('POST', url, body, opts),
     patch: (url, body, opts) => request('PATCH', url, body, opts),
+    put: (url, body, opts) => request('PUT', url, body, opts),
     del: (url, opts) => request('DELETE', url, null, { ...opts, expectJson: false }),
     publishAll: async () => {
       for (let a = 1; a <= 6; a++) {

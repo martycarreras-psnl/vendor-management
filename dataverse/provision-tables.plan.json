@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-21T03:17:34.063Z",
+  "generatedAt": "2026-04-22T18:34:47.403Z",
   "sourcePlan": "dataverse/planning-payload.json",
   "globalOptionSets": [
     {
@@ -166,6 +166,15 @@
         {
           "table": "rpvms_servicenowassessments",
           "column": "rpvms_assessmenttype"
+        }
+      ]
+    },
+    {
+      "name": "rpvms_scorestatus",
+      "referencedBy": [
+        {
+          "table": "rpvms_vendorscores",
+          "column": "rpvms_reviewstatus"
         }
       ]
     },
@@ -1299,6 +1308,15 @@
           "requiredLevel": "None",
           "type": "Memo",
           "maxLength": 4000
+        },
+        {
+          "schemaName": "rpvms_ReviewStatus",
+          "logicalName": "rpvms_reviewstatus",
+          "displayName": "Review Status",
+          "requiredLevel": "None",
+          "description": "Lifecycle of the VP review: NotStarted -> Draft -> Approved (with optional Rejected). Separate from legacy rpvms_Status (vendor lifecycle reuse).",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_scorestatus"
         }
       ]
     },
@@ -1564,6 +1582,115 @@
           "requiredLevel": "None",
           "type": "DateTime",
           "format": "DateOnly"
+        }
+      ]
+    },
+    {
+      "schemaName": "rpvms_PromptSuggestion",
+      "displayName": "Prompt Suggestion",
+      "displayCollectionName": "Prompt Suggestions",
+      "logicalSingularName": "rpvms_promptsuggestion",
+      "logicalPluralName": "rpvms_promptsuggestions",
+      "entitySetName": "rpvms_promptsuggestions",
+      "tableLogicalName": "rpvms_promptsuggestions",
+      "description": "Managed prompt suggestions shown in the vendIQ chat interface",
+      "ownership": "UserOwned",
+      "hasActivities": false,
+      "hasNotes": false,
+      "primaryName": {
+        "schemaName": "rpvms_PromptText",
+        "logicalName": "rpvms_prompttext",
+        "displayName": "Prompt Text",
+        "requiredLevel": "ApplicationRequired",
+        "maxLength": 500,
+        "description": "The suggestion text displayed to the user"
+      },
+      "columns": [
+        {
+          "schemaName": "rpvms_Category",
+          "logicalName": "rpvms_category",
+          "displayName": "Category",
+          "requiredLevel": "None",
+          "description": "Optional category for grouping (e.g. Risk, Spend, Contracts)",
+          "type": "String",
+          "format": "Text",
+          "maxLength": 100
+        },
+        {
+          "schemaName": "rpvms_SortOrder",
+          "logicalName": "rpvms_sortorder",
+          "displayName": "Sort Order",
+          "requiredLevel": "None",
+          "description": "Display order (lower = first)",
+          "type": "Integer",
+          "minValue": 0,
+          "maxValue": 9999
+        },
+        {
+          "schemaName": "rpvms_IsActive",
+          "logicalName": "rpvms_isactive",
+          "displayName": "Is Active",
+          "requiredLevel": "None",
+          "description": "Only active prompts are shown in the chat UI",
+          "type": "Boolean"
+        }
+      ]
+    },
+    {
+      "schemaName": "rpvms_VPVendorAssignment",
+      "displayName": "VP Vendor Assignment",
+      "displayCollectionName": "VP Vendor Assignments",
+      "logicalSingularName": "rpvms_vpvendorassignment",
+      "logicalPluralName": "rpvms_vpvendorassignments",
+      "entitySetName": "rpvms_vpvendorassignments",
+      "tableLogicalName": "rpvms_vpvendorassignments",
+      "description": "Bridge table: which Vice President (systemuser) is assigned to review which Vendor for a given CycleYear.",
+      "ownership": "UserOwned",
+      "hasActivities": false,
+      "hasNotes": true,
+      "primaryName": {
+        "schemaName": "rpvms_AssignmentName",
+        "logicalName": "rpvms_assignmentname",
+        "displayName": "Assignment Name",
+        "description": "Auto: {ReviewerName} / {VendorName} / {CycleYear}",
+        "maxLength": 300
+      },
+      "columns": [
+        {
+          "schemaName": "rpvms_CycleYear",
+          "logicalName": "rpvms_cycleyear",
+          "displayName": "Cycle Year",
+          "requiredLevel": "ApplicationRequired",
+          "description": "Review cycle year; part of natural key with Reviewer + Vendor.",
+          "type": "Integer",
+          "minValue": 2020,
+          "maxValue": 2100
+        },
+        {
+          "schemaName": "rpvms_ReviewDueDate",
+          "logicalName": "rpvms_reviewduedate",
+          "displayName": "Review Due Date",
+          "requiredLevel": "None",
+          "description": "Date by which this VP should complete the review. Drives overdue indicator in the queue.",
+          "type": "DateTime",
+          "format": "DateOnly"
+        },
+        {
+          "schemaName": "rpvms_IsActive",
+          "logicalName": "rpvms_isactive",
+          "displayName": "Is Active",
+          "requiredLevel": "None",
+          "description": "Only active assignments appear in a VP's review queue. Soft-delete via this flag rather than deleting rows to preserve history.",
+          "type": "Boolean"
+        },
+        {
+          "schemaName": "rpvms_Notes",
+          "logicalName": "rpvms_notes",
+          "displayName": "Notes",
+          "requiredLevel": "None",
+          "description": "Free-form notes captured at assignment time (e.g., rationale for reviewer choice).",
+          "type": "Memo",
+          "maxLength": 2000
         }
       ]
     }

@@ -203,6 +203,9 @@ export interface GLTransaction {
   headerMemo?: string;
 }
 
+/** Lifecycle of a single VendorScore review record. */
+export type ScoreStatus = 'NotStarted' | 'Draft' | 'Approved' | 'Rejected';
+
 export interface VendorScore {
   id: string;
   vendorId: string;
@@ -217,7 +220,12 @@ export interface VendorScore {
   wtScoreCritDepOnly?: number;
   topSpendCostCenter?: string;
   comment?: string;
+  /** Legacy status (Active/Inactive/...). Retained for back-compat with the old picklist. */
   status?: VendorStatus;
+  /** Review lifecycle status (NotStarted → Draft → Approved/Rejected). */
+  reviewStatus?: ScoreStatus;
+  modifiedOn?: string;
+  modifiedByName?: string;
 }
 
 export interface VendorBudget {
@@ -388,4 +396,58 @@ export interface PromptSuggestion {
   isActive?: boolean;
   createdOn?: string;
   modifiedOn?: string;
+}
+
+// ---------- Reviewer / Assignment ----------
+
+/** A Dataverse systemuser surfaced as a VP-eligible reviewer. */
+export interface Reviewer {
+  id: string;
+  fullName: string;
+  email?: string;
+  jobTitle?: string;
+  isDisabled?: boolean;
+}
+
+/** Bridge row linking a VP (systemuser) to a Vendor for a given review cycle. */
+export interface VPVendorAssignment {
+  id: string;
+  assignmentName: string;
+  reviewerId: string;
+  reviewerName?: string;
+  vendorId: string;
+  vendorName?: string;
+  cycleYear: number;
+  reviewDueDate?: string;
+  isActive: boolean;
+  assignedById?: string;
+  assignedByName?: string;
+  notes?: string;
+}
+
+/** A review-queue row: an assignment joined to its current-year and prior-year scores. */
+export interface ReviewQueueItem {
+  assignment: VPVendorAssignment;
+  vendor: Vendor;
+  currentScore: VendorScore | null;
+  priorScore: VendorScore | null;
+}
+
+// ---------- Scoring suggestions ----------
+
+export interface ScoreDimensionSuggestion {
+  /** Suggested 1–5 value. May be undefined when there is no signal. */
+  value?: CriticalityLevel;
+  /** 0..1 confidence the suggestion is correct. */
+  confidence: number;
+  /** Human-readable rationale, surfaced in the wizard. */
+  rationale: string;
+  /** Source records that contributed (typed loosely; UI cites the labels). */
+  sources: Array<{ system: 'OneTrust' | 'ServiceNow' | 'GL' | 'Contract' | 'PriorYear'; label: string; id?: string }>;
+}
+
+export interface ScoreSuggestion {
+  criticality: ScoreDimensionSuggestion;
+  dependency: ScoreDimensionSuggestion;
+  spend: ScoreDimensionSuggestion;
 }

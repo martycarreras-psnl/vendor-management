@@ -34,6 +34,8 @@ import type {
   Rpvms_vendorsrpvms_isvar,
 } from '@/generated/models/Rpvms_vendorsModel';
 import type { Rpvms_vendorsuppliersrpvms_relationshiptype } from '@/generated/models/Rpvms_vendorsuppliersModel';
+import type { Rpvms_vendorscoresrpvms_reviewstatus } from '@/generated/models/Rpvms_vendorscoresModel';
+import type { Rpvms_vpvendorassignmentsrpvms_isactive } from '@/generated/models/Rpvms_vpvendorassignmentsModel';
 
 import {
   Rpvms_vendorsrpvms_classification as VendorClassificationMap,
@@ -74,6 +76,8 @@ import {
   Rpvms_vendorratecardsrpvms_locationtype as RateCardLocationMap,
 } from '@/generated/models/Rpvms_vendorratecardsModel';
 import { Rpvms_vendorsuppliersrpvms_relationshiptype as VendorSupplierRelMap } from '@/generated/models/Rpvms_vendorsuppliersModel';
+import { Rpvms_vendorscoresrpvms_reviewstatus as VendorScoreReviewStatusMap } from '@/generated/models/Rpvms_vendorscoresModel';
+import { Rpvms_vpvendorassignmentsrpvms_isactive as AssignmentIsActiveMap } from '@/generated/models/Rpvms_vpvendorassignmentsModel';
 
 import type {
   VendorClassification,
@@ -92,6 +96,7 @@ import type {
   RateCardExperienceLevel,
   RateCardLocationType,
   CriticalityLevel,
+  ScoreStatus,
 } from '@/types/vendiq';
 
 /** Resolve a generated option-set key (e.g. "412900000") to the enum string value. */
@@ -268,4 +273,23 @@ export function parseDecimal(v: string | undefined | null): number | undefined {
   if (v === undefined || v === null || v === '') return undefined;
   const n = Number(v);
   return Number.isFinite(n) ? n : undefined;
+}
+
+// ---- VendorScore review status ----
+export function readScoreStatus(v: Rpvms_vendorscoresrpvms_reviewstatus | undefined): ScoreStatus | undefined {
+  return lookup(VendorScoreReviewStatusMap, v as string | undefined) as ScoreStatus | undefined;
+}
+export function writeScoreStatus(v: ScoreStatus | undefined): Rpvms_vendorscoresrpvms_reviewstatus | undefined {
+  return reverseLookup(VendorScoreReviewStatusMap, v) as Rpvms_vendorscoresrpvms_reviewstatus | undefined;
+}
+
+// ---- VPVendorAssignment IsActive ----
+export function readAssignmentIsActive(v: Rpvms_vpvendorassignmentsrpvms_isactive | undefined): boolean | undefined {
+  const s = lookup(AssignmentIsActiveMap, v as string | undefined);
+  if (s === undefined) return undefined;
+  return s === 'Yes';
+}
+export function writeAssignmentIsActive(v: boolean | undefined): Rpvms_vpvendorassignmentsrpvms_isactive | undefined {
+  if (v === undefined) return undefined;
+  return reverseLookup(AssignmentIsActiveMap, v ? 'Yes' : 'No') as Rpvms_vpvendorassignmentsrpvms_isactive | undefined;
 }

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-21T03:17:34.067Z",
+  "generatedAt": "2026-04-22T18:34:47.408Z",
   "sourcePlan": "dataverse/planning-payload.json",
   "dataverseTables": [
     "rpvms_vendor",
@@ -14,7 +14,9 @@
     "rpvms_vendorbudget",
     "rpvms_vendorratecard",
     "rpvms_vendorproductservice",
-    "rpvms_vendornamealias"
+    "rpvms_vendornamealias",
+    "rpvms_promptsuggestion",
+    "rpvms_vpvendorassignment"
   ],
   "pacCommands": [
     "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_vendor",
@@ -29,6 +31,8 @@
     "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_vendorbudget",
     "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_vendorratecard",
     "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_vendorproductservice",
-    "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_vendornamealias"
+    "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_vendornamealias",
+    "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_promptsuggestion",
+    "~/.dotnet/tools/pac code add-data-source -a dataverse -t rpvms_vpvendorassignment"
   ]
 }

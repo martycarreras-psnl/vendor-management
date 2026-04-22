@@ -182,10 +182,12 @@ function validateRelationships(plan) {
     const toTable = requireStringFromKeys(relationship, ['toTable', 'referencedEntity'], `${context}.toTable`).toLowerCase();
     requireString(relationship, 'schemaName', context);
 
-    if (tableNames.size > 0 && !tableNames.has(fromTable)) {
+    if (tableNames.size > 0 && !tableNames.has(fromTable) && !RESERVED_NAMES.has(fromTable)) {
       fail(`${context}.fromTable "${fromTable}" does not match any table in the plan`);
     }
-    if (tableNames.size > 0 && !tableNames.has(toTable)) {
+    if (tableNames.size > 0 && !tableNames.has(toTable) && !RESERVED_NAMES.has(toTable)) {
+      // System tables (e.g., systemuser, team, businessunit) are valid relationship targets
+      // even though they aren't declared in the plan — they exist in Dataverse by default.
       fail(`${context}.toTable "${toTable}" does not match any table in the plan`);
     }
   });

@@ -32,6 +32,8 @@ export function createVendiqMockProvider(): VendIqDataProvider {
     oneTrustAssessments: stub as VendIqDataProvider['oneTrustAssessments'],
     serviceNowAssessments: stub as VendIqDataProvider['serviceNowAssessments'],
     promptSuggestions: stub as VendIqDataProvider['promptSuggestions'],
+    reviewers: stub as VendIqDataProvider['reviewers'],
+    assignments: stub as VendIqDataProvider['assignments'],
     connectivity: {
       async probe(): Promise<ConnectivityStatus> {
         return {

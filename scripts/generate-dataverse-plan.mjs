@@ -118,7 +118,7 @@ function main() {
     relationships,
   };
 
-  const dataverseTables = [...new Set(tables.map((table) => table.tableLogicalName))];
+  const dataverseTables = [...new Set(tables.map((table) => table.logicalSingularName))];
   const registrationPlan = {
     generatedAt: new Date().toISOString(),
     sourcePlan: relativePath(resolvedPath),

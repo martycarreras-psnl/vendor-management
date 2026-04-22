@@ -1119,6 +1119,15 @@
           "requiredLevel": "None",
           "type": "Memo",
           "maxLength": 4000
+        },
+        {
+          "schemaName": "rpvms_ReviewStatus",
+          "logicalName": "rpvms_reviewstatus",
+          "displayName": "Review Status",
+          "requiredLevel": "None",
+          "description": "Lifecycle of the VP review: NotStarted -> Draft -> Approved (with optional Rejected). Separate from legacy rpvms_Status (vendor lifecycle reuse).",
+          "type": "Picklist",
+          "globalOptionSetName": "rpvms_scorestatus"
         }
       ],
       "primaryName": {
@@ -1453,6 +1462,66 @@
         "maxLength": 500,
         "description": "The suggestion text displayed to the user"
       }
+    },
+    {
+      "schemaName": "rpvms_VPVendorAssignment",
+      "displayName": "VP Vendor Assignment",
+      "displayCollectionName": "VP Vendor Assignments",
+      "logicalSingularName": "rpvms_vpvendorassignment",
+      "logicalPluralName": "rpvms_vpvendorassignments",
+      "entitySetName": "rpvms_vpvendorassignments",
+      "tableLogicalName": "rpvms_vpvendorassignments",
+      "description": "Bridge table: which Vice President (systemuser) is assigned to review which Vendor for a given CycleYear.",
+      "ownership": "UserOwned",
+      "ownershipType": "UserOwned",
+      "isActivity": false,
+      "hasActivities": false,
+      "hasNotes": true,
+      "columns": [
+        {
+          "schemaName": "rpvms_CycleYear",
+          "logicalName": "rpvms_cycleyear",
+          "displayName": "Cycle Year",
+          "requiredLevel": "ApplicationRequired",
+          "description": "Review cycle year; part of natural key with Reviewer + Vendor.",
+          "type": "Integer",
+          "minValue": 2020,
+          "maxValue": 2100
+        },
+        {
+          "schemaName": "rpvms_ReviewDueDate",
+          "logicalName": "rpvms_reviewduedate",
+          "displayName": "Review Due Date",
+          "requiredLevel": "None",
+          "description": "Date by which this VP should complete the review. Drives overdue indicator in the queue.",
+          "type": "DateTime",
+          "format": "DateOnly"
+        },
+        {
+          "schemaName": "rpvms_IsActive",
+          "logicalName": "rpvms_isactive",
+          "displayName": "Is Active",
+          "requiredLevel": "None",
+          "description": "Only active assignments appear in a VP's review queue. Soft-delete via this flag rather than deleting rows to preserve history.",
+          "type": "Boolean"
+        },
+        {
+          "schemaName": "rpvms_Notes",
+          "logicalName": "rpvms_notes",
+          "displayName": "Notes",
+          "requiredLevel": "None",
+          "description": "Free-form notes captured at assignment time (e.g., rationale for reviewer choice).",
+          "type": "Memo",
+          "maxLength": 2000
+        }
+      ],
+      "primaryName": {
+        "schemaName": "rpvms_AssignmentName",
+        "logicalName": "rpvms_assignmentname",
+        "displayName": "Assignment Name",
+        "description": "Auto: {ReviewerName} / {VendorName} / {CycleYear}",
+        "maxLength": 300
+      }
     }
   ],
   "relationships": [
@@ -1643,6 +1712,48 @@
       "lookupLogicalName": "rpvms_vendorid",
       "lookupDisplayName": "Vendor",
       "requiredLevel": "ApplicationRequired",
+      "cascadeConfiguration": "Referential"
+    },
+    {
+      "type": "ManyToOne",
+      "schemaName": "rpvms_VPVendorAssignment_Reviewer",
+      "fromTable": "rpvms_vpvendorassignment",
+      "toTable": "systemuser",
+      "referencingEntity": "rpvms_vpvendorassignment",
+      "referencedEntity": "systemuser",
+      "lookupSchemaName": "rpvms_Reviewer",
+      "lookupLogicalName": "rpvms_reviewer",
+      "lookupDisplayName": "Reviewer",
+      "lookupDescription": "Vice President assigned to review the vendor.",
+      "requiredLevel": "ApplicationRequired",
+      "cascadeConfiguration": "Referential"
+    },
+    {
+      "type": "ManyToOne",
+      "schemaName": "rpvms_VPVendorAssignment_Vendor",
+      "fromTable": "rpvms_vpvendorassignment",
+      "toTable": "rpvms_vendor",
+      "referencingEntity": "rpvms_vpvendorassignment",
+      "referencedEntity": "rpvms_vendor",
+      "lookupSchemaName": "rpvms_VendorId",
+      "lookupLogicalName": "rpvms_vendorid",
+      "lookupDisplayName": "Vendor",
+      "lookupDescription": "Vendor being reviewed in this cycle.",
+      "requiredLevel": "ApplicationRequired",
+      "cascadeConfiguration": "Referential"
+    },
+    {
+      "type": "ManyToOne",
+      "schemaName": "rpvms_VPVendorAssignment_AssignedBy",
+      "fromTable": "rpvms_vpvendorassignment",
+      "toTable": "systemuser",
+      "referencingEntity": "rpvms_vpvendorassignment",
+      "referencedEntity": "systemuser",
+      "lookupSchemaName": "rpvms_AssignedBy",
+      "lookupLogicalName": "rpvms_assignedby",
+      "lookupDisplayName": "Assigned By",
+      "lookupDescription": "Admin who created this assignment.",
+      "requiredLevel": "None",
       "cascadeConfiguration": "Referential"
     }
   ],
@@ -2190,6 +2301,33 @@
           "value": 412900004,
           "label": "Unknown",
           "description": ""
+        }
+      ]
+    },
+    {
+      "name": "rpvms_scorestatus",
+      "displayName": "Vendor Score Review Status",
+      "description": "Lifecycle for the VP review of a VendorScore. VP Submit transitions directly to Approved (no second persona for v1).",
+      "options": [
+        {
+          "value": 412900000,
+          "label": "Not Started",
+          "description": "Assigned but no score work has begun."
+        },
+        {
+          "value": 412900001,
+          "label": "Draft",
+          "description": "VP has begun scoring; autosaved between wizard steps."
+        },
+        {
+          "value": 412900002,
+          "label": "Approved",
+          "description": "VP submitted; score is final for the cycle."
+        },
+        {
+          "value": 412900003,
+          "label": "Rejected",
+          "description": "Admin-only rollback of an Approved score."
         }
       ]
     }
