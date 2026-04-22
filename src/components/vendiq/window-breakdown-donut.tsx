@@ -29,7 +29,9 @@ export function WindowBreakdownDonut({
   total: number;
   title?: string;
 }) {
-  // Collapse Terminated into Expired/Termed visually.
+  // Collapse Terminated into Expired/Termed visually, and only include
+  // statuses that actually have contracts in the window so the legend
+  // doesn't render a stack of zeros.
   const merged: Array<{ key: string; label: string; color: string; value: number }> = [];
   const seen = new Set<string>();
   (Object.keys(STATUS_LABELS) as ContractStatus[]).forEach((s) => {
@@ -39,12 +41,12 @@ export function WindowBreakdownDonut({
     const value =
       (counts[s] ?? 0) +
       (s === 'Expired' ? (counts.Terminated ?? 0) : 0);
-    if (value > 0 || s === 'Active' || s === 'UnderReview' || s === 'Pending' || s === 'Expired') {
+    if (value > 0) {
       merged.push({ key: s, label, color: STATUS_COLORS[s], value });
     }
   });
 
-  const data = merged.filter((m) => m.value > 0);
+  const data = merged;
 
   return (
     <div className="rounded-lg border bg-card p-4 shadow-sm">

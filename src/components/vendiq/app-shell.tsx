@@ -11,7 +11,6 @@ import {
 import { cn } from '@/lib/utils';
 import { ConnectivityPill } from '@/components/vendiq/connectivity-pill';
 import { ModeToggle } from '@/components/mode-toggle';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useState, type KeyboardEvent } from 'react';
 import vendiqIconMarkup from '@/assets/vendiq_icon.svg?raw';
 
@@ -62,40 +61,39 @@ export function AppShell() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <ConnectivityPill />
           <ModeToggle />
         </div>
       </header>
 
       <div className="flex min-h-0 flex-1">
-        {/* Icon-only sidebar */}
-        <aside className="flex w-14 shrink-0 flex-col items-center gap-1 border-r bg-card py-3">
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Tooltip key={item.to}>
-                <TooltipTrigger asChild>
-                  <NavLink
-                    to={item.to}
-                    end={item.end}
-                    className={({ isActive }) =>
-                      cn(
-                        'flex h-11 w-11 flex-col items-center justify-center gap-0.5 rounded-md text-[10px] font-medium transition-colors',
-                        'text-muted-foreground hover:bg-muted hover:text-foreground',
-                        isActive && 'bg-primary/10 text-primary',
-                      )
-                    }
-                    aria-label={item.label}
-                  >
-                    <Icon className="h-[18px] w-[18px]" aria-hidden />
-                    <span>{item.label}</span>
-                  </NavLink>
-                </TooltipTrigger>
-                <TooltipContent side="right">{item.label}</TooltipContent>
-              </Tooltip>
-            );
-          })}
-          <div className="mt-auto text-[9px] text-muted-foreground opacity-70">v0.1</div>
+        {/* Expanded sidebar */}
+        <aside className="flex w-56 shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground">
+          <nav className="flex-1 p-2 pt-3">
+            {NAV_ITEMS.map((item) => {
+              const Icon = item.icon;
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.end}
+                  className={({ isActive }) =>
+                    cn(
+                      'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                      'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                      isActive && 'bg-sidebar-accent text-sidebar-accent-foreground',
+                    )
+                  }
+                >
+                  <Icon className="h-4 w-4" aria-hidden />
+                  {item.label}
+                </NavLink>
+              );
+            })}
+          </nav>
+          <div className="mt-auto flex flex-col gap-2 border-t border-sidebar-border p-3">
+            <ConnectivityPill />
+            <div className="text-[11px] opacity-70">v0.1 · Code App · Dev</div>
+          </div>
         </aside>
 
         {/* Main content */}
