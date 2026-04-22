@@ -92,6 +92,15 @@ export function CopilotChatProvider({
     savePersisted(messages, conversationId);
   }, [messages, conversationId]);
 
+  // Drip-feed state: keeps isLoading true while interim messages are being revealed
+  const [isDripping, setIsDripping] = useState(false);
+  const dripTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // Clean up drip timers on unmount
+  useEffect(() => {
+    return () => { dripTimers.current.forEach(clearTimeout); };
+  }, []);
+
   const mutation = useMutation({
     mutationFn: async (message: string) => {
       return invokeAgent(message, { agentName, conversationId: conversationIdRef.current });
@@ -113,19 +122,51 @@ export function CopilotChatProvider({
         ]);
         return;
       }
-      const now = new Date();
-      setMessages((prev) => [
-        ...prev,
-        ...replies.map((content, i) => ({
-          id: makeId(),
-          role: 'agent' as const,
-          content,
-          timestamp: now,
-          isInterim: i < replies.length - 1,
-        })),
-      ]);
+
+      // Single response → show immediately
+      if (replies.length === 1) {
+        setMessages((prev) => [
+          ...prev,
+          { id: makeId(), role: 'agent', content: replies[0], timestamp: new Date() },
+        ]);
+        return;
+      }
+
+      // Multiple responses → drip-feed with staggered delays
+      // Clear any previous drip timers
+      dripTimers.current.forEach(clearTimeout);
+      dripTimers.current = [];
+      setIsDripping(true);
+
+      const INTERIM_DELAY = 600; // ms between each interim step
+      const FINAL_DELAY = 400;   // ms after last interim before final answer
+
+      replies.forEach((content, i) => {
+        const isLast = i === replies.length - 1;
+        const delay = isLast
+          ? (replies.length - 1) * INTERIM_DELAY + FINAL_DELAY
+          : i * INTERIM_DELAY;
+
+        const timer = setTimeout(() => {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: makeId(),
+              role: 'agent' as const,
+              content,
+              timestamp: new Date(),
+              isInterim: !isLast,
+            },
+          ]);
+          if (isLast) {
+            setIsDripping(false);
+          }
+        }, delay);
+        dripTimers.current.push(timer);
+      });
     },
     onError: (err) => {
+      setIsDripping(false);
       setMessages((prev) => [
         ...prev,
         {
@@ -167,13 +208,13 @@ export function CopilotChatProvider({
     () => ({
       messages,
       conversationId,
-      isLoading: mutation.isPending,
+      isLoading: mutation.isPending || isDripping,
       error: mutation.error,
       agentName,
       sendMessage,
       newChat,
     }),
-    [messages, conversationId, mutation.isPending, mutation.error, agentName, sendMessage, newChat],
+    [messages, conversationId, mutation.isPending, isDripping, mutation.error, agentName, sendMessage, newChat],
   );
 
   return <CopilotChatContext.Provider value={value}>{children}</CopilotChatContext.Provider>;
