@@ -8,6 +8,8 @@ import Vendor360Page from "@/pages/vendor-360"
 import SupplierLookupPage from "@/pages/supplier-lookup"
 import Supplier360Page from "@/pages/supplier-360"
 import RiskDashboardPage from "@/pages/risk-dashboard"
+import ReviewsPage from "@/pages/reviews"
+import VendorScoreWizardPage from "@/pages/vendor-score-wizard"
 import ChatPage from "@/pages/chat"
 import PromptSuggestionsPage from "@/pages/prompt-suggestions"
 import SettingsPage from "@/pages/settings"
@@ -32,6 +34,8 @@ export const router = createHashRouter([
       { path: "contracts", element: <ContractExpirationPage /> },
       { path: "contracts/:contractId", element: <ContractDetailsPage /> },
       { path: "risk", element: <RiskDashboardPage /> },
+      { path: "reviews", element: <ReviewsPage /> },
+      { path: "reviews/:assignmentId/score", element: <VendorScoreWizardPage /> },
       { path: "chat", element: <ChatPage /> },
       { path: "prompt-suggestions", element: <PromptSuggestionsPage /> },
       { path: "settings", element: <SettingsPage /> },
