@@ -16,6 +16,8 @@ export interface ChatMessage {
   role: 'user' | 'agent';
   content: string;
   timestamp: Date;
+  /** True for intermediate chain-of-thought / interim responses (not the final answer). */
+  isInterim?: boolean;
 }
 
 interface CopilotChatContextValue {
@@ -114,11 +116,12 @@ export function CopilotChatProvider({
       const now = new Date();
       setMessages((prev) => [
         ...prev,
-        ...replies.map((content) => ({
+        ...replies.map((content, i) => ({
           id: makeId(),
           role: 'agent' as const,
           content,
           timestamp: now,
+          isInterim: i < replies.length - 1,
         })),
       ]);
     },

@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
-import { Send, MessageSquarePlus, Sparkles, Bot, User } from 'lucide-react';
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { Send, MessageSquarePlus, Sparkles, Bot, User, ChevronRight } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Button } from '@/components/ui/button';
@@ -42,39 +42,7 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
         {isUser ? (
           <div className="whitespace-pre-wrap break-words">{msg.content}</div>
         ) : (
-          <div
-            className={cn(
-              'break-words text-sm leading-relaxed',
-              // Prose-like styling without tailwind-typography plugin
-              '[&_p]:my-1.5 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0',
-              '[&_ul]:my-1.5 [&_ul]:list-disc [&_ul]:pl-5',
-              '[&_ol]:my-1.5 [&_ol]:list-decimal [&_ol]:pl-5',
-              '[&_li]:my-0.5',
-              '[&_strong]:font-semibold',
-              '[&_em]:italic',
-              '[&_h1]:mt-3 [&_h1]:mb-1.5 [&_h1]:text-base [&_h1]:font-semibold',
-              '[&_h2]:mt-3 [&_h2]:mb-1.5 [&_h2]:text-sm [&_h2]:font-semibold',
-              '[&_h3]:mt-2 [&_h3]:mb-1 [&_h3]:text-sm [&_h3]:font-semibold',
-              '[&_code]:rounded [&_code]:bg-muted [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[12px] [&_code]:font-mono',
-              '[&_pre]:my-2 [&_pre]:overflow-x-auto [&_pre]:rounded-md [&_pre]:bg-muted [&_pre]:p-2',
-              '[&_pre_code]:bg-transparent [&_pre_code]:p-0',
-              '[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:opacity-80',
-              '[&_blockquote]:my-2 [&_blockquote]:border-l-2 [&_blockquote]:border-border [&_blockquote]:pl-3 [&_blockquote]:italic [&_blockquote]:text-muted-foreground',
-              '[&_hr]:my-3 [&_hr]:border-border',
-              '[&_table]:my-2 [&_table]:w-full [&_table]:border-collapse [&_table]:text-xs',
-              '[&_th]:border [&_th]:border-border [&_th]:bg-muted [&_th]:px-2 [&_th]:py-1 [&_th]:text-left [&_th]:font-semibold',
-              '[&_td]:border [&_td]:border-border [&_td]:px-2 [&_td]:py-1 [&_td]:align-top',
-            )}
-          >
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                a: ({ node: _n, ...props }) => <a {...props} target="_blank" rel="noreferrer noopener" />,
-              }}
-            >
-              {msg.content}
-            </ReactMarkdown>
-          </div>
+          <MarkdownContent content={msg.content} />
         )}
         <div
           className={cn(
@@ -85,6 +53,85 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
           {formatTime(msg.timestamp)}
         </div>
       </div>
+    </div>
+  );
+}
+
+/** Collapsible chain-of-thought block for interim messages before the final answer. */
+function ThinkingSteps({ steps }: { steps: ChatMessage[] }) {
+  const [expanded, setExpanded] = useState(false);
+  if (steps.length === 0) return null;
+  return (
+    <div className="ml-11 mb-1">
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="group inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+      >
+        <ChevronRight className={cn('h-3 w-3 transition-transform', expanded && 'rotate-90')} />
+        <span className="font-medium">Thought for a moment</span>
+        <span className="opacity-60">· {steps.length} step{steps.length !== 1 ? 's' : ''}</span>
+      </button>
+      {expanded && (
+        <div className="mt-1 space-y-1 border-l-2 border-muted pl-3">
+          {steps.map((s) => (
+            <div key={s.id} className="rounded-md bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+              <MarkdownContent content={s.content} compact />
+              <div className="mt-0.5 text-[10px] opacity-50">{formatTime(s.timestamp)}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Groups consecutive agent messages into interim (thinking) + final answer. */
+function AgentResponseGroup({ messages: msgs }: { messages: ChatMessage[] }) {
+  const interims = msgs.filter((m) => m.isInterim);
+  const final = msgs.find((m) => !m.isInterim) ?? msgs[msgs.length - 1];
+  return (
+    <>
+      {interims.length > 0 && <ThinkingSteps steps={interims} />}
+      <MessageBubble msg={final} />
+    </>
+  );
+}
+
+function MarkdownContent({ content, compact }: { content: string; compact?: boolean }) {
+  return (
+    <div
+      className={cn(
+        'break-words leading-relaxed',
+        compact ? 'text-xs' : 'text-sm',
+        '[&_p]:my-1.5 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0',
+        '[&_ul]:my-1.5 [&_ul]:list-disc [&_ul]:pl-5',
+        '[&_ol]:my-1.5 [&_ol]:list-decimal [&_ol]:pl-5',
+        '[&_li]:my-0.5',
+        '[&_strong]:font-semibold',
+        '[&_em]:italic',
+        '[&_h1]:mt-3 [&_h1]:mb-1.5 [&_h1]:text-base [&_h1]:font-semibold',
+        '[&_h2]:mt-3 [&_h2]:mb-1.5 [&_h2]:text-sm [&_h2]:font-semibold',
+        '[&_h3]:mt-2 [&_h3]:mb-1 [&_h3]:text-sm [&_h3]:font-semibold',
+        '[&_code]:rounded [&_code]:bg-muted [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[12px] [&_code]:font-mono',
+        '[&_pre]:my-2 [&_pre]:overflow-x-auto [&_pre]:rounded-md [&_pre]:bg-muted [&_pre]:p-2',
+        '[&_pre_code]:bg-transparent [&_pre_code]:p-0',
+        '[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 [&_a:hover]:opacity-80',
+        '[&_blockquote]:my-2 [&_blockquote]:border-l-2 [&_blockquote]:border-border [&_blockquote]:pl-3 [&_blockquote]:italic [&_blockquote]:text-muted-foreground',
+        '[&_hr]:my-3 [&_hr]:border-border',
+        '[&_table]:my-2 [&_table]:w-full [&_table]:border-collapse [&_table]:text-xs',
+        '[&_th]:border [&_th]:border-border [&_th]:bg-muted [&_th]:px-2 [&_th]:py-1 [&_th]:text-left [&_th]:font-semibold',
+        '[&_td]:border [&_td]:border-border [&_td]:px-2 [&_td]:py-1 [&_td]:align-top',
+      )}
+    >
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          a: ({ node: _n, ...props }) => <a {...props} target="_blank" rel="noreferrer noopener" />,
+        }}
+      >
+        {content}
+      </ReactMarkdown>
     </div>
   );
 }
@@ -105,6 +152,31 @@ function TypingIndicator() {
       </div>
     </div>
   );
+}
+
+/**
+ * Group messages so consecutive agent messages are rendered together:
+ * interim messages become collapsible "thinking" steps, final message gets the bubble.
+ */
+function renderMessageGroups(messages: ChatMessage[]): ReactNode[] {
+  const groups: ReactNode[] = [];
+  let i = 0;
+  while (i < messages.length) {
+    const msg = messages[i];
+    if (msg.role === 'user') {
+      groups.push(<MessageBubble key={msg.id} msg={msg} />);
+      i++;
+    } else {
+      // Collect consecutive agent messages
+      const agentBatch: ChatMessage[] = [];
+      while (i < messages.length && messages[i].role === 'agent') {
+        agentBatch.push(messages[i]);
+        i++;
+      }
+      groups.push(<AgentResponseGroup key={agentBatch[0].id} messages={agentBatch} />);
+    }
+  }
+  return groups;
 }
 
 export default function ChatPage() {
@@ -186,9 +258,7 @@ export default function ChatPage() {
             </div>
           ) : (
             <>
-              {messages.map((m) => (
-                <MessageBubble key={m.id} msg={m} />
-              ))}
+              {renderMessageGroups(messages)}
               {isLoading ? <TypingIndicator /> : null}
             </>
           )}
