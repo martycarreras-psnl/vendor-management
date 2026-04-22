@@ -7,9 +7,11 @@ import { DataGrid, type ColumnDef } from '@/components/vendiq/data-grid';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { DataverseFieldLabel } from '@/components/ui/dataverse-field-label';
 import { Plus, Pencil, Trash2, X, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PromptSuggestion } from '@/types/vendiq';
+import { useDataverseFieldMetadata } from '@/hooks/vendiq/use-dataverse-field-metadata';
 
 function usePromptSuggestions() {
   const provider = useVendiq();
@@ -32,6 +34,9 @@ export default function PromptSuggestionsPage() {
   const provider = useVendiq();
   const queryClient = useQueryClient();
   const query = usePromptSuggestions();
+  const promptTextMetadata = useDataverseFieldMetadata('rpvms_promptsuggestions', 'rpvms_prompttext');
+  const promptTextRequired = promptTextMetadata.data?.isRequired ?? true;
+  const promptTextLabel = promptTextMetadata.data?.displayName ?? 'Prompt Text';
 
   const [editingId, setEditingId] = useState<string | null>(null); // null = creating new, undefined = idle
   const [showForm, setShowForm] = useState(false);
@@ -40,8 +45,13 @@ export default function PromptSuggestionsPage() {
 
   const saveMutation = useMutation({
     mutationFn: async () => {
+      const promptText = form.promptText.trim();
+      if (promptTextRequired && promptText.length === 0) {
+        throw new Error(`${promptTextLabel} is required.`);
+      }
+
       const input = {
-        promptText: form.promptText.trim(),
+        promptText,
         category: form.category.trim() || undefined,
         sortOrder: parseInt(form.sortOrder, 10) || 0,
         isActive: form.isActive,
@@ -171,10 +181,17 @@ export default function PromptSuggestionsPage() {
           )}
           <div className="grid gap-3 md:grid-cols-2">
             <div className="md:col-span-2">
-              <Label className="text-xs text-muted-foreground">Prompt Text *</Label>
+              <DataverseFieldLabel
+                tableLogicalName="rpvms_promptsuggestions"
+                fieldLogicalName="rpvms_prompttext"
+                fallback="Prompt Text"
+                className="text-xs text-muted-foreground"
+              />
               <Input
                 className="mt-1"
                 value={form.promptText}
+                aria-required={promptTextRequired || undefined}
+                aria-invalid={formError?.includes(promptTextLabel) ? true : undefined}
                 onChange={(e) => setForm((f) => ({ ...f, promptText: e.target.value }))}
                 placeholder="e.g. Which contracts are expiring in the next 90 days?"
               />
@@ -210,7 +227,7 @@ export default function PromptSuggestionsPage() {
             </div>
           </div>
           <div className="mt-4 flex items-center gap-2">
-            <Button size="sm" onClick={() => saveMutation.mutate()} disabled={!form.promptText.trim() || saveMutation.isPending} className="gap-2">
+            <Button size="sm" onClick={() => saveMutation.mutate()} disabled={(promptTextRequired && !form.promptText.trim()) || saveMutation.isPending} className="gap-2">
               <Check className="h-4 w-4" />
               {saveMutation.isPending ? 'Saving…' : editingId ? 'Save Changes' : 'Create'}
             </Button>

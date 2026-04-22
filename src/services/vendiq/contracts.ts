@@ -34,6 +34,20 @@ export interface ListOptions {
   select?: string[];
 }
 
+export type DataverseFieldRequiredLevel = 'none' | 'recommended' | 'application' | 'system';
+
+export interface DataverseFieldMetadata {
+  tableLogicalName: string;
+  fieldLogicalName: string;
+  displayName?: string;
+  requiredLevel: DataverseFieldRequiredLevel;
+  isRequired: boolean;
+}
+
+export interface FieldMetadataRepository {
+  getField(tableLogicalName: string, fieldLogicalName: string): Promise<DataverseFieldMetadata | null>;
+}
+
 export interface VendorRepository {
   list(options?: ListOptions): Promise<Vendor[]>;
   getById(id: string): Promise<Vendor | null>;
@@ -199,6 +213,7 @@ export interface VendIqDataProvider {
   promptSuggestions: PromptSuggestionRepository;
   reviewers: ReviewerRepository;
   assignments: AssignmentRepository;
+  fieldMetadata: FieldMetadataRepository;
   connectivity: ConnectivityRepository;
   /** Convenience: derive current criticality for a vendor from the latest SN assessment. */
   getVendorCriticality(vendorId: string): Promise<CriticalityLevel | undefined>;

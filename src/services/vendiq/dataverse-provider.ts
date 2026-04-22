@@ -1,6 +1,8 @@
 // Dataverse-backed implementation of VendIqDataProvider.
 // All interactions with src/generated/** are isolated here.
 
+import type { EntityMetadata } from '@microsoft/power-apps/data/metadata/dataverse';
+
 import { Rpvms_vendorsService } from '@/generated/services/Rpvms_vendorsService';
 import { Rpvms_suppliersService } from '@/generated/services/Rpvms_suppliersService';
 import { Rpvms_vendorsuppliersService } from '@/generated/services/Rpvms_vendorsuppliersService';
@@ -61,6 +63,7 @@ import type {
 } from '@/types/vendiq';
 
 import type {
+  DataverseFieldMetadata,
   ListOptions,
   VendIqDataProvider,
   VendorScoreCreateInput,
@@ -438,9 +441,107 @@ function toIGetAllOptions(options?: ListOptions) {
   };
 }
 
+type FieldMetadataGetter = () => Promise<{ data?: Partial<EntityMetadata>; error?: unknown }>;
+
+const REQUIRED_LEVEL_BY_VALUE: Record<number, DataverseFieldMetadata['requiredLevel']> = {
+  0: 'none',
+  1: 'system',
+  2: 'application',
+  3: 'recommended',
+};
+
+const fieldMetadataServiceRegistry: Record<string, FieldMetadataGetter> = {
+  rpvms_vendors: () => Rpvms_vendorsService.getMetadata({ schema: { columns: 'all' } }),
+  rpvms_suppliers: () => Rpvms_suppliersService.getMetadata({ schema: { columns: 'all' } }),
+  rpvms_vendorsuppliers: () => Rpvms_vendorsuppliersService.getMetadata({ schema: { columns: 'all' } }),
+  rpvms_contracts: () => Rpvms_contractsService.getMetadata({ schema: { columns: 'all' } }),
+  rpvms_contractparties: () => Rpvms_contractpartiesService.getMetadata({ schema: { columns: 'all' } }),
+  rpvms_gltransactions: () => Rpvms_gltransactionsService.getMetadata({ schema: { columns: 'all' } }),
+  rpvms_vendorscores: () => Rpvms_vendorscoresService.getMetadata({ schema: { columns: 'all' } }),
+  rpvms_vendorbudgets: () => Rpvms_vendorbudgetsService.getMetadata({ schema: { columns: 'all' } }),
+  rpvms_vendorratecards: () => Rpvms_vendorratecardsService.getMetadata({ schema: { columns: 'all' } }),
+  rpvms_vendorproductservices: () => Rpvms_vendorproductservicesService.getMetadata({ schema: { columns: 'all' } }),
+  rpvms_vendornamealiases: () => Rpvms_vendornamealiasesService.getMetadata({ schema: { columns: 'all' } }),
+  rpvms_onetrustassessments: () => Rpvms_onetrustassessmentsService.getMetadata({ schema: { columns: 'all' } }),
+  rpvms_servicenowassessments: () => Rpvms_servicenowassessmentsService.getMetadata({ schema: { columns: 'all' } }),
+  rpvms_promptsuggestions: () => Rpvms_promptsuggestionsService.getMetadata({ schema: { columns: 'all' } }),
+  rpvms_vpvendorassignments: () => Rpvms_vpvendorassignmentsService.getMetadata({ schema: { columns: 'all' } }),
+  systemusers: () => SystemusersService.getMetadata({ schema: { columns: 'all' } }),
+};
+
+function readLocalizedLabel(label: unknown): string | undefined {
+  if (!label || typeof label !== 'object') return undefined;
+
+  const userLabel = (label as { UserLocalizedLabel?: { Label?: string } }).UserLocalizedLabel?.Label;
+  if (typeof userLabel === 'string' && userLabel.length > 0) return userLabel;
+
+  const localized = (label as { LocalizedLabels?: Array<{ Label?: string }> }).LocalizedLabels;
+  if (Array.isArray(localized)) {
+    const first = localized.find((entry) => typeof entry?.Label === 'string' && entry.Label.length > 0);
+    return first?.Label;
+  }
+
+  return undefined;
+}
+
+function mapRequiredLevel(value: unknown): DataverseFieldMetadata['requiredLevel'] {
+  if (typeof value === 'number' && value in REQUIRED_LEVEL_BY_VALUE) {
+    return REQUIRED_LEVEL_BY_VALUE[value];
+  }
+  return 'none';
+}
+
+function mapAttributeMetadata(tableLogicalName: string, attribute: unknown): DataverseFieldMetadata | null {
+  if (!attribute || typeof attribute !== 'object') return null;
+
+  const logicalName = (attribute as { LogicalName?: unknown }).LogicalName;
+  if (typeof logicalName !== 'string' || logicalName.length === 0) return null;
+
+  const requiredLevelValue = (attribute as { RequiredLevel?: { Value?: unknown } }).RequiredLevel?.Value;
+  const requiredLevel = mapRequiredLevel(requiredLevelValue);
+
+  return {
+    tableLogicalName,
+    fieldLogicalName: logicalName,
+    displayName: readLocalizedLabel((attribute as { DisplayName?: unknown }).DisplayName),
+    requiredLevel,
+    isRequired: requiredLevel === 'application' || requiredLevel === 'system',
+  };
+}
+
 // ---- Provider ----
 
 export function createVendiqDataverseProvider(): VendIqDataProvider {
+  const fieldMetadataCache = new Map<string, Map<string, DataverseFieldMetadata>>();
+
+  const fieldMetadata = {
+    async getField(tableLogicalName: string, fieldLogicalName: string): Promise<DataverseFieldMetadata | null> {
+      const cachedTable = fieldMetadataCache.get(tableLogicalName);
+      if (cachedTable?.has(fieldLogicalName)) {
+        return cachedTable.get(fieldLogicalName) ?? null;
+      }
+
+      const getMetadata = fieldMetadataServiceRegistry[tableLogicalName];
+      if (!getMetadata) {
+        return null;
+      }
+
+      const metadata = unwrap(await getMetadata());
+      const attributes = Array.isArray(metadata.Attributes) ? metadata.Attributes : [];
+      const byLogicalName = new Map<string, DataverseFieldMetadata>();
+
+      for (const attribute of attributes) {
+        const mapped = mapAttributeMetadata(tableLogicalName, attribute);
+        if (mapped) {
+          byLogicalName.set(mapped.fieldLogicalName, mapped);
+        }
+      }
+
+      fieldMetadataCache.set(tableLogicalName, byLogicalName);
+      return byLogicalName.get(fieldLogicalName) ?? null;
+    },
+  };
+
   const vendors = {
     async list(options?: ListOptions): Promise<Vendor[]> {
       const res = unwrap(await Rpvms_vendorsService.getAll(toIGetAllOptions(options))) || [];
@@ -1093,6 +1194,7 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
     promptSuggestions,
     reviewers,
     assignments,
+    fieldMetadata,
     connectivity,
     async getVendorCriticality(vendorId: string): Promise<CriticalityLevel | undefined> {
       const latest = await serviceNowAssessments.latestCriticalityByVendor(vendorId);

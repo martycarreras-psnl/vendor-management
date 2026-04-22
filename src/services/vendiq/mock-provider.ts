@@ -34,6 +34,11 @@ export function createVendiqMockProvider(): VendIqDataProvider {
     promptSuggestions: stub as VendIqDataProvider['promptSuggestions'],
     reviewers: stub as VendIqDataProvider['reviewers'],
     assignments: stub as VendIqDataProvider['assignments'],
+    fieldMetadata: {
+      async getField() {
+        return null;
+      },
+    },
     connectivity: {
       async probe(): Promise<ConnectivityStatus> {
         return {
