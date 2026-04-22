@@ -303,8 +303,10 @@ function ContractsTab({ bundle }: { bundle: VendorBundle }) {
         </thead>
         <tbody>
           {sorted.map((c) => (
-            <tr key={c.id} className="border-b last:border-0">
-              <td className="px-4 py-2 font-medium">{c.contractName}</td>
+            <tr key={c.id} className="border-b last:border-0 hover:bg-muted/40 cursor-pointer">
+              <td className="px-4 py-2 font-medium">
+                <Link to={`/contracts/${c.id}`} className="text-primary hover:underline">{c.contractName}</Link>
+              </td>
               <td className="px-4 py-2 text-muted-foreground">{c.contractType ?? '—'}</td>
               <td className="px-4 py-2">{c.contractStatus ?? '—'}</td>
               <td className="px-4 py-2">{formatDate(c.effectiveDate)}</td>

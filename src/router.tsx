@@ -2,6 +2,7 @@ import { createHashRouter, Navigate } from "react-router-dom"
 import { AppShell } from "@/components/vendiq/app-shell"
 import PortfolioPage from "@/pages/portfolio"
 import ContractExpirationPage from "@/pages/contract-expiration"
+import ContractDetailsPage from "@/pages/contract-details"
 import VendorLookupPage from "@/pages/vendor-lookup"
 import Vendor360Page from "@/pages/vendor-360"
 import RiskDashboardPage from "@/pages/risk-dashboard"
@@ -23,6 +24,7 @@ export const router = createHashRouter([
       { path: "vendors", element: <VendorLookupPage /> },
       { path: "vendors/:vendorId", element: <Vendor360Page /> },
       { path: "contracts", element: <ContractExpirationPage /> },
+      { path: "contracts/:contractId", element: <ContractDetailsPage /> },
       { path: "risk", element: <RiskDashboardPage /> },
       { path: "reports", element: <ReportsPage /> },
       { path: "settings", element: <SettingsPage /> },

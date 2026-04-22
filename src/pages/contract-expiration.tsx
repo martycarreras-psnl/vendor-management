@@ -44,7 +44,7 @@ export default function ContractExpirationPage() {
           <ul className="grid gap-2 md:grid-cols-2">
             {actionRail.map((c) => (
               <li key={c.id} className="rounded-md border bg-card p-3 text-sm">
-                <div className="font-medium">{c.contractName}</div>
+                <Link to={`/contracts/${c.id}`} className="font-medium text-primary hover:underline">{c.contractName}</Link>
                 <div className="text-xs text-muted-foreground">
                   Notice {formatDate(c.noticeDate)} · Expires {formatDate(c.expirationDate)} · {c.supplierName ?? 'No supplier'}
                 </div>
@@ -91,7 +91,7 @@ function BucketColumn({
         {items.map((c) => (
           <li key={c.id} className="rounded-md border bg-card p-3 text-sm shadow-sm">
             <div className="flex items-baseline justify-between gap-2">
-              <div className="min-w-0 truncate font-medium" title={c.contractName}>{c.contractName}</div>
+              <Link to={`/contracts/${c.id}`} className="min-w-0 truncate font-medium text-primary hover:underline" title={c.contractName}>{c.contractName}</Link>
               <div className="shrink-0 text-xs text-muted-foreground tabular-nums">{formatDate(c.expirationDate)}</div>
             </div>
             <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">

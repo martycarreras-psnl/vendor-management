@@ -49,6 +49,7 @@ export interface ContractRepository {
   list(options?: ListOptions): Promise<Contract[]>;
   listBySupplier(supplierId: string): Promise<Contract[]>;
   getById(id: string): Promise<Contract | null>;
+  update(id: string, input: Partial<Contract>): Promise<Contract>;
 }
 
 export interface ContractPartyRepository {

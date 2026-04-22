@@ -74,9 +74,12 @@ import {
   readVendorPhi,
   readVendorStatus,
   readYesNoNA,
+  writeContractStatus,
+  writeContractType,
   writeSNCriticality,
   writeVendorClassification,
   writeVendorStatus,
+  writeYesNoNA,
 } from '@/services/vendiq/option-sets';
 
 // ---- Mapping helpers ----
@@ -428,6 +431,31 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
       } catch {
         return null;
       }
+    },
+    async update(id: string, input: Partial<Contract>): Promise<Contract> {
+      const payload: Record<string, unknown> = {};
+      if (input.contractName !== undefined) payload.rpvms_contractname = input.contractName;
+      if (input.documentId !== undefined) payload.rpvms_documentid = input.documentId;
+      if (input.matterId !== undefined) payload.rpvms_matterid = input.matterId;
+      if (input.matterShortName !== undefined) payload.rpvms_mattershortname = input.matterShortName;
+      if (input.matterFullName !== undefined) payload.rpvms_matterfullname = input.matterFullName;
+      if (input.contractingEntityName !== undefined) payload.rpvms_contractingentityname = input.contractingEntityName;
+      if (input.practiceName !== undefined) payload.rpvms_practicename = input.practiceName;
+      if (input.contractType !== undefined) payload.rpvms_contracttype = writeContractType(input.contractType);
+      if (input.subContractType !== undefined) payload.rpvms_subcontracttype = input.subContractType;
+      if (input.contractStatus !== undefined) payload.rpvms_contractstatus = writeContractStatus(input.contractStatus);
+      if (input.dateSigned !== undefined) payload.rpvms_datesigned = input.dateSigned;
+      if (input.effectiveDate !== undefined) payload.rpvms_effectivedate = input.effectiveDate;
+      if (input.expirationDate !== undefined) payload.rpvms_expirationdate = input.expirationDate;
+      if (input.noticeDate !== undefined) payload.rpvms_noticedate = input.noticeDate;
+      if (input.autoRenew !== undefined) payload.rpvms_autorenew = writeYesNoNA(input.autoRenew);
+      if (input.autoRenewalDetails !== undefined) payload.rpvms_autorenewaldetails = input.autoRenewalDetails;
+      if (input.amended !== undefined) payload.rpvms_amended = writeYesNoNA(input.amended);
+      if (input.terminationWithoutCause !== undefined) payload.rpvms_terminationwithoutcause = writeYesNoNA(input.terminationWithoutCause);
+      if (input.terminationNoticeDetail !== undefined) payload.rpvms_terminationnoticedetail = input.terminationNoticeDetail;
+      if (input.otherSignificantTerms !== undefined) payload.rpvms_othersignificantterms = input.otherSignificantTerms;
+      const res = unwrap(await Rpvms_contractsService.update(id, payload as never));
+      return mapContract(res);
     },
   };
 

@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { Link } from 'react-router-dom';
 import type { ContractWithVendor } from '@/types/vendiq';
 import { formatCurrency } from '@/lib/vendiq-format';
 
@@ -103,10 +104,9 @@ function BucketRow({
               const flex = Math.max(minFlex, (weights[i] / total) * labeled.length);
               const spend = vendorSpendByContract?.get(c.id) ?? c.annualSpend;
               return (
-                <button
+                <Link
                   key={c.id}
-                  type="button"
-                  onClick={onClick}
+                  to={`/contracts/${c.id}`}
                   style={{ flex: `${flex} 1 0`, minWidth: 40 }}
                   className={cn(
                     'group relative flex flex-col justify-center overflow-hidden rounded-md px-2 py-1 text-left transition-opacity hover:opacity-90',
@@ -121,7 +121,7 @@ function BucketRow({
                   {spend !== undefined && (
                     <div className="truncate text-[10px] opacity-85">{formatCurrency(spend)}</div>
                   )}
-                </button>
+                </Link>
               );
             })}
             {remaining > 0 && (

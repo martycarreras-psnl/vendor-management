@@ -149,14 +149,23 @@ export function readIsReseller(v: string | undefined): boolean | undefined {
 export function readContractStatus(v: Rpvms_contractsrpvms_contractstatus | undefined): ContractStatus | undefined {
   return lookup(ContractStatusMap, v as string | undefined) as ContractStatus | undefined;
 }
+export function writeContractStatus(v: ContractStatus | undefined): Rpvms_contractsrpvms_contractstatus | undefined {
+  return reverseLookup(ContractStatusMap, v) as Rpvms_contractsrpvms_contractstatus | undefined;
+}
 export function readContractType(v: Rpvms_contractsrpvms_contracttype | undefined): ContractType | undefined {
   return lookup(ContractTypeMap, v as string | undefined) as ContractType | undefined;
+}
+export function writeContractType(v: ContractType | undefined): Rpvms_contractsrpvms_contracttype | undefined {
+  return reverseLookup(ContractTypeMap, v) as Rpvms_contractsrpvms_contracttype | undefined;
 }
 export function readYesNoNA(v: string | undefined): YesNoNA | undefined {
   // All Yes/No/N_A fields share the same value space; pick any one of the maps.
   return lookup(ContractAutoRenewMap, v) as YesNoNA | undefined
     ?? lookup(ContractAmendedMap, v) as YesNoNA | undefined
     ?? lookup(ContractTwoMap, v) as YesNoNA | undefined;
+}
+export function writeYesNoNA(v: YesNoNA | undefined): string | undefined {
+  return reverseLookup(ContractAutoRenewMap, v);
 }
 
 // ---- GL ----
