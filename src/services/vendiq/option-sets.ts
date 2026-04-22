@@ -126,13 +126,23 @@ export function writeVendorStatus(v: VendorStatus | undefined): Rpvms_vendorsrpv
 export function readCommercialRole(v: Rpvms_vendorsrpvms_commercialrole | undefined): CommercialRole | undefined {
   return lookup(VendorCommercialRoleMap, v as string | undefined) as CommercialRole | undefined;
 }
+export function writeCommercialRole(v: CommercialRole | undefined): Rpvms_vendorsrpvms_commercialrole | undefined {
+  return reverseLookup(VendorCommercialRoleMap, v) as Rpvms_vendorsrpvms_commercialrole | undefined;
+}
 export function readVendorPhi(v: Rpvms_vendorsrpvms_activephiaccess | undefined): YesNoNA | undefined {
   return lookup(VendorPhiMap, v as string | undefined) as YesNoNA | undefined;
+}
+export function writeVendorPhi(v: YesNoNA | undefined): Rpvms_vendorsrpvms_activephiaccess | undefined {
+  return reverseLookup(VendorPhiMap, v) as Rpvms_vendorsrpvms_activephiaccess | undefined;
 }
 export function readIsVar(v: Rpvms_vendorsrpvms_isvar | undefined): boolean | undefined {
   const s = lookup(VendorIsVarMap, v as string | undefined);
   if (!s) return undefined;
   return s === 'Yes';
+}
+export function writeIsVar(v: boolean | undefined): Rpvms_vendorsrpvms_isvar | undefined {
+  if (v === undefined) return undefined;
+  return reverseLookup(VendorIsVarMap, v ? 'Yes' : 'No') as Rpvms_vendorsrpvms_isvar | undefined;
 }
 
 // ---- Supplier ----

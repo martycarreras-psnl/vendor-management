@@ -76,8 +76,11 @@ import {
   readYesNoNA,
   writeContractStatus,
   writeContractType,
+  writeCommercialRole,
+  writeIsVar,
   writeSNCriticality,
   writeVendorClassification,
+  writeVendorPhi,
   writeVendorStatus,
   writeYesNoNA,
 } from '@/services/vendiq/option-sets';
@@ -380,6 +383,9 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
       if (input.primaryOffering !== undefined) payload.rpvms_primaryoffering = input.primaryOffering;
       if (input.categoryL1 !== undefined) payload.rpvms_categoryl1 = input.categoryL1;
       if (input.categoryL2 !== undefined) payload.rpvms_categoryl2 = input.categoryL2;
+      if (input.commercialRole !== undefined) payload.rpvms_commercialrole = writeCommercialRole(input.commercialRole);
+      if (input.activePhiAccess !== undefined) payload.rpvms_activephiaccess = writeVendorPhi(input.activePhiAccess);
+      if (input.isVar !== undefined) payload.rpvms_isvar = writeIsVar(input.isVar);
       const res = unwrap(await Rpvms_vendorsService.update(id, payload));
       return mapVendor(res);
     },

@@ -9,6 +9,7 @@ import type {
   Contract,
   VendorBudget,
   VendorScore,
+  VendorSupplier,
   PortfolioFilters,
   TopVendorRow,
   KpiTotals,
@@ -28,6 +29,7 @@ export interface PortfolioDataset {
   scoresLatestByVendor: Map<string, VendorScore>;
   contractsByVendor: Map<string, Contract[]>;
   supplierToVendors: Map<string, string[]>;
+  suppliersByVendor: Map<string, VendorSupplier[]>;
   fiscalYear: string;
 }
 
@@ -105,11 +107,15 @@ export function usePortfolioDataset() {
 
       // Supplier -> Vendors index via the VendorSupplier bridge.
       const supplierToVendors = new Map<string, string[]>();
+      const suppliersByVendor = new Map<string, VendorSupplier[]>();
       for (const vs of vendorSuppliers) {
         if (!vs.supplierId || !vs.vendorId) continue;
         const arr = supplierToVendors.get(vs.supplierId) ?? [];
         arr.push(vs.vendorId);
         supplierToVendors.set(vs.supplierId, arr);
+        const vendorArr = suppliersByVendor.get(vs.vendorId) ?? [];
+        vendorArr.push(vs);
+        suppliersByVendor.set(vs.vendorId, vendorArr);
       }
 
       // Vendor -> Contracts index via ContractParty (authoritative), with fallback
@@ -142,6 +148,7 @@ export function usePortfolioDataset() {
         scoresLatestByVendor,
         contractsByVendor,
         supplierToVendors,
+        suppliersByVendor,
         fiscalYear,
       } satisfies PortfolioDataset;
     },
