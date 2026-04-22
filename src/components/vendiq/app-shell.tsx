@@ -7,6 +7,7 @@ import {
   Sparkles,
   Settings,
   Search,
+  AppWindow,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ConnectivityPill } from '@/components/vendiq/connectivity-pill';
@@ -60,6 +61,16 @@ export function AppShell() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <a
+            href="https://m365.cloud.microsoft/"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="inline-flex h-8 items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 text-xs font-medium text-white transition-colors hover:border-white/30 hover:bg-white/15"
+            title="Open Microsoft 365 in a new tab"
+          >
+            <AppWindow className="h-3.5 w-3.5" aria-hidden />
+            Microsoft 365
+          </a>
         </div>
       </header>
 
