@@ -4,6 +4,7 @@
 
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { ClipboardEdit } from 'lucide-react';
 import { useVendiq } from '@/services/vendiq/provider-context';
 import { useVPReviewContext } from '@/hooks/vendiq/use-vp-review-context';
 import { DataGrid, type ColumnDef } from '@/components/vendiq/data-grid';
@@ -118,14 +119,7 @@ export default function ReviewsPage() {
       key: 'vendor',
       header: 'Vendor',
       accessor: (r) => r.vendorName,
-      render: (r) => (
-        <Link
-          to={`/reviews/${r.assignmentId}/score`}
-          className="font-medium text-primary underline-offset-2 hover:underline"
-        >
-          {r.vendorName}
-        </Link>
-      ),
+      render: (r) => <span className="font-medium">{r.vendorName}</span>,
     },
     {
       key: 'criticality',
@@ -200,6 +194,30 @@ export default function ReviewsPage() {
             {up ? '+' : ''}
             {r.delta.toFixed(2)}
           </span>
+        );
+      },
+      align: 'right',
+    },
+    {
+      key: 'action',
+      header: '',
+      accessor: () => '',
+      render: (r) => {
+        const label =
+          r.status === 'NotStarted'
+            ? 'Start review'
+            : r.status === 'Approved'
+              ? 'View review'
+              : 'Continue review';
+        return (
+          <Link
+            to={`/reviews/${r.assignmentId}/score`}
+            title={label}
+            aria-label={`${label} for ${r.vendorName}`}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md border bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+          >
+            <ClipboardEdit className="h-4 w-4" />
+          </Link>
         );
       },
       align: 'right',
