@@ -45,14 +45,14 @@ export default function PromptSuggestionsPage() {
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      const promptText = form.promptText.trim();
+      const promptText = (form.promptText ?? '').trim();
       if (promptTextRequired && promptText.length === 0) {
         throw new Error(`${promptTextLabel} is required.`);
       }
 
       const input = {
         promptText,
-        category: form.category.trim() || undefined,
+        category: (form.category ?? '').trim() || undefined,
         sortOrder: parseInt(form.sortOrder, 10) || 0,
         isActive: form.isActive,
       };
@@ -86,7 +86,7 @@ export default function PromptSuggestionsPage() {
   const startEdit = useCallback((ps: PromptSuggestion) => {
     setEditingId(ps.id);
     setForm({
-      promptText: ps.promptText,
+      promptText: ps.promptText ?? '',
       category: ps.category ?? '',
       sortOrder: String(ps.sortOrder ?? 0),
       isActive: ps.isActive ?? true,
@@ -133,7 +133,7 @@ export default function PromptSuggestionsPage() {
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              if (confirm(`Delete "${r.promptText.slice(0, 60)}"?`)) {
+              if (confirm(`Delete "${(r.promptText ?? '').slice(0, 60)}"?`)) {
                 deleteMutation.mutate(r.id);
               }
             }}
@@ -227,7 +227,7 @@ export default function PromptSuggestionsPage() {
             </div>
           </div>
           <div className="mt-4 flex items-center gap-2">
-            <Button size="sm" onClick={() => saveMutation.mutate()} disabled={(promptTextRequired && !form.promptText.trim()) || saveMutation.isPending} className="gap-2">
+            <Button size="sm" onClick={() => saveMutation.mutate()} disabled={(promptTextRequired && !(form.promptText ?? '').trim()) || saveMutation.isPending} className="gap-2">
               <Check className="h-4 w-4" />
               {saveMutation.isPending ? 'Saving…' : editingId ? 'Save Changes' : 'Create'}
             </Button>
