@@ -7,6 +7,9 @@ import { ChevronUp, ChevronDown, ChevronsUpDown, X, Download } from 'lucide-reac
 
 // ---- Public API ----
 
+/** Filter input type rendered in the filter row. Auto-detected when omitted. */
+export type FilterType = 'text' | 'select' | 'date' | 'number' | 'boolean';
+
 export interface ColumnDef<T> {
   /** Unique key for this column. */
   key: string;
@@ -22,6 +25,28 @@ export interface ColumnDef<T> {
   filterable?: boolean;
   /** Disable sorting for this column. Default true. */
   sortable?: boolean;
+  /**
+   * Filter input type. When omitted, auto-detected from data:
+   * - accessor returns boolean → 'boolean'
+   * - accessor returns number → 'number'
+   * - values look like ISO dates (YYYY-MM-...) → 'date'
+   * - ≤20 distinct non-empty values → 'select'
+   * - otherwise → 'text'
+   */
+  filterType?: FilterType;
+  /** Explicit options for 'select' filter (overrides auto-detection). */
+  filterOptions?: string[];
+}
+
+/** Internal filter value shape per column — supports range and exact values. */
+interface ColFilterValue {
+  text?: string;       // text substring
+  exact?: string;      // select exact match
+  bool?: string;       // 'true' | 'false' | ''
+  dateFrom?: string;   // YYYY-MM-DD
+  dateTo?: string;     // YYYY-MM-DD
+  numMin?: string;     // number min
+  numMax?: string;     // number max
 }
 
 export interface DataGridProps<T> {
@@ -57,14 +82,54 @@ export function DataGrid<T>({
   const [sortKey, setSortKey] = useState<string | null>(defaultSort?.key ?? null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>(defaultSort?.dir ?? 'asc');
 
-  // Filter state: key → lowercase search string
-  const [colFilters, setColFilters] = useState<Record<string, string>>({});
+  // Filter state: key → structured filter value
+  const [colFilters, setColFilters] = useState<Record<string, ColFilterValue>>({});
   const [showFilters, setShowFilters] = useState(false);
 
   // Page state
   const [page, setPage] = useState(0);
 
-  const hasActiveFilters = Object.values(colFilters).some((v) => v.length > 0);
+  const hasActiveFilters = Object.values(colFilters).some((v) => isFilterActive(v));
+
+  // Auto-detect filter types from data
+  const resolvedFilterTypes = useMemo(() => {
+    const map = new Map<string, { type: FilterType; options?: string[] }>();
+    for (const col of columns) {
+      if (col.filterable === false) continue;
+      if (col.filterType) {
+        map.set(col.key, { type: col.filterType, options: col.filterOptions });
+        continue;
+      }
+      // Sample data to infer type
+      const sample = data.slice(0, 100);
+      const values = sample.map((r) => col.accessor(r)).filter((v) => v !== null && v !== undefined);
+      if (values.length === 0) { map.set(col.key, { type: 'text' }); continue; }
+
+      // Boolean?
+      if (values.every((v) => typeof v === 'boolean')) {
+        map.set(col.key, { type: 'boolean' }); continue;
+      }
+      // Number?
+      if (values.every((v) => typeof v === 'number')) {
+        map.set(col.key, { type: 'number' }); continue;
+      }
+      // Date? (ISO string starting with YYYY-MM)
+      const ISO_DATE = /^\d{4}-\d{2}/;
+      if (values.every((v) => typeof v === 'string' && ISO_DATE.test(v))) {
+        map.set(col.key, { type: 'date' }); continue;
+      }
+      // Select? (≤20 distinct non-empty string values)
+      if (col.filterOptions) {
+        map.set(col.key, { type: 'select', options: col.filterOptions }); continue;
+      }
+      const distinct = new Set(data.map((r) => col.accessor(r)).filter((v) => v !== null && v !== undefined && v !== '').map((v) => String(v)));
+      if (distinct.size > 0 && distinct.size <= 20) {
+        map.set(col.key, { type: 'select', options: [...distinct].sort() }); continue;
+      }
+      map.set(col.key, { type: 'text' });
+    }
+    return map;
+  }, [columns, data]);
 
   // ---- Derived data ----
 
@@ -72,14 +137,45 @@ export function DataGrid<T>({
     if (!hasActiveFilters) return data;
     return data.filter((row) =>
       columns.every((col) => {
-        const q = colFilters[col.key];
-        if (!q) return true;
+        const fv = colFilters[col.key];
+        if (!fv || !isFilterActive(fv)) return true;
         const raw = col.accessor(row);
-        if (raw === null || raw === undefined) return false;
-        return String(raw).toLowerCase().includes(q);
+        const ft = resolvedFilterTypes.get(col.key)?.type ?? 'text';
+
+        switch (ft) {
+          case 'boolean': {
+            if (!fv.bool) return true;
+            const boolVal = raw === true || raw === 'true' || raw === 'Yes';
+            return fv.bool === 'true' ? boolVal : !boolVal;
+          }
+          case 'select': {
+            if (!fv.exact) return true;
+            return String(raw ?? '') === fv.exact;
+          }
+          case 'date': {
+            const s = String(raw ?? '').slice(0, 10);
+            if (!s) return !fv.dateFrom && !fv.dateTo;
+            if (fv.dateFrom && s < fv.dateFrom) return false;
+            if (fv.dateTo && s > fv.dateTo) return false;
+            return true;
+          }
+          case 'number': {
+            if (raw === null || raw === undefined) return !fv.numMin && !fv.numMax;
+            const n = typeof raw === 'number' ? raw : parseFloat(String(raw));
+            if (Number.isNaN(n)) return false;
+            if (fv.numMin && n < parseFloat(fv.numMin)) return false;
+            if (fv.numMax && n > parseFloat(fv.numMax)) return false;
+            return true;
+          }
+          default: { // text
+            if (!fv.text) return true;
+            if (raw === null || raw === undefined) return false;
+            return String(raw).toLowerCase().includes(fv.text);
+          }
+        }
       }),
     );
-  }, [data, colFilters, columns, hasActiveFilters]);
+  }, [data, colFilters, columns, hasActiveFilters, resolvedFilterTypes]);
 
   const sorted = useMemo(() => {
     if (!sortKey) return filtered;
@@ -109,8 +205,8 @@ export function DataGrid<T>({
   const rangeEnd = Math.min((safePage + 1) * effectivePageSize, sorted.length);
 
   // Reset page when filters change
-  const setFilter = useCallback((key: string, value: string) => {
-    setColFilters((prev) => ({ ...prev, [key]: value.toLowerCase() }));
+  const setFilter = useCallback((key: string, patch: Partial<ColFilterValue>) => {
+    setColFilters((prev) => ({ ...prev, [key]: { ...prev[key], ...patch } }));
     setPage(0);
   }, []);
 
@@ -231,21 +327,45 @@ export function DataGrid<T>({
             {/* Filter row */}
             {showFilters && (
               <tr className="border-b bg-muted/20">
-                {columns.map((col) => (
-                  <th key={col.key} className={cn('px-4 py-1.5', col.align === 'right' && 'text-right')}>
-                    {col.filterable !== false ? (
-                      <input
-                        type="text"
-                        placeholder="Filter…"
-                        value={colFilters[col.key] ?? ''}
-                        onChange={(e) => setFilter(col.key, e.target.value)}
-                        className="w-full min-w-[60px] rounded border bg-background px-2 py-1 text-xs font-normal normal-case tracking-normal outline-none focus:ring-1 focus:ring-primary"
-                      />
-                    ) : (
-                      <span />
-                    )}
-                  </th>
-                ))}
+                {columns.map((col) => {
+                  if (col.filterable === false) return <th key={col.key} className="px-4 py-1.5"><span /></th>;
+                  const meta = resolvedFilterTypes.get(col.key);
+                  const ft = meta?.type ?? 'text';
+                  const fv = colFilters[col.key] ?? {};
+                  const base = 'w-full min-w-[60px] rounded border bg-background px-2 py-1 text-xs font-normal normal-case tracking-normal outline-none focus:ring-1 focus:ring-primary';
+                  return (
+                    <th key={col.key} className={cn('px-4 py-1.5', col.align === 'right' && 'text-right')}>
+                      {ft === 'boolean' && (
+                        <select className={base} value={fv.bool ?? ''} onChange={(e) => setFilter(col.key, { bool: e.target.value })}>
+                          <option value="">All</option>
+                          <option value="true">Yes</option>
+                          <option value="false">No</option>
+                        </select>
+                      )}
+                      {ft === 'select' && (
+                        <select className={base} value={fv.exact ?? ''} onChange={(e) => setFilter(col.key, { exact: e.target.value })}>
+                          <option value="">All</option>
+                          {(meta?.options ?? []).map((o) => <option key={o} value={o}>{o}</option>)}
+                        </select>
+                      )}
+                      {ft === 'date' && (
+                        <div className="flex gap-1">
+                          <input type="date" className={cn(base, 'min-w-[100px]')} value={fv.dateFrom ?? ''} onChange={(e) => setFilter(col.key, { dateFrom: e.target.value })} title="From" />
+                          <input type="date" className={cn(base, 'min-w-[100px]')} value={fv.dateTo ?? ''} onChange={(e) => setFilter(col.key, { dateTo: e.target.value })} title="To" />
+                        </div>
+                      )}
+                      {ft === 'number' && (
+                        <div className="flex gap-1">
+                          <input type="number" className={cn(base, 'min-w-[50px]')} placeholder="Min" value={fv.numMin ?? ''} onChange={(e) => setFilter(col.key, { numMin: e.target.value })} />
+                          <input type="number" className={cn(base, 'min-w-[50px]')} placeholder="Max" value={fv.numMax ?? ''} onChange={(e) => setFilter(col.key, { numMax: e.target.value })} />
+                        </div>
+                      )}
+                      {ft === 'text' && (
+                        <input type="text" placeholder="Filter…" className={base} value={fv.text ?? ''} onChange={(e) => setFilter(col.key, { text: e.target.value.toLowerCase() })} />
+                      )}
+                    </th>
+                  );
+                })}
               </tr>
             )}
           </thead>
@@ -332,4 +452,8 @@ function escapeCsvField(value: string): string {
     return `"${value.replace(/"/g, '""')}"`;
   }
   return value;
+}
+
+function isFilterActive(fv: ColFilterValue): boolean {
+  return !!(fv.text || fv.exact || fv.bool || fv.dateFrom || fv.dateTo || fv.numMin || fv.numMax);
 }
