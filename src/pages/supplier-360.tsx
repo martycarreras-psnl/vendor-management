@@ -47,12 +47,11 @@ function useSupplier360(supplierId: string) {
         provider.vendors.list({ top: 5000 }),
       ]);
 
-      // Enrich vendor names so we never display raw GUIDs
+      // Enrich vendor names — always prefer the vendors table's canonical name
       const vendorNameById = new Map(vendors.map((v) => [v.id, v.vendorName]));
       for (const vs of vendorSuppliers) {
-        if (!vs.vendorName) {
-          vs.vendorName = vendorNameById.get(vs.vendorId);
-        }
+        const canonical = vendorNameById.get(vs.vendorId);
+        if (canonical) vs.vendorName = canonical;
       }
 
       return { supplier, vendorSuppliers, contracts, contractParties, glTransactions };

@@ -89,12 +89,11 @@ function useVendor360(vendorId: string) {
         provider.suppliers.list({ top: 5000 }),
       ]);
 
-      // Enrich supplier names so we never display blanks
+      // Enrich supplier names — always prefer the supplier table's canonical name
       const supplierNameById = new Map(suppliers.map((s) => [s.id, s.supplierName]));
       for (const vs of vendorSuppliers) {
-        if (!vs.supplierName) {
-          vs.supplierName = supplierNameById.get(vs.supplierId);
-        }
+        const canonical = supplierNameById.get(vs.supplierId);
+        if (canonical) vs.supplierName = canonical;
       }
 
       // Load contracts: the Vendor ↔ Contract linkage is via ContractParty; for any

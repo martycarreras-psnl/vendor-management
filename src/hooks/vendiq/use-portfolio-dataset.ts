@@ -115,10 +115,9 @@ export function usePortfolioDataset() {
       const suppliersByVendor = new Map<string, VendorSupplier[]>();
       for (const vs of vendorSuppliers) {
         if (!vs.supplierId || !vs.vendorId) continue;
-        // Enrich supplier name from the suppliers table when the lookup name is missing.
-        if (!vs.supplierName) {
-          vs.supplierName = supplierNameById.get(vs.supplierId);
-        }
+        // Enrich supplier name — always prefer the suppliers table's canonical name.
+        const canonical = supplierNameById.get(vs.supplierId);
+        if (canonical) vs.supplierName = canonical;
         const arr = supplierToVendors.get(vs.supplierId) ?? [];
         arr.push(vs.vendorId);
         supplierToVendors.set(vs.supplierId, arr);
