@@ -450,6 +450,13 @@ const REQUIRED_LEVEL_BY_VALUE: Record<number, DataverseFieldMetadata['requiredLe
   3: 'recommended',
 };
 
+const REQUIRED_LEVEL_BY_NAME: Record<string, DataverseFieldMetadata['requiredLevel']> = {
+  none: 'none',
+  systemrequired: 'system',
+  applicationrequired: 'application',
+  recommended: 'recommended',
+};
+
 const fieldMetadataServiceRegistry: Record<string, FieldMetadataGetter> = {
   rpvms_vendors: () => Rpvms_vendorsService.getMetadata({ schema: { columns: 'all' } }),
   rpvms_suppliers: () => Rpvms_suppliersService.getMetadata({ schema: { columns: 'all' } }),
@@ -487,6 +494,16 @@ function readLocalizedLabel(label: unknown): string | undefined {
 function mapRequiredLevel(value: unknown): DataverseFieldMetadata['requiredLevel'] {
   if (typeof value === 'number' && value in REQUIRED_LEVEL_BY_VALUE) {
     return REQUIRED_LEVEL_BY_VALUE[value];
+  }
+  if (typeof value === 'string') {
+    const numeric = Number(value);
+    if (Number.isFinite(numeric) && numeric in REQUIRED_LEVEL_BY_VALUE) {
+      return REQUIRED_LEVEL_BY_VALUE[numeric];
+    }
+    const normalized = value.trim().toLowerCase();
+    if (normalized in REQUIRED_LEVEL_BY_NAME) {
+      return REQUIRED_LEVEL_BY_NAME[normalized];
+    }
   }
   return 'none';
 }
