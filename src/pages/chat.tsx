@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
-import { Send, Trash2, Sparkles, Bot, User } from 'lucide-react';
+import { Send, MessageSquarePlus, Sparkles, Bot, User } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { useCopilotAgent, type ChatMessage } from '@/hooks/vendiq/use-copilot-agent';
+import { useCopilotChat, type ChatMessage } from '@/providers/copilot-chat-provider';
 
 const SUGGESTIONS = [
   'Which contracts are expiring in the next 90 days?',
@@ -108,7 +108,7 @@ function TypingIndicator() {
 }
 
 export default function ChatPage() {
-  const { messages, sendMessage, clearChat, isLoading, agentName } = useCopilotAgent();
+  const { messages, sendMessage, newChat, isLoading, agentName } = useCopilotChat();
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -148,12 +148,13 @@ export default function ChatPage() {
         <Button
           variant="outline"
           size="sm"
-          onClick={clearChat}
+          onClick={newChat}
           disabled={messages.length === 0 || isLoading}
           className="gap-2"
+          title="Start a new conversation"
         >
-          <Trash2 className="h-4 w-4" aria-hidden />
-          Clear
+          <MessageSquarePlus className="h-4 w-4" aria-hidden />
+          New chat
         </Button>
       </header>
 
