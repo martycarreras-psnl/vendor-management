@@ -10,7 +10,6 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ConnectivityPill } from '@/components/vendiq/connectivity-pill';
-import { ModeToggle } from '@/components/mode-toggle';
 import { useState, type KeyboardEvent } from 'react';
 import vendiqIconMarkup from '@/assets/vendiq_icon.svg?raw';
 
@@ -61,7 +60,6 @@ export function AppShell() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <ModeToggle />
         </div>
       </header>
 
