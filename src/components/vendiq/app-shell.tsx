@@ -4,7 +4,7 @@ import {
   Users,
   FileText,
   ShieldCheck,
-  BarChart3,
+  Sparkles,
   Settings,
   Search,
 } from 'lucide-react';
@@ -18,7 +18,7 @@ const NAV_ITEMS = [
   { to: '/vendors', label: 'Vendors', icon: Users, end: false },
   { to: '/contracts', label: 'Contracts', icon: FileText, end: false },
   { to: '/risk', label: 'Risk', icon: ShieldCheck, end: false },
-  { to: '/reports', label: 'Reports', icon: BarChart3, end: false },
+  { to: '/chat', label: 'Ask vendIQ', icon: Sparkles, end: false },
   { to: '/settings', label: 'Settings', icon: Settings, end: false },
 ];
 

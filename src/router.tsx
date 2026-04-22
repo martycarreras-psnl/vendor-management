@@ -6,7 +6,7 @@ import ContractDetailsPage from "@/pages/contract-details"
 import VendorLookupPage from "@/pages/vendor-lookup"
 import Vendor360Page from "@/pages/vendor-360"
 import RiskDashboardPage from "@/pages/risk-dashboard"
-import ReportsPage from "@/pages/reports"
+import ChatPage from "@/pages/chat"
 import SettingsPage from "@/pages/settings"
 import NotFoundPage from "@/pages/not-found"
 
@@ -26,7 +26,7 @@ export const router = createHashRouter([
       { path: "contracts", element: <ContractExpirationPage /> },
       { path: "contracts/:contractId", element: <ContractDetailsPage /> },
       { path: "risk", element: <RiskDashboardPage /> },
-      { path: "reports", element: <ReportsPage /> },
+      { path: "chat", element: <ChatPage /> },
       { path: "settings", element: <SettingsPage /> },
       { path: "*", element: <NotFoundPage /> },
     ],

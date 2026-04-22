@@ -16,6 +16,14 @@
         "office365users"
       ],
       "dataSets": {}
+    },
+    "d6ff96cf-d8b9-4dfc-8bfb-380ca8d0fac6": {
+      "id": "/providers/Microsoft.PowerApps/apis/shared_microsoftcopilotstudio",
+      "displayName": "Microsoft Copilot Studio",
+      "dataSources": [
+        "microsoftcopilotstudio"
+      ],
+      "dataSets": {}
     }
   },
   "databaseReferences": {

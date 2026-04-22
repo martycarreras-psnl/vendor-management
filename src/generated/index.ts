@@ -5,6 +5,7 @@
 
 // Models
 export * as CommonModels from './models/CommonModels';
+export * as MicrosoftCopilotStudioModel from './models/MicrosoftCopilotStudioModel';
 export * as Office365UsersModel from './models/Office365UsersModel';
 export * as Rpvms_contractpartiesModel from './models/Rpvms_contractpartiesModel';
 export * as Rpvms_contractsModel from './models/Rpvms_contractsModel';
@@ -21,6 +22,7 @@ export * as Rpvms_vendorscoresModel from './models/Rpvms_vendorscoresModel';
 export * as Rpvms_vendorsuppliersModel from './models/Rpvms_vendorsuppliersModel';
 
 // Services
+export * from './services/MicrosoftCopilotStudioService';
 export * from './services/Office365UsersService';
 export * from './services/Rpvms_contractpartiesService';
 export * from './services/Rpvms_contractsService';
