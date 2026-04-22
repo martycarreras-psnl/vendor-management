@@ -149,9 +149,9 @@ export default function Supplier360Page() {
         </div>
       </header>
 
-      {/* Underline tabs */}
-      <div className="border-b">
-        <nav className="-mb-px flex gap-0 overflow-x-auto" aria-label="Supplier sections">
+      {/* Tab bar */}
+      <div className="rounded-lg border bg-muted/30 p-1">
+        <nav className="flex flex-wrap gap-1" aria-label="Supplier sections">
           {TABS.map((tab) => {
             const count = tab.count?.(bundle);
             const isActive = activeTab === tab.key;
@@ -161,13 +161,13 @@ export default function Supplier360Page() {
                 type="button"
                 onClick={() => setActiveTab(tab.key)}
                 className={cn(
-                  'group relative flex items-center gap-2 whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition-colors',
+                  'inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-all',
                   isActive
-                    ? 'border-primary text-primary'
-                    : 'border-transparent text-muted-foreground hover:border-muted-foreground/30 hover:text-foreground',
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:bg-background/50 hover:text-foreground',
                 )}
               >
-                <span className="text-base leading-none">{tab.icon}</span>
+                <span className="text-sm leading-none">{tab.icon}</span>
                 <span>{tab.label}</span>
                 {count !== undefined && count > 0 && (
                   <span className={cn(
