@@ -13,7 +13,7 @@ import { ConnectivityPill } from '@/components/vendiq/connectivity-pill';
 import { ModeToggle } from '@/components/mode-toggle';
 import { Input } from '@/components/ui/input';
 import { useState, type KeyboardEvent } from 'react';
-import vendiqIcon from '@/assets/vendiq_icon.png';
+import vendiqIcon from '@/assets/vendiq_icon.svg';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Home', icon: LayoutDashboard, end: true },
