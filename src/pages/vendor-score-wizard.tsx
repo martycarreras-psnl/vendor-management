@@ -132,7 +132,8 @@ export default function VendorScoreWizardPage() {
   });
 
   const status: ScoreStatus = initial?.reviewStatus ?? 'NotStarted';
-  const isLocked = status === 'Approved';
+  const [unlockEdit, setUnlockEdit] = useState(false);
+  const isLocked = status === 'Approved' && !unlockEdit;
 
   const upsertMutation = useMutation({
     mutationFn: async (target: ScoreStatus): Promise<VendorScore> => {
@@ -295,10 +296,14 @@ export default function VendorScoreWizardPage() {
                 Save as draft
               </Button>
               <Button
-                onClick={() => upsertMutation.mutate('Approved')}
+                onClick={() => {
+                  upsertMutation.mutate('Approved', {
+                    onSuccess: () => setUnlockEdit(false),
+                  });
+                }}
                 disabled={!allSet || isLocked || upsertMutation.isPending}
               >
-                Submit for approval
+                {status === 'Approved' && unlockEdit ? 'Save & re-submit' : 'Submit for approval'}
               </Button>
               <Button
                 onClick={() => upsertMutation.mutate('Rejected')}
@@ -308,15 +313,44 @@ export default function VendorScoreWizardPage() {
               >
                 Reject
               </Button>
+              {status === 'Approved' && !unlockEdit && (
+                <Button variant="outline" onClick={() => setUnlockEdit(true)}>
+                  Edit submitted review
+                </Button>
+              )}
+              {status === 'Approved' && unlockEdit && (
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setUnlockEdit(false);
+                    // Reset to original values.
+                    setDims({
+                      criticality: initial?.criticalityScore,
+                      dependency: initial?.dependencyScore,
+                      spend: initial?.spendScore,
+                      value: initial?.valueScore,
+                      alignment: initial?.alignmentScore,
+                    });
+                    setComment(initial?.comment ?? '');
+                  }}
+                >
+                  Cancel edit
+                </Button>
+              )}
             </div>
             {!allSet && !isLocked && (
               <p className="mt-3 text-xs text-muted-foreground">
                 Set all 5 dimensions to enable Submit for approval.
               </p>
             )}
-            {isLocked && (
+            {status === 'Approved' && !unlockEdit && (
               <p className="mt-3 text-xs text-muted-foreground">
-                This score is approved and locked. Contact an admin to re-open.
+                This review is approved. Click "Edit submitted review" to make changes.
+              </p>
+            )}
+            {status === 'Approved' && unlockEdit && (
+              <p className="mt-3 text-xs text-signal-amber">
+                Editing an approved review. Save &amp; re-submit to persist changes.
               </p>
             )}
           </div>

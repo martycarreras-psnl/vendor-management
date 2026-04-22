@@ -90,7 +90,7 @@ export function AppShell() {
           />
           <span className="text-sm font-semibold">Radiology Partners</span>
           <span className="text-sm opacity-60">|</span>
-          <span className="text-sm opacity-80">Vendor Management</span>
+          <span className="text-sm opacity-80">VendIQ</span>
         </div>
         <div className="mx-auto w-full max-w-xl">
           <div className="relative">
