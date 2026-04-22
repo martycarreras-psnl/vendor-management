@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { KpiCard } from '@/components/vendiq/kpi-card';
-import { FilterBar } from '@/components/vendiq/filter-bar';
+import { FilterRail } from '@/components/vendiq/filter-rail';
 import { ExpirationRadar } from '@/components/vendiq/expiration-radar';
 import { TopVendorsTable } from '@/components/vendiq/top-vendors-table';
 import { usePortfolioDataset, computeKpis, computeTopVendors, computeExpirationBuckets } from '@/hooks/vendiq/use-portfolio-dataset';
@@ -38,50 +38,54 @@ export default function PortfolioPage() {
         <p className="text-sm text-muted-foreground">Fiscal year {ctx.fiscalYear} · {ctx.vendors.length} vendors tracked · {ctx.contracts.length} contracts on file</p>
       </header>
 
-      <FilterBar filters={filters} onChange={setFilters} onClear={clear} />
+      <div className="grid gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
+        <FilterRail filters={filters} onChange={setFilters} onClear={clear} className="lg:sticky lg:top-4 lg:self-start" />
 
-      <section className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-        <KpiCard label="Active vendors" value={formatCompactNumber(kpis.activeVendors)} sublabel="Status = Active" />
-        <KpiCard label="Annual spend (YTD)" value={formatCurrency(kpis.annualSpendYtd)} sublabel={`FY ${kpis.fiscalYear} budgets`} accent="primary" />
-        <KpiCard label="Contracts expiring 90d" value={formatCompactNumber(kpis.expiring90dCount)} sublabel="Across all suppliers" accent="signal-amber" />
-        <KpiCard label="Critical vendors at risk" value={formatCompactNumber(kpis.criticalAtRiskCount)} sublabel="Criticality ≥4 · expiring ≤90d" accent="signal-red" />
-      </section>
+        <div className="space-y-4 min-w-0">
+          <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            <KpiCard label="Active vendors" value={formatCompactNumber(kpis.activeVendors)} sublabel="Status = Active" />
+            <KpiCard label="Annual spend (YTD)" value={formatCurrency(kpis.annualSpendYtd)} sublabel={`FY ${kpis.fiscalYear} budgets`} accent="primary" />
+            <KpiCard label="Contracts expiring 90d" value={formatCompactNumber(kpis.expiring90dCount)} sublabel="Across all suppliers" accent="signal-amber" />
+            <KpiCard label="Critical vendors at risk" value={formatCompactNumber(kpis.criticalAtRiskCount)} sublabel="Criticality ≥4 · expiring ≤90d" accent="signal-red" />
+          </section>
 
-      <section className="grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <ExpirationRadar
-            buckets={buckets}
-            onBucketClick={(b) => navigate(`/contracts?bucket=${b}`)}
-          />
+          <section className="grid gap-4 xl:grid-cols-3">
+            <div className="xl:col-span-2">
+              <ExpirationRadar
+                buckets={buckets}
+                onBucketClick={(b) => navigate(`/contracts?bucket=${b}`)}
+              />
+            </div>
+            <div className="rounded-lg border bg-card p-4 shadow-sm">
+              <div>
+                <h3 className="text-sm font-semibold">90-day action list</h3>
+                <p className="text-xs text-muted-foreground">Most imminent contract expirations</p>
+              </div>
+              <ul className="mt-3 space-y-2 text-sm">
+                {[...buckets['0-30'], ...buckets['31-60'], ...buckets['61-90']].slice(0, 8).map((c) => (
+                  <li key={c.id} className="flex items-center justify-between gap-2 rounded-md border bg-muted/30 px-3 py-2">
+                    <div className="min-w-0">
+                      <div className="truncate font-medium" title={c.contractName}>{c.contractName}</div>
+                      <div className="truncate text-xs text-muted-foreground">{c.supplierName ?? 'No supplier linked'}</div>
+                    </div>
+                    <div className="shrink-0 text-right text-xs">
+                      <div className="font-semibold tabular-nums">{c.expirationDate ? new Date(c.expirationDate).toLocaleDateString() : '—'}</div>
+                      <div className="text-muted-foreground">{c.contractType ?? ''}</div>
+                    </div>
+                  </li>
+                ))}
+                {buckets['0-30'].length + buckets['31-60'].length + buckets['61-90'].length === 0 && (
+                  <li className="text-sm text-muted-foreground">No contracts expiring in 90 days.</li>
+                )}
+              </ul>
+            </div>
+          </section>
+
+          <section>
+            <TopVendorsTable rows={topVendors} />
+          </section>
         </div>
-        <div className="rounded-lg border bg-card p-4 shadow-sm">
-          <div>
-            <h3 className="text-sm font-semibold">90-day action list</h3>
-            <p className="text-xs text-muted-foreground">Most imminent contract expirations</p>
-          </div>
-          <ul className="mt-3 space-y-2 text-sm">
-            {[...buckets['0-30'], ...buckets['31-60'], ...buckets['61-90']].slice(0, 8).map((c) => (
-              <li key={c.id} className="flex items-center justify-between gap-2 rounded-md border bg-muted/30 px-3 py-2">
-                <div className="min-w-0">
-                  <div className="truncate font-medium" title={c.contractName}>{c.contractName}</div>
-                  <div className="truncate text-xs text-muted-foreground">{c.supplierName ?? 'No supplier linked'}</div>
-                </div>
-                <div className="shrink-0 text-right text-xs">
-                  <div className="font-semibold tabular-nums">{c.expirationDate ? new Date(c.expirationDate).toLocaleDateString() : '—'}</div>
-                  <div className="text-muted-foreground">{c.contractType ?? ''}</div>
-                </div>
-              </li>
-            ))}
-            {buckets['0-30'].length + buckets['31-60'].length + buckets['61-90'].length === 0 && (
-              <li className="text-sm text-muted-foreground">No contracts expiring in 90 days.</li>
-            )}
-          </ul>
-        </div>
-      </section>
-
-      <section>
-        <TopVendorsTable rows={topVendors} />
-      </section>
+      </div>
     </div>
   );
 }

@@ -67,8 +67,9 @@ export function AppShell() {
             );
           })}
         </nav>
-        <div className="border-t border-sidebar-border p-3 text-[11px] opacity-70">
-          v0.1 · Code App · Dev
+        <div className="mt-auto flex flex-col gap-2 border-t border-sidebar-border p-3">
+          <ConnectivityPill />
+          <div className="text-[11px] opacity-70">v0.1 · Code App · Dev</div>
         </div>
       </aside>
 
@@ -88,7 +89,6 @@ export function AppShell() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <ConnectivityPill />
             <ModeToggle />
           </div>
         </header>
