@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useCallback, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronUp, ChevronDown, ChevronsUpDown, X } from 'lucide-react';
+import { ChevronUp, ChevronDown, ChevronsUpDown, X, Download } from 'lucide-react';
 
 // ---- Public API ----
 
@@ -130,6 +130,26 @@ export function DataGrid<T>({
     });
   }, []);
 
+  const exportCsv = useCallback(() => {
+    const header = columns.map((c) => escapeCsvField(c.header)).join(',');
+    const rows = sorted.map((row) =>
+      columns.map((c) => {
+        const raw = c.accessor(row);
+        return escapeCsvField(raw === null || raw === undefined ? '' : String(raw));
+      }).join(','),
+    );
+    const csv = [header, ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `export-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [sorted, columns]);
+
   return (
     <div className={cn('overflow-hidden', className)}>
       {/* Toolbar */}
@@ -157,6 +177,14 @@ export function DataGrid<T>({
             )}
           >
             {showFilters ? 'Hide filters' : 'Show filters'}
+          </button>
+          <button
+            type="button"
+            onClick={exportCsv}
+            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted/60"
+            title="Export all filtered rows as CSV"
+          >
+            <Download className="h-3 w-3" /> Export CSV
           </button>
         </div>
       </div>
@@ -297,4 +325,11 @@ function formatCell(value: string | number | boolean | null | undefined): ReactN
   if (value === null || value === undefined) return <span className="text-muted-foreground">—</span>;
   if (typeof value === 'boolean') return value ? 'Yes' : 'No';
   return String(value);
+}
+
+function escapeCsvField(value: string): string {
+  if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
 }
