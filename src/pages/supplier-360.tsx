@@ -462,7 +462,11 @@ function ContractsTab({ bundle }: { bundle: SupplierBundle }) {
 
 // ---- GL TRANSACTIONS TAB ----
 
+const GL_PAGE_SIZE = 50;
+
 function GLTab({ bundle }: { bundle: SupplierBundle }) {
+  const [page, setPage] = useState(0);
+
   if (bundle.glTransactions.length === 0) return <EmptyState message="No GL transactions on file." />;
 
   const sorted = [...bundle.glTransactions].sort((a, b) =>
@@ -470,6 +474,10 @@ function GLTab({ bundle }: { bundle: SupplierBundle }) {
   );
 
   const totalNet = sorted.reduce((acc, gl) => acc + (gl.netAmount ?? 0), 0);
+  const totalPages = Math.ceil(sorted.length / GL_PAGE_SIZE);
+  const pageRows = sorted.slice(page * GL_PAGE_SIZE, (page + 1) * GL_PAGE_SIZE);
+  const rangeStart = page * GL_PAGE_SIZE + 1;
+  const rangeEnd = Math.min((page + 1) * GL_PAGE_SIZE, sorted.length);
 
   return (
     <SectionCard title={`GL Transactions · ${bundle.glTransactions.length}`}>
@@ -490,7 +498,7 @@ function GLTab({ bundle }: { bundle: SupplierBundle }) {
             </tr>
           </thead>
           <tbody>
-            {sorted.slice(0, 100).map((gl) => (
+            {pageRows.map((gl) => (
               <tr key={gl.id} className="border-b last:border-0 transition-colors hover:bg-muted/30">
                 <td className="px-4 py-2.5">{gl.fiscalYear ?? '—'}</td>
                 <td className="px-4 py-2.5 tabular-nums">{formatDate(gl.accountingDate)}</td>
@@ -503,12 +511,56 @@ function GLTab({ bundle }: { bundle: SupplierBundle }) {
             ))}
           </tbody>
         </table>
-        {sorted.length > 100 && (
-          <div className="py-3 text-center text-xs text-muted-foreground">
-            Showing 100 of {sorted.length} transactions
-          </div>
-        )}
       </div>
+      {/* Pagination controls */}
+      {totalPages > 1 && (
+        <div className="mt-3 flex items-center justify-between border-t pt-3">
+          <span className="text-xs text-muted-foreground tabular-nums">
+            {rangeStart}–{rangeEnd} of {sorted.length}
+          </span>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              disabled={page === 0}
+              onClick={() => setPage(0)}
+            >
+              First
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              disabled={page === 0}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              Prev
+            </Button>
+            <span className="px-2 text-xs tabular-nums text-muted-foreground">
+              {page + 1} / {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              disabled={page >= totalPages - 1}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              disabled={page >= totalPages - 1}
+              onClick={() => setPage(totalPages - 1)}
+            >
+              Last
+            </Button>
+          </div>
+        </div>
+      )}
     </SectionCard>
   );
 }
