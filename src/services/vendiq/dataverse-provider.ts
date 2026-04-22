@@ -33,7 +33,7 @@ import type { Rpvms_vendornamealiases } from '@/generated/models/Rpvms_vendornam
 import type { Rpvms_onetrustassessments } from '@/generated/models/Rpvms_onetrustassessmentsModel';
 import type { Rpvms_servicenowassessments } from '@/generated/models/Rpvms_servicenowassessmentsModel';
 import type { Rpvms_promptsuggestions } from '@/generated/models/Rpvms_promptsuggestionsModel';
-import type { Rpvms_vpvendorassignments } from '@/generated/models/Rpvms_vpvendorassignmentsModel';
+import type { Rpvms_vpvendorassignments, Rpvms_vpvendorassignmentsrpvms_isactive } from '@/generated/models/Rpvms_vpvendorassignmentsModel';
 import type { Systemusers } from '@/generated/models/SystemusersModel';
 
 import type {
@@ -106,7 +106,6 @@ import {
   readScoreStatus,
   writeScoreStatus,
   readAssignmentIsActive,
-  writeAssignmentIsActive,
 } from '@/services/vendiq/option-sets';
 
 // ---- Mapping helpers ----
@@ -931,7 +930,7 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
     async listForReviewer(reviewerId: string, cycleYear: number): Promise<VPVendorAssignment[]> {
       const res = unwrap(
         await Rpvms_vpvendorassignmentsService.getAll({
-          filter: `_rpvms_reviewer_value eq ${reviewerId} and rpvms_cycleyear eq ${cycleYear} and rpvms_isactive eq 1`,
+          filter: `_rpvms_reviewer_value eq ${reviewerId} and rpvms_cycleyear eq ${cycleYear} and rpvms_isactive eq true`,
           orderBy: ['rpvms_reviewduedate asc'],
         }),
       ) || [];
@@ -940,7 +939,7 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
     async listForVendor(vendorId: string, cycleYear: number): Promise<VPVendorAssignment[]> {
       const res = unwrap(
         await Rpvms_vpvendorassignmentsService.getAll({
-          filter: `_rpvms_vendorid_value eq ${vendorId} and rpvms_cycleyear eq ${cycleYear} and rpvms_isactive eq 1`,
+          filter: `_rpvms_vendorid_value eq ${vendorId} and rpvms_cycleyear eq ${cycleYear} and rpvms_isactive eq true`,
         }),
       ) || [];
       return res.map(mapVPVendorAssignment);
@@ -1012,7 +1011,7 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
       // Filter out vendors already actively assigned to this reviewer/cycle.
       const existing = unwrap(
         await Rpvms_vpvendorassignmentsService.getAll({
-          filter: `_rpvms_reviewer_value eq ${input.reviewerId} and rpvms_cycleyear eq ${input.cycleYear} and rpvms_isactive eq 1`,
+          filter: `_rpvms_reviewer_value eq ${input.reviewerId} and rpvms_cycleyear eq ${input.cycleYear} and rpvms_isactive eq true`,
           select: ['_rpvms_vendorid_value'],
         }),
       ) || [];
@@ -1026,7 +1025,7 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
           rpvms_cycleyear: String(input.cycleYear),
           'rpvms_Reviewer@odata.bind': systemuserBind(input.reviewerId),
           'rpvms_VendorId@odata.bind': vendorBind(vendorId),
-          rpvms_isactive: writeAssignmentIsActive(true),
+          rpvms_isactive: true as unknown as Rpvms_vpvendorassignmentsrpvms_isactive,
         };
         if (input.reviewDueDate) payload.rpvms_reviewduedate = input.reviewDueDate;
         if (input.assignedById) payload['rpvms_AssignedBy@odata.bind'] = systemuserBind(input.assignedById);
@@ -1037,7 +1036,7 @@ export function createVendiqDataverseProvider(): VendIqDataProvider {
       return created;
     },
     async deactivate(id: string): Promise<void> {
-      await Rpvms_vpvendorassignmentsService.update(id, { rpvms_isactive: writeAssignmentIsActive(false) } as never);
+      await Rpvms_vpvendorassignmentsService.update(id, { rpvms_isactive: false as unknown as Rpvms_vpvendorassignmentsrpvms_isactive } as never);
     },
     async remove(id: string): Promise<void> {
       await Rpvms_vpvendorassignmentsService.delete(id);
