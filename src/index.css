@@ -153,4 +153,47 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /*
+    Required-field styling.
+    Drives off aria-required (set by every DataverseFieldLabel-backed input),
+    so any new editable field picks this up automatically.
+    Goal: easy to spot in dense forms without feeling like an error.
+    Uses a soft amber left border + faint tint + amber focus ring.
+  */
+  :root {
+    --required-accent: var(--signal-amber);
+    --required-tint: oklch(0.98 0.04 85);
+  }
+  .dark {
+    --required-tint: oklch(0.28 0.04 80 / 0.35);
+  }
+
+  input[aria-required='true'],
+  textarea[aria-required='true'],
+  select[aria-required='true'],
+  [role='combobox'][aria-required='true'],
+  button[aria-required='true'][role='combobox'] {
+    border-left-width: 3px;
+    border-left-color: var(--required-accent);
+    background-color: var(--required-tint);
+  }
+
+  input[aria-required='true']:focus-visible,
+  textarea[aria-required='true']:focus-visible,
+  select[aria-required='true']:focus-visible,
+  [role='combobox'][aria-required='true']:focus-visible,
+  button[aria-required='true'][role='combobox']:focus-visible {
+    --tw-ring-color: var(--required-accent);
+    border-left-color: var(--required-accent);
+  }
+
+  /* Invalid/empty required field: escalate to destructive red. */
+  input[aria-required='true'][aria-invalid='true'],
+  textarea[aria-required='true'][aria-invalid='true'],
+  select[aria-required='true'][aria-invalid='true'],
+  [role='combobox'][aria-required='true'][aria-invalid='true'] {
+    border-left-color: var(--destructive);
+    background-color: oklch(0.97 0.04 25);
+  }
 }
