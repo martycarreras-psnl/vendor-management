@@ -9,6 +9,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DataverseFieldLabel, useDataverseFieldRequired } from '@/components/ui/dataverse-field-label';
 import { toDataverseFieldName } from '@/lib/dataverse-field-name';
+import { findEmptyRequiredKeys } from '@/lib/required-fields-validator';
+import { FormValidationProvider, useFieldInvalid } from '@/lib/form-validation-context';
+import { useDataverseRequiredFields } from '@/hooks/vendiq/use-dataverse-required-fields';
 import { DataGrid, type ColumnDef } from '@/components/vendiq/data-grid';
 import { formatCurrency, formatDate } from '@/lib/vendiq-format';
 import { cn } from '@/lib/utils';
@@ -247,6 +250,9 @@ function OverviewTab({ bundle, supplierId }: { bundle: SupplierBundle; supplierI
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Partial<Supplier>>({});
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [invalidFields, setInvalidFields] = useState<ReadonlySet<string>>(new Set());
+
+  const requiredFieldsQuery = useDataverseRequiredFields(SUPPLIER_TABLE);
 
   const mutation = useMutation({
     mutationFn: async (updates: Partial<Supplier>) => provider.suppliers.update(supplierId, updates),
@@ -255,6 +261,7 @@ function OverviewTab({ bundle, supplierId }: { bundle: SupplierBundle; supplierI
       setEditing(false);
       setDraft({});
       setSaveError(null);
+      setInvalidFields(new Set());
     },
     onError: (err: Error) => setSaveError(err.message),
   });
@@ -263,15 +270,23 @@ function OverviewTab({ bundle, supplierId }: { bundle: SupplierBundle; supplierI
     setDraft({ ...supplier });
     setEditing(true);
     setSaveError(null);
+    setInvalidFields(new Set());
   }, [supplier]);
 
   const cancelEditing = useCallback(() => {
     setEditing(false);
     setDraft({});
     setSaveError(null);
+    setInvalidFields(new Set());
   }, []);
 
   const handleSave = useCallback(() => {
+    const invalid = findEmptyRequiredKeys<Supplier>(draft, requiredFieldsQuery.data);
+    if (invalid.size > 0) {
+      setInvalidFields(invalid);
+      setSaveError('Fill the highlighted required fields before saving.');
+      return;
+    }
     const changes: Partial<Supplier> = {};
     for (const key of Object.keys(draft) as (keyof Supplier)[]) {
       if (key === 'id') continue;
@@ -280,16 +295,24 @@ function OverviewTab({ bundle, supplierId }: { bundle: SupplierBundle; supplierI
       }
     }
     if (Object.keys(changes).length === 0) { setEditing(false); return; }
+    setInvalidFields(new Set());
     mutation.mutate(changes);
-  }, [draft, supplier, mutation]);
+  }, [draft, supplier, mutation, requiredFieldsQuery.data]);
 
   const update = useCallback((field: keyof Supplier, value: unknown) => {
     setDraft((prev) => ({ ...prev, [field]: value }));
+    setInvalidFields((prev) => {
+      if (!prev.has(field as string)) return prev;
+      const next = new Set(prev);
+      next.delete(field as string);
+      return next;
+    });
   }, []);
 
   const source = editing ? draft : supplier;
 
   return (
+    <FormValidationProvider invalidFields={invalidFields}>
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold text-muted-foreground">Supplier Details</h2>
@@ -322,10 +345,9 @@ function OverviewTab({ bundle, supplierId }: { bundle: SupplierBundle; supplierI
         </div>
       </SectionCard>
     </div>
+    </FormValidationProvider>
   );
 }
-
-// ---- Editable field components ----
 // All helpers below are bound to the `rpvms_suppliers` table. Labels, asterisk,
 // and aria-required are driven by live Dataverse metadata.
 const SUPPLIER_TABLE = 'rpvms_suppliers';
@@ -336,6 +358,7 @@ function SField({ label, value, field, editing, onUpdate }: {
 }) {
   const logical = toDataverseFieldName(field as string);
   const required = useDataverseFieldRequired(SUPPLIER_TABLE, logical);
+  const invalid = useFieldInvalid(field as string);
   return (
     <div>
       <DataverseFieldLabel
@@ -349,6 +372,7 @@ function SField({ label, value, field, editing, onUpdate }: {
           className="mt-1"
           value={(value as string) ?? ''}
           aria-required={required || undefined}
+          aria-invalid={invalid || undefined}
           onChange={(e) => onUpdate(field, e.target.value || undefined)}
         />
       ) : (
@@ -364,6 +388,7 @@ function SSelect<T extends string>({ label, value, field, options, editing, onUp
 }) {
   const logical = toDataverseFieldName(field as string);
   const required = useDataverseFieldRequired(SUPPLIER_TABLE, logical);
+  const invalid = useFieldInvalid(field as string);
   return (
     <div>
       <DataverseFieldLabel
@@ -377,6 +402,7 @@ function SSelect<T extends string>({ label, value, field, options, editing, onUp
           className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
           value={value ?? ''}
           aria-required={required || undefined}
+          aria-invalid={invalid || undefined}
           onChange={(e) => onUpdate(field, (e.target.value || undefined) as T | undefined)}
         >
           <option value="">—</option>
@@ -395,6 +421,7 @@ function SBool({ label, value, field, editing, onUpdate }: {
 }) {
   const logical = toDataverseFieldName(field as string);
   const required = useDataverseFieldRequired(SUPPLIER_TABLE, logical);
+  const invalid = useFieldInvalid(field as string);
   return (
     <div>
       <DataverseFieldLabel
@@ -408,6 +435,7 @@ function SBool({ label, value, field, editing, onUpdate }: {
           className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
           value={value === undefined ? '' : value ? 'true' : 'false'}
           aria-required={required || undefined}
+          aria-invalid={invalid || undefined}
           onChange={(e) => onUpdate(field, e.target.value === '' ? undefined : e.target.value === 'true')}
         >
           <option value="">—</option>

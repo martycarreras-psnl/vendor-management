@@ -531,31 +531,41 @@ function mapAttributeMetadata(tableLogicalName: string, attribute: unknown): Dat
 export function createVendiqDataverseProvider(): VendIqDataProvider {
   const fieldMetadataCache = new Map<string, Map<string, DataverseFieldMetadata>>();
 
+  async function loadTableMetadata(tableLogicalName: string): Promise<Map<string, DataverseFieldMetadata> | null> {
+    const cached = fieldMetadataCache.get(tableLogicalName);
+    if (cached) return cached;
+
+    const getMetadata = fieldMetadataServiceRegistry[tableLogicalName];
+    if (!getMetadata) return null;
+
+    const metadata = unwrap(await getMetadata());
+    const attributes = Array.isArray(metadata.Attributes) ? metadata.Attributes : [];
+    const byLogicalName = new Map<string, DataverseFieldMetadata>();
+
+    for (const attribute of attributes) {
+      const mapped = mapAttributeMetadata(tableLogicalName, attribute);
+      if (mapped) {
+        byLogicalName.set(mapped.fieldLogicalName, mapped);
+      }
+    }
+
+    fieldMetadataCache.set(tableLogicalName, byLogicalName);
+    return byLogicalName;
+  }
+
   const fieldMetadata = {
     async getField(tableLogicalName: string, fieldLogicalName: string): Promise<DataverseFieldMetadata | null> {
-      const cachedTable = fieldMetadataCache.get(tableLogicalName);
-      if (cachedTable?.has(fieldLogicalName)) {
-        return cachedTable.get(fieldLogicalName) ?? null;
+      const byLogicalName = await loadTableMetadata(tableLogicalName);
+      return byLogicalName?.get(fieldLogicalName) ?? null;
+    },
+    async listRequired(tableLogicalName: string): Promise<ReadonlySet<string>> {
+      const byLogicalName = await loadTableMetadata(tableLogicalName);
+      if (!byLogicalName) return new Set();
+      const required = new Set<string>();
+      for (const meta of byLogicalName.values()) {
+        if (meta.isRequired) required.add(meta.fieldLogicalName);
       }
-
-      const getMetadata = fieldMetadataServiceRegistry[tableLogicalName];
-      if (!getMetadata) {
-        return null;
-      }
-
-      const metadata = unwrap(await getMetadata());
-      const attributes = Array.isArray(metadata.Attributes) ? metadata.Attributes : [];
-      const byLogicalName = new Map<string, DataverseFieldMetadata>();
-
-      for (const attribute of attributes) {
-        const mapped = mapAttributeMetadata(tableLogicalName, attribute);
-        if (mapped) {
-          byLogicalName.set(mapped.fieldLogicalName, mapped);
-        }
-      }
-
-      fieldMetadataCache.set(tableLogicalName, byLogicalName);
-      return byLogicalName.get(fieldLogicalName) ?? null;
+      return required;
     },
   };
 

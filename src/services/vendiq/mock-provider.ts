@@ -38,6 +38,9 @@ export function createVendiqMockProvider(): VendIqDataProvider {
       async getField() {
         return null;
       },
+      async listRequired() {
+        return new Set<string>();
+      },
     },
     connectivity: {
       async probe(): Promise<ConnectivityStatus> {

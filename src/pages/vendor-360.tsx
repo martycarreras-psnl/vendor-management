@@ -12,6 +12,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DataverseFieldLabel, useDataverseFieldRequired } from '@/components/ui/dataverse-field-label';
 import { toDataverseFieldName } from '@/lib/dataverse-field-name';
+import { findEmptyRequiredKeys } from '@/lib/required-fields-validator';
+import { FormValidationProvider, useFieldInvalid } from '@/lib/form-validation-context';
+import { useDataverseRequiredFields } from '@/hooks/vendiq/use-dataverse-required-fields';
 import { formatCurrency, formatDate } from '@/lib/vendiq-format';
 import { useCurrentUserRoles } from '@/hooks/vendiq/use-current-user-roles';
 import { cn } from '@/lib/utils';
@@ -338,6 +341,9 @@ function OverviewTab({ bundle, vendorId }: { bundle: VendorBundle; vendorId: str
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Partial<Vendor>>({});
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [invalidFields, setInvalidFields] = useState<ReadonlySet<string>>(new Set());
+
+  const requiredFieldsQuery = useDataverseRequiredFields(VENDOR_TABLE);
 
   const mutation = useMutation({
     mutationFn: async (updates: Partial<Vendor>) => provider.vendors.update(vendorId, updates),
@@ -346,6 +352,7 @@ function OverviewTab({ bundle, vendorId }: { bundle: VendorBundle; vendorId: str
       setEditing(false);
       setDraft({});
       setSaveError(null);
+      setInvalidFields(new Set());
     },
     onError: (err: Error) => setSaveError(err.message),
   });
@@ -354,15 +361,23 @@ function OverviewTab({ bundle, vendorId }: { bundle: VendorBundle; vendorId: str
     setDraft({ ...vendor });
     setEditing(true);
     setSaveError(null);
+    setInvalidFields(new Set());
   }, [vendor]);
 
   const cancelEditing = useCallback(() => {
     setEditing(false);
     setDraft({});
     setSaveError(null);
+    setInvalidFields(new Set());
   }, []);
 
   const handleSave = useCallback(() => {
+    const invalid = findEmptyRequiredKeys<Vendor>(draft, requiredFieldsQuery.data);
+    if (invalid.size > 0) {
+      setInvalidFields(invalid);
+      setSaveError('Fill the highlighted required fields before saving.');
+      return;
+    }
     const changes: Partial<Vendor> = {};
     for (const key of Object.keys(draft) as (keyof Vendor)[]) {
       if (key === 'id') continue;
@@ -371,11 +386,18 @@ function OverviewTab({ bundle, vendorId }: { bundle: VendorBundle; vendorId: str
       }
     }
     if (Object.keys(changes).length === 0) { setEditing(false); return; }
+    setInvalidFields(new Set());
     mutation.mutate(changes);
-  }, [draft, vendor, mutation]);
+  }, [draft, vendor, mutation, requiredFieldsQuery.data]);
 
   const update = useCallback((field: keyof Vendor, value: unknown) => {
     setDraft((prev) => ({ ...prev, [field]: value }));
+    setInvalidFields((prev) => {
+      if (!prev.has(field as string)) return prev;
+      const next = new Set(prev);
+      next.delete(field as string);
+      return next;
+    });
   }, []);
 
   const source = editing ? draft : vendor;
@@ -383,6 +405,7 @@ function OverviewTab({ bundle, vendorId }: { bundle: VendorBundle; vendorId: str
   const latest = [...bundle.scores].sort((a, b) => (b.scoreYear || '').localeCompare(a.scoreYear || ''))[0];
 
   return (
+    <FormValidationProvider invalidFields={invalidFields}>
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold text-muted-foreground">Vendor Details</h2>
@@ -464,6 +487,7 @@ function OverviewTab({ bundle, vendorId }: { bundle: VendorBundle; vendorId: str
         </SectionCard>
       </div>
     </div>
+    </FormValidationProvider>
   );
 }
 
@@ -489,6 +513,7 @@ function VField({ label, value, field, editing, onUpdate, className }: {
 }) {
   const logical = toDataverseFieldName(field as string);
   const required = useDataverseFieldRequired(VENDOR_TABLE, logical);
+  const invalid = useFieldInvalid(field as string);
   return (
     <div className={className}>
       <DataverseFieldLabel
@@ -502,6 +527,7 @@ function VField({ label, value, field, editing, onUpdate, className }: {
           className="mt-1"
           value={(value as string) ?? ''}
           aria-required={required || undefined}
+          aria-invalid={invalid || undefined}
           onChange={(e) => onUpdate(field, e.target.value || undefined)}
         />
       ) : (
@@ -518,6 +544,7 @@ function VSelect<T extends string>({ label, value, field, options, editing, onUp
   const display = displayFn ?? ((v: T) => v);
   const logical = toDataverseFieldName(field as string);
   const required = useDataverseFieldRequired(VENDOR_TABLE, logical);
+  const invalid = useFieldInvalid(field as string);
   return (
     <div>
       <DataverseFieldLabel
@@ -531,6 +558,7 @@ function VSelect<T extends string>({ label, value, field, options, editing, onUp
           className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
           value={value ?? ''}
           aria-required={required || undefined}
+          aria-invalid={invalid || undefined}
           onChange={(e) => onUpdate(field, (e.target.value || undefined) as T | undefined)}
         >
           <option value="">—</option>
@@ -549,6 +577,7 @@ function VBool({ label, value, field, editing, onUpdate }: {
 }) {
   const logical = toDataverseFieldName(field as string);
   const required = useDataverseFieldRequired(VENDOR_TABLE, logical);
+  const invalid = useFieldInvalid(field as string);
   return (
     <div>
       <DataverseFieldLabel
@@ -562,6 +591,7 @@ function VBool({ label, value, field, editing, onUpdate }: {
           className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
           value={value === undefined ? '' : value ? 'true' : 'false'}
           aria-required={required || undefined}
+          aria-invalid={invalid || undefined}
           onChange={(e) => onUpdate(field, e.target.value === '' ? undefined : e.target.value === 'true')}
         >
           <option value="">—</option>

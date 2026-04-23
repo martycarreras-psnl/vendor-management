@@ -241,7 +241,7 @@ export default function PromptSuggestionsPage() {
             </div>
           </div>
           <div className="mt-4 flex items-center gap-2">
-            <Button size="sm" onClick={() => saveMutation.mutate()} disabled={(promptTextRequired && !(form.promptText ?? '').trim()) || saveMutation.isPending} className="gap-2">
+            <Button size="sm" onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending} className="gap-2">
               <Check className="h-4 w-4" />
               {saveMutation.isPending ? 'Saving…' : editingId ? 'Save Changes' : 'Create'}
             </Button>

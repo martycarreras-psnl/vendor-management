@@ -46,6 +46,13 @@ export interface DataverseFieldMetadata {
 
 export interface FieldMetadataRepository {
   getField(tableLogicalName: string, fieldLogicalName: string): Promise<DataverseFieldMetadata | null>;
+  /**
+   * Returns the set of logical column names that are Business-Required
+   * (`ApplicationRequired`) or `SystemRequired` for the given table.
+   * Used by form-save validators to block writes when required fields
+   * are empty.
+   */
+  listRequired(tableLogicalName: string): Promise<ReadonlySet<string>>;
 }
 
 export interface VendorRepository {

@@ -10,6 +10,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DataverseFieldLabel, useDataverseFieldRequired } from '@/components/ui/dataverse-field-label';
 import { toDataverseFieldName } from '@/lib/dataverse-field-name';
+import { findEmptyRequiredKeys } from '@/lib/required-fields-validator';
+import { FormValidationProvider, useFieldInvalid } from '@/lib/form-validation-context';
+import { useDataverseRequiredFields } from '@/hooks/vendiq/use-dataverse-required-fields';
 import { DataGrid } from '@/components/vendiq/data-grid';
 import { formatDate, daysUntil } from '@/lib/vendiq-format';
 import { cn } from '@/lib/utils';
@@ -65,6 +68,9 @@ export default function ContractDetailsPage() {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Partial<Contract>>({});
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [invalidFields, setInvalidFields] = useState<ReadonlySet<string>>(new Set());
+
+  const requiredFieldsQuery = useDataverseRequiredFields(CONTRACT_TABLE);
 
   const mutation = useMutation({
     mutationFn: async (updates: Partial<Contract>) => {
@@ -76,6 +82,7 @@ export default function ContractDetailsPage() {
       setEditing(false);
       setDraft({});
       setSaveError(null);
+      setInvalidFields(new Set());
     },
     onError: (err: Error) => {
       setSaveError(err.message);
@@ -87,16 +94,24 @@ export default function ContractDetailsPage() {
     setDraft({ ...query.data.contract });
     setEditing(true);
     setSaveError(null);
+    setInvalidFields(new Set());
   }, [query.data]);
 
   const cancelEditing = useCallback(() => {
     setEditing(false);
     setDraft({});
     setSaveError(null);
+    setInvalidFields(new Set());
   }, []);
 
   const handleSave = useCallback(() => {
     if (!contractId || !query.data?.contract) return;
+    const invalid = findEmptyRequiredKeys<Contract>(draft, requiredFieldsQuery.data);
+    if (invalid.size > 0) {
+      setInvalidFields(invalid);
+      setSaveError('Fill the highlighted required fields before saving.');
+      return;
+    }
     // Diff only changed fields
     const original = query.data.contract;
     const changes: Partial<Contract> = {};
@@ -110,12 +125,23 @@ export default function ContractDetailsPage() {
       setEditing(false);
       return;
     }
+    setInvalidFields(new Set());
     mutation.mutate(changes);
-  }, [contractId, draft, query.data, mutation]);
+  }, [contractId, draft, query.data, mutation, requiredFieldsQuery.data]);
 
   const updateDraft = useCallback((field: keyof Contract, value: unknown) => {
     setDraft((prev) => ({ ...prev, [field]: value }));
+    setInvalidFields((prev) => {
+      if (!prev.has(field as string)) return prev;
+      const next = new Set(prev);
+      next.delete(field as string);
+      return next;
+    });
   }, []);
+
+  // Hoisted here so hooks run unconditionally (Rules of Hooks).
+  const contractNameRequired = useDataverseFieldRequired(CONTRACT_TABLE, 'rpvms_contractname');
+  const contractNameInvalid = useFieldInvalid('contractName');
 
   if (!contractId) {
     return <div className="text-sm text-muted-foreground">Missing contract id.</div>;
@@ -140,6 +166,7 @@ export default function ContractDetailsPage() {
   const noticeDays = daysUntil(source.noticeDate);
 
   return (
+    <FormValidationProvider invalidFields={invalidFields}>
     <div className="space-y-4">
       {/* Breadcrumb */}
       <nav className="text-xs text-muted-foreground">
@@ -156,6 +183,8 @@ export default function ContractDetailsPage() {
               <Input
                 className="text-2xl font-semibold"
                 value={draft.contractName ?? ''}
+                aria-required={contractNameRequired || undefined}
+                aria-invalid={contractNameInvalid || undefined}
                 onChange={(e) => updateDraft('contractName', e.target.value)}
               />
             ) : (
@@ -293,6 +322,7 @@ export default function ContractDetailsPage() {
         )}
       </section>
     </div>
+    </FormValidationProvider>
   );
 }
 
@@ -344,6 +374,7 @@ function Field({
 }) {
   const logical = toDataverseFieldName(field as string);
   const required = useDataverseFieldRequired(CONTRACT_TABLE, logical);
+  const invalid = useFieldInvalid(field as string);
   return (
     <div className={className}>
       <DataverseFieldLabel
@@ -359,6 +390,7 @@ function Field({
             rows={3}
             value={(value as string) ?? ''}
             aria-required={required || undefined}
+            aria-invalid={invalid || undefined}
             onChange={(e) => onUpdate(field, e.target.value || undefined)}
           />
         ) : (
@@ -366,6 +398,7 @@ function Field({
             className="mt-1"
             value={(value as string) ?? ''}
             aria-required={required || undefined}
+            aria-invalid={invalid || undefined}
             onChange={(e) => onUpdate(field, e.target.value || undefined)}
           />
         )
@@ -391,6 +424,7 @@ function DateField({
 }) {
   const logical = toDataverseFieldName(field as string);
   const required = useDataverseFieldRequired(CONTRACT_TABLE, logical);
+  const invalid = useFieldInvalid(field as string);
   // Normalize ISO date to YYYY-MM-DD for the input type=date
   const inputValue = value ? value.slice(0, 10) : '';
   return (
@@ -407,6 +441,7 @@ function DateField({
           type="date"
           value={inputValue}
           aria-required={required || undefined}
+          aria-invalid={invalid || undefined}
           onChange={(e) => onUpdate(field, e.target.value ? `${e.target.value}T00:00:00Z` : undefined)}
         />
       ) : (
@@ -436,6 +471,7 @@ function SelectField<T extends string>({
   const display = displayFn ?? ((v: T) => v);
   const logical = toDataverseFieldName(field as string);
   const required = useDataverseFieldRequired(CONTRACT_TABLE, logical);
+  const invalid = useFieldInvalid(field as string);
   return (
     <div>
       <DataverseFieldLabel
@@ -449,6 +485,7 @@ function SelectField<T extends string>({
           className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
           value={value ?? ''}
           aria-required={required || undefined}
+          aria-invalid={invalid || undefined}
           onChange={(e) => onUpdate(field, (e.target.value || undefined) as T | undefined)}
         >
           <option value="">—</option>
