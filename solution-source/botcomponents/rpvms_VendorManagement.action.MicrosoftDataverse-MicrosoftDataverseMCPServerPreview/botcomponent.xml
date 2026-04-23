@@ -1,0 +1,10 @@
+<botcomponent schemaname="rpvms_VendorManagement.action.MicrosoftDataverse-MicrosoftDataverseMCPServerPreview">
+  <componenttype>9</componenttype>
+  <iscustomizable>0</iscustomizable>
+  <name>Microsoft Dataverse - Microsoft Dataverse MCP Server (Preview)</name>
+  <parentbotid>
+    <schemaname>rpvms_VendorManagement</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

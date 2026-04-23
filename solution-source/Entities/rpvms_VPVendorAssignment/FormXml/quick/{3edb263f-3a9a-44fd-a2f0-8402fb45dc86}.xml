@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{3edb263f-3a9a-44fd-a2f0-8402fb45dc86}</formid>
+    <IntroducedVersion>1.0.0.4</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form>
+      <tabs>
+        <tab verticallayout="true" id="{1cf5f3aa-11cf-40e2-9e4b-2480dc3732a8}" IsUserDefined="1">
+          <labels>
+            <label description="" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="100%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="{f102ac8d-d3cf-4ac9-b866-5110a12ac21a}">
+                  <labels>
+                    <label description="GENERAL" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{5c37f346-5dfa-4ce4-b41c-a93b55a44fad}">
+                        <labels>
+                          <label description="Assignment Name" languagecode="1033" />
+                        </labels>
+                        <control id="rpvms_assignmentname" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="rpvms_assignmentname" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{2721b91d-7124-429a-a49f-4148d3038a83}">
+                        <labels>
+                          <label description="Owner" languagecode="1033" />
+                        </labels>
+                        <control id="ownerid" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="ownerid" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Information" languagecode="1033" />
+    </LocalizedNames>
+  </systemform>
+</forms>

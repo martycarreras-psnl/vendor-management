@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<optionset Name="rpvms_experiencelevel" localizedName="Rate Card Experience Level" description="VendorRateCard.ExperienceLevel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <OptionSetType>picklist</OptionSetType>
+  <IsGlobal>1</IsGlobal>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <IsCustomizable>1</IsCustomizable>
+  <displaynames>
+    <displayname description="Rate Card Experience Level" languagecode="1033" />
+  </displaynames>
+  <Descriptions>
+    <Description description="VendorRateCard.ExperienceLevel" languagecode="1033" />
+  </Descriptions>
+  <options>
+    <option value="412900000" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Junior" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900001" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Mid" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900002" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Senior" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900003" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Expert" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900004" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Unknown" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+  </options>
+</optionset>

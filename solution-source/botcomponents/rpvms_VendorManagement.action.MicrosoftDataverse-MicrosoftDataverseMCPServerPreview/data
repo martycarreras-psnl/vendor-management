@@ -1,0 +1,12 @@
+kind: TaskDialog
+modelDisplayName: Microsoft Dataverse MCP Server (Preview)
+modelDescription: Provides Remote MCP Server access to Dataverse with preview tools
+action:
+  kind: InvokeExternalAgentTaskAction
+  connectionReference: rpvms_VendorManagement.shared_commondataserviceforapps.731642cac9cf499eb2aabd3743d7e32a
+  connectionProperties:
+    mode: Invoker
+
+  operationDetails:
+    kind: ModelContextProtocolMetadata
+    operationId: InvokeMCPPreview

@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<optionset Name="rpvms_vendorstatus" localizedName="Vendor Lifecycle Status" description="Vendor.Status | VendorScore.Status" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <OptionSetType>picklist</OptionSetType>
+  <IsGlobal>1</IsGlobal>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <IsCustomizable>1</IsCustomizable>
+  <displaynames>
+    <displayname description="Vendor Lifecycle Status" languagecode="1033" />
+  </displaynames>
+  <Descriptions>
+    <Description description="Vendor.Status | VendorScore.Status" languagecode="1033" />
+  </Descriptions>
+  <options>
+    <option value="412900000" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Active" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900001" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Inactive" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900002" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Onboarding" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900003" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Offboarded" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900004" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Under Review" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+  </options>
+</optionset>

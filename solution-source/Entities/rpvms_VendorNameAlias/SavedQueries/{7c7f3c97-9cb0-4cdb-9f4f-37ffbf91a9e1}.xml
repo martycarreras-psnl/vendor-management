@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{7c7f3c97-9cb0-4cdb-9f4f-37ffbf91a9e1}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="rpvms_vendornamealiasname" select="1" icon="1" preview="1">
+        <row name="result" id="rpvms_vendornamealiasid">
+          <cell name="rpvms_vendornamealiasname" width="300" />
+          <cell name="createdon" width="125" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>1</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="rpvms_vendornamealias">
+          <attribute name="rpvms_vendornamealiasid" />
+          <attribute name="rpvms_vendornamealiasname" />
+          <attribute name="createdon" />
+          <order attribute="rpvms_vendornamealiasname" descending="false" />
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Vendor Name Alias Advanced Find View" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

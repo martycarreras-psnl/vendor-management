@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<optionset Name="rpvms_contracttype" localizedName="Contract Type" description="Contract.ContractType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <OptionSetType>picklist</OptionSetType>
+  <IsGlobal>1</IsGlobal>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <IsCustomizable>1</IsCustomizable>
+  <displaynames>
+    <displayname description="Contract Type" languagecode="1033" />
+  </displaynames>
+  <Descriptions>
+    <Description description="Contract.ContractType" languagecode="1033" />
+  </Descriptions>
+  <options>
+    <option value="412900000" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Master Services Agreement" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900001" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Statement of Work" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900002" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Order Form" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900003" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="License Agreement" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900004" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="NDA" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900005" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Amendment" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900006" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="BAA" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="Business Associate Agreement (HIPAA)" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900007" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Other" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+  </options>
+</optionset>

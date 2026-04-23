@@ -1,0 +1,5 @@
+<botcomponent_connectionreferenceset>
+  <botcomponent_connectionreference botcomponentid.schemaname="rpvms_VendorManagement.action.MicrosoftDataverse-MicrosoftDataverseMCPServerPreview" connectionreferenceid.connectionreferencelogicalname="rpvms_VendorManagement.shared_commondataserviceforapps.731642cac9cf499eb2aabd3743d7e32a">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_connectionreference>
+</botcomponent_connectionreferenceset>

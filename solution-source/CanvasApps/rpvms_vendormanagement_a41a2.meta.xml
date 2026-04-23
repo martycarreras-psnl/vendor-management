@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CanvasApp xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Name>rpvms_vendormanagement_a41a2</Name>
+  <AppVersion>2026-04-23T00:19:58Z</AppVersion>
+  <Status>Ready</Status>
+  <CreatedByClientVersion>0.0.0.0</CreatedByClientVersion>
+  <MinClientVersion>0.0.0.0</MinClientVersion>
+  <Tags>{}</Tags>
+  <IsCdsUpgraded>0</IsCdsUpgraded>
+  <GalleryItemId xsi:nil="true"></GalleryItemId>
+  <BackgroundColor>RGBA(255,255,255,1)</BackgroundColor>
+  <DisplayName>Vendor Management</DisplayName>
+  <Description xsi:nil="true"></Description>
+  <CommitMessage xsi:nil="true"></CommitMessage>
+  <Publisher xsi:nil="true"></Publisher>
+  <AuthorizationReferences>[]</AuthorizationReferences>
+  <ConnectionReferences>{"c4c4477e-7f1b-42f1-bba4-1d66da063eaf":{"id":"/providers/Microsoft.PowerApps/apis/shared_office365users","displayName":"Office 365 Users","iconUri":"https://conn-afd-prod-endpoint-bmc9bqahasf3grgk.b01.azurefd.net/releases/v1.0.1788/1.0.1788.4544/office365users/icon.png","dataSources":["office365users"],"isOnPremiseConnection":false,"bypassConsent":false,"dataSets":{},"apiTier":"Standard"},"d6ff96cf-d8b9-4dfc-8bfb-380ca8d0fac6":{"id":"/providers/Microsoft.PowerApps/apis/shared_microsoftcopilotstudio","displayName":"Microsoft Copilot Studio","iconUri":"https://conn-afd-prod-endpoint-bmc9bqahasf3grgk.b01.azurefd.net/releases/v1.0.1807/1.0.1807.4739/microsoftcopilotstudio/icon.png","dataSources":["microsoftcopilotstudio"],"isOnPremiseConnection":false,"bypassConsent":false,"dataSets":{},"apiTier":"Standard"}}</ConnectionReferences>
+  <DatabaseReferences>{"default.cds":{"databaseDetails":{"referenceType":"Environmental","environmentName":"default.cds","overrideValues":{"status":"NotSpecified","environmentVariableName":""}},"dataSources":{"vendors":{"entitySetName":"rpvms_vendors","logicalName":"rpvms_vendor"},"suppliers":{"entitySetName":"rpvms_suppliers","logicalName":"rpvms_supplier"},"vendorsuppliers":{"entitySetName":"rpvms_vendorsuppliers","logicalName":"rpvms_vendorsupplier"},"gltransactions":{"entitySetName":"rpvms_gltransactions","logicalName":"rpvms_gltransaction"},"contracts":{"entitySetName":"rpvms_contracts","logicalName":"rpvms_contract"},"contractpartys":{"entitySetName":"rpvms_contractparties","logicalName":"rpvms_contractparty"},"onetrustassessments":{"entitySetName":"rpvms_onetrustassessments","logicalName":"rpvms_onetrustassessment"},"servicenowassessments":{"entitySetName":"rpvms_servicenowassessments","logicalName":"rpvms_servicenowassessment"},"vendorscores":{"entitySetName":"rpvms_vendorscores","logicalName":"rpvms_vendorscore"},"vendorbudgets":{"entitySetName":"rpvms_vendorbudgets","logicalName":"rpvms_vendorbudget"},"vendorratecards":{"entitySetName":"rpvms_vendorratecards","logicalName":"rpvms_vendorratecard"},"vendorproduct_services":{"entitySetName":"rpvms_vendorproductservices","logicalName":"rpvms_vendorproductservice"},"vendornamealias":{"entitySetName":"rpvms_vendornamealiases","logicalName":"rpvms_vendornamealias"},"promptsuggestions":{"entitySetName":"rpvms_promptsuggestions","logicalName":"rpvms_promptsuggestion"},"vpvendorassignments":{"entitySetName":"rpvms_vpvendorassignments","logicalName":"rpvms_vpvendorassignment"},"users":{"entitySetName":"systemusers","logicalName":"systemuser"}}}}</DatabaseReferences>
+  <AppComponents>[]</AppComponents>
+  <AppComponentDependencies>[]</AppComponentDependencies>
+  <CanConsumeAppPass>1</CanConsumeAppPass>
+  <CanvasAppType>4</CanvasAppType>
+  <BypassConsent>0</BypassConsent>
+  <AdminControlBypassConsent>0</AdminControlBypassConsent>
+  <EmbeddedApp xsi:nil="true"></EmbeddedApp>
+  <IntroducedVersion>1.0</IntroducedVersion>
+  <CdsDependencies>{"cdsdependencies":[{"logicalname":"rpvms_vendor","componenttype":1},{"logicalname":"rpvms_supplier","componenttype":1},{"logicalname":"rpvms_vendorsupplier","componenttype":1},{"logicalname":"rpvms_gltransaction","componenttype":1},{"logicalname":"rpvms_contract","componenttype":1},{"logicalname":"rpvms_contractparty","componenttype":1},{"logicalname":"rpvms_onetrustassessment","componenttype":1},{"logicalname":"rpvms_servicenowassessment","componenttype":1},{"logicalname":"rpvms_vendorscore","componenttype":1},{"logicalname":"rpvms_vendorbudget","componenttype":1},{"logicalname":"rpvms_vendorratecard","componenttype":1},{"logicalname":"rpvms_vendorproductservice","componenttype":1},{"logicalname":"rpvms_vendornamealias","componenttype":1},{"logicalname":"rpvms_promptsuggestion","componenttype":1},{"logicalname":"rpvms_vpvendorassignment","componenttype":1},{"logicalname":"systemuser","componenttype":1}]}</CdsDependencies>
+  <IsCustomizable>1</IsCustomizable>
+  <CodeAppPackageUris>
+    <CodeAppPackageUri>/CanvasApps/rpvms_vendormanagement_a41a2_CodeAppPackages/index.html_ContentType_text/html</CodeAppPackageUri>
+    <CodeAppPackageUri>/CanvasApps/rpvms_vendormanagement_a41a2_CodeAppPackages/assets/index-BOx2Fxgn.css_ContentType_text/css</CodeAppPackageUri>
+    <CodeAppPackageUri>/CanvasApps/rpvms_vendormanagement_a41a2_CodeAppPackages/assets/index-Bob86o4H.js_ContentType_application/javascript</CodeAppPackageUri>
+    <CodeAppPackageUri>/CanvasApps/rpvms_vendormanagement_a41a2_CodeAppPackages/power-apps.svg_ContentType_image/svg+xml</CodeAppPackageUri>
+    <CodeAppPackageUri>/CanvasApps/rpvms_vendormanagement_a41a2_CodeAppPackages/vendiq_icon.png_ContentType_image/png</CodeAppPackageUri>
+    <CodeAppPackageUri>/CanvasApps/rpvms_vendormanagement_a41a2_CodeAppPackages/vendiq_icon.svg_ContentType_image/svg+xml</CodeAppPackageUri>
+  </CodeAppPackageUris>
+</CanvasApp>

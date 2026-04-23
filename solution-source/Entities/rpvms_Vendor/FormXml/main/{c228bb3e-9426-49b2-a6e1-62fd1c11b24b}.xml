@@ -1,0 +1,261 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <systemform>
+    <formid>{c228bb3e-9426-49b2-a6e1-62fd1c11b24b}</formid>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <FormPresentation>1</FormPresentation>
+    <FormActivationState>1</FormActivationState>
+    <form headerdensity="HighWithControls">
+      <tabs>
+        <tab verticallayout="true" id="{146609f3-4a98-418c-b296-1b16d4a6651b}" IsUserDefined="1">
+          <labels>
+            <label description="General" languagecode="1033" />
+          </labels>
+          <columns>
+            <column width="33%">
+              <sections>
+                <section showlabel="false" showbar="false" IsUserDefined="0" id="{3a4fd081-64a7-433f-b492-f7c7174df472}">
+                  <labels>
+                    <label description="General" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell id="{bed3506c-2356-4a9c-89fb-bb5abcd4fe0f}">
+                        <labels>
+                          <label description="Vendor Name" languagecode="1033" />
+                        </labels>
+                        <control id="rpvms_vendorname" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="rpvms_vendorname" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{ba107567-c3ba-4dc8-af59-f13e15caed87}">
+                        <labels>
+                          <label description="Owner" languagecode="1033" />
+                        </labels>
+                        <control id="ownerid" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="ownerid" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{8e36af7e-feda-4bd7-bb45-bee6e80ed60d}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Category L1" languagecode="1033" />
+                        </labels>
+                        <control id="rpvms_categoryl1" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="rpvms_categoryl1" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{54bae9de-ddac-48d0-8076-a2408366e093}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Category L2" languagecode="1033" />
+                        </labels>
+                        <control id="rpvms_categoryl2" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="rpvms_categoryl2" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{80c5d036-fad3-4ff1-8567-638ae5925332}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Classification" languagecode="1033" />
+                        </labels>
+                        <control id="rpvms_classification" classid="{3EF39988-22BB-4F0B-BBBE-64B5A3748AEE}" datafieldname="rpvms_classification" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{cd1b6a92-a175-4863-997d-bcf87532d476}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Commercial Role" languagecode="1033" />
+                        </labels>
+                        <control id="rpvms_commercialrole" classid="{3EF39988-22BB-4F0B-BBBE-64B5A3748AEE}" datafieldname="rpvms_commercialrole" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{e257cabf-cee8-4f17-844c-e1e97550d22e}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Is VAR" languagecode="1033" />
+                        </labels>
+                        <control id="rpvms_isvar" classid="{67FAC785-CD58-4F9F-ABB3-4B7DDC6ED5ED}" datafieldname="rpvms_isvar" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{9c7c9705-8074-4d79-93e9-40c30888c7aa}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="PHI Access" languagecode="1033" />
+                        </labels>
+                        <control id="rpvms_activephiaccess" classid="{3EF39988-22BB-4F0B-BBBE-64B5A3748AEE}" datafieldname="rpvms_activephiaccess" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{bfb92c4b-6af6-4f41-bf17-f6add8e0b892}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Primary Offering" languagecode="1033" />
+                        </labels>
+                        <control id="rpvms_primaryoffering" classid="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}" datafieldname="rpvms_primaryoffering" disabled="false" />
+                      </cell>
+                    </row>
+                    <row>
+                      <cell id="{d1be96ab-1bca-4bd4-8a77-cbd072e02351}" locklevel="0" colspan="1" rowspan="1">
+                        <labels>
+                          <label description="Status" languagecode="1033" />
+                        </labels>
+                        <control id="rpvms_status" classid="{3EF39988-22BB-4F0B-BBBE-64B5A3748AEE}" datafieldname="rpvms_status" disabled="false" />
+                      </cell>
+                    </row>
+                  </rows>
+                </section>
+                <section name="null_section_4" id="85452db0-9d5e-495f-9693-83b1c0154c55" IsUserDefined="0" locklevel="0" showlabel="true" showbar="false" layout="varwidth" celllabelalignment="Left" celllabelposition="Left" columns="11" labelwidth="115">
+                  <labels>
+                    <label description="Budget Info" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell locklevel="0" id="{f372506f-cf67-48cf-8129-ffd6e95dd318}">
+                        <labels>
+                          <label description="" languagecode="1033" />
+                        </labels>
+                      </cell>
+                      <cell locklevel="0" id="{a9280370-f298-4d96-97d3-caa75e7e0def}">
+                        <labels>
+                          <label description="" languagecode="1033" />
+                        </labels>
+                      </cell>
+                    </row>
+                    <row>
+                      <cell locklevel="0" id="{c0b126e3-6994-4fdc-ab76-76ecbafae76a}" rowspan="4" colspan="1" auto="false" showlabel="false">
+                        <labels>
+                          <label description="New SG control 1776785529751" languagecode="1033" />
+                        </labels>
+                        <control indicationOfSubgrid="true" id="Subgrid_new_1" classid="{E7A81278-8635-4D9E-8D4D-59480B391C5B}">
+                          <parameters>
+                            <RecordsPerPage>4</RecordsPerPage>
+                            <AutoExpand>Fixed</AutoExpand>
+                            <EnableQuickFind>false</EnableQuickFind>
+                            <EnableViewPicker>false</EnableViewPicker>
+                            <EnableChartPicker>true</EnableChartPicker>
+                            <ChartGridMode>All</ChartGridMode>
+                            <RelationshipName>rpvms_VendorBudget_Vendor</RelationshipName>
+                            <TargetEntityType>rpvms_vendorbudget</TargetEntityType>
+                            <ViewId>{6E8D82C0-2878-455B-BE41-0A2DD97786DB}</ViewId>
+                            <ViewIds>{6E8D82C0-2878-455B-BE41-0A2DD97786DB}</ViewIds>
+                          </parameters>
+                        </control>
+                      </cell>
+                      <cell locklevel="0" id="{5a696df5-3cde-4f06-8981-04574d4c3fa2}">
+                        <labels>
+                          <label description="" languagecode="1033" />
+                        </labels>
+                      </cell>
+                    </row>
+                    <row />
+                    <row />
+                    <row />
+                  </rows>
+                </section>
+              </sections>
+            </column>
+            <column width="66%">
+              <sections>
+                <section showlabel="false" showbar="false" id="{f0341b00-4822-457c-b600-e9050c21515a}" IsUserDefined="0" height="auto">
+                  <labels>
+                    <label description="Notes" languagecode="1033" />
+                  </labels>
+                  <rows>
+                    <row>
+                      <cell showlabel="false" rowspan="15" auto="false" id="{2347cde4-15ee-444a-b1a6-666a66a63c5d}">
+                        <labels>
+                          <label description="Note Text" languagecode="1033" />
+                        </labels>
+                        <control id="notescontrol" classid="{06375649-c143-495e-a496-c962e5b4488e}">
+                          <parameters>
+                            <DefaultTabId>NotesTab</DefaultTabId>
+                          </parameters>
+                        </control>
+                      </cell>
+                    </row>
+                    <row />
+                    <row />
+                    <row />
+                    <row />
+                    <row />
+                    <row />
+                    <row />
+                    <row />
+                    <row />
+                    <row />
+                    <row />
+                    <row />
+                    <row />
+                    <row height="auto" />
+                  </rows>
+                </section>
+              </sections>
+            </column>
+          </columns>
+        </tab>
+      </tabs>
+      <header id="{d368bbfa-2438-4d6e-a984-4597db6c9d68}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{77bc89a9-84bf-4b34-81c3-f34e5a74b827}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{6f65293e-0f37-4fee-a02f-bc9b7686d096}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{cf442f9d-e88b-4c15-a4ce-abb2aa1050e3}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{8ceb7429-0e32-44b4-b66c-4ef9b2367a20}" locklevel="0" colspan="1" rowspan="1">
+              <labels>
+                <label description="Modified By" languagecode="1033" />
+              </labels>
+              <control id="header_modifiedby" classid="{270BD3DB-D9AF-4782-9025-509E298DEC0A}" datafieldname="modifiedby" disabled="false" />
+            </cell>
+            <cell id="{a5731b2f-550e-4685-9c4f-9dac511e83e7}" locklevel="0" colspan="1" rowspan="1">
+              <labels>
+                <label description="Modified On" languagecode="1033" />
+              </labels>
+              <control id="header_modifiedon" classid="{5B773807-9FB2-42DB-97C3-7A91EFF8ADFF}" datafieldname="modifiedon" disabled="false" />
+            </cell>
+          </row>
+        </rows>
+      </header>
+      <footer id="{2b04d531-866b-443e-aa0e-7af2c86049c3}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+        <rows>
+          <row>
+            <cell id="{a9fa368b-33d3-4d01-8449-284204fbbd18}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{468c9828-2df1-46da-a3e9-f5be94287088}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+            <cell id="{a781dc59-8a63-4d9d-9293-2983eb8ddd1f}" showlabel="false">
+              <labels>
+                <label description="" languagecode="1033" />
+              </labels>
+            </cell>
+          </row>
+        </rows>
+      </footer>
+      <DisplayConditions Order="0" FallbackForm="true">
+        <Everyone />
+      </DisplayConditions>
+    </form>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>1</CanBeDeleted>
+    <LocalizedNames>
+      <LocalizedName description="Information" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="A form for this entity." languagecode="1033" />
+    </Descriptions>
+  </systemform>
+</forms>

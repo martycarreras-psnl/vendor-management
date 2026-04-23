@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<optionset Name="rpvms_relationshiptype" localizedName="Vendor-Supplier Relationship" description="VendorSupplier.RelationshipType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <OptionSetType>picklist</OptionSetType>
+  <IsGlobal>1</IsGlobal>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <IsCustomizable>1</IsCustomizable>
+  <displaynames>
+    <displayname description="Vendor-Supplier Relationship" languagecode="1033" />
+  </displaynames>
+  <Descriptions>
+    <Description description="VendorSupplier.RelationshipType" languagecode="1033" />
+  </Descriptions>
+  <options>
+    <option value="412900000" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Direct" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="Vendor IS the pay-to supplier" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900001" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="VAR/Reseller" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="Supplier sells vendor product on their behalf" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900002" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Subcontractor" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="Supplier performs work under vendor name" languagecode="1033" />
+      </Descriptions>
+    </option>
+  </options>
+</optionset>

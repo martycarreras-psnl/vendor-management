@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<optionset Name="rpvms_commercialrole" localizedName="Commercial Role" description="Vendor.CommercialRole" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <OptionSetType>picklist</OptionSetType>
+  <IsGlobal>1</IsGlobal>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <IsCustomizable>1</IsCustomizable>
+  <displaynames>
+    <displayname description="Commercial Role" languagecode="1033" />
+  </displaynames>
+  <Descriptions>
+    <Description description="Vendor.CommercialRole" languagecode="1033" />
+  </Descriptions>
+  <options>
+    <option value="412900000" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Vendor" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="Product/service provider" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900001" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Reseller" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900002" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="VAR" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="Value-added reseller" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900003" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Distributor" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900004" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Hybrid" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="Both vendor and reseller" languagecode="1033" />
+      </Descriptions>
+    </option>
+  </options>
+</optionset>

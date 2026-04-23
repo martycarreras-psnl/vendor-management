@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>1</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{4fbc6b07-ea68-42b4-985a-ffc26efa7d12}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="rpvms_vendorproductservicename" select="1" icon="1" preview="1">
+        <row name="result" id="rpvms_vendorproductserviceid">
+          <cell name="rpvms_vendorproductservicename" width="300" />
+          <cell name="createdon" width="125" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>4</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="rpvms_vendorproductservice">
+          <attribute name="rpvms_vendorproductserviceid" />
+          <attribute name="rpvms_vendorproductservicename" />
+          <attribute name="createdon" />
+          <order attribute="rpvms_vendorproductservicename" descending="false" />
+          <filter type="and">
+            <condition attribute="statecode" operator="eq" value="0" />
+          </filter>
+          <filter type="or" isquickfindfields="1">
+            <condition attribute="rpvms_vendorproductservicename" operator="like" value="{0}" />
+          </filter>
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Quick Find Active Vendor Product/Services" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

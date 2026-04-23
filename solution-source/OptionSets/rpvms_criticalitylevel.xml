@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<optionset Name="rpvms_criticalitylevel" localizedName="Criticality Level" description="ServiceNowAssessment.CriticalityLevel | OneTrustAssessment.Criticality | VendorScore.Criticality | Vendor.CriticalityLevel (rollup)" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <OptionSetType>picklist</OptionSetType>
+  <IsGlobal>1</IsGlobal>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <IsCustomizable>1</IsCustomizable>
+  <displaynames>
+    <displayname description="Criticality Level" languagecode="1033" />
+  </displaynames>
+  <Descriptions>
+    <Description description="ServiceNowAssessment.CriticalityLevel | OneTrustAssessment.Criticality | VendorScore.Criticality | Vendor.CriticalityLevel (rollup)" languagecode="1033" />
+  </Descriptions>
+  <options>
+    <option value="412900000" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="1 - Negligible" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="Little or no impact" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900001" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="2 - Low" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="Small impact" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900002" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="3 - Noticeable" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="Noticeable impact" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900003" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="4 - Considerable" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="Considerable impact, large financial loss" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900004" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="5 - Catastrophic" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="Potentially irreversible consequences" languagecode="1033" />
+      </Descriptions>
+    </option>
+  </options>
+</optionset>

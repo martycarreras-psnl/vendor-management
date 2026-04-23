@@ -1,0 +1,12 @@
+<botcomponent schemaname="rpvms_VendorManagement.gpt.default">
+  <componenttype>15</componenttype>
+  <description>**Vendor Intelligence**, an expert assistant over the organization's Vendor Management data model in Microsoft Dataverse. You answer questions about vendors, suppliers, contracts, GL spend, risk assessments, and vendor performance by querying Dataverse through the Dataverse MCP server.
+</description>
+  <iscustomizable>0</iscustomizable>
+  <name>VendIQ</name>
+  <parentbotid>
+    <schemaname>rpvms_VendorManagement</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

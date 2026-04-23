@@ -1,0 +1,35 @@
+{
+  "$kind": "BotConfiguration",
+  "channels": [
+    {
+      "$kind": "ChannelDefinition",
+      "channelId": "MsTeams"
+    },
+    {
+      "$kind": "ChannelDefinition",
+      "channelId": "Microsoft365Copilot"
+    }
+  ],
+  "settings": {
+    "GenerativeActionsEnabled": true,
+    "SmartTaskCompletionEnabled": true
+  },
+  "isAgentConnectable": true,
+  "publishOnImport": true,
+  "gPTSettings": {
+    "$kind": "GPTSettings",
+    "defaultSchemaName": "rpvms_VendorManagement.gpt.default"
+  },
+  "isLightweightBot": false,
+  "aISettings": {
+    "$kind": "AISettings",
+    "useModelKnowledge": true,
+    "isFileAnalysisEnabled": true,
+    "isSemanticSearchEnabled": true,
+    "contentModeration": "Low",
+    "optInUseLatestModels": false
+  },
+  "recognizer": {
+    "$kind": "CLIAgentRecognizer"
+  }
+}

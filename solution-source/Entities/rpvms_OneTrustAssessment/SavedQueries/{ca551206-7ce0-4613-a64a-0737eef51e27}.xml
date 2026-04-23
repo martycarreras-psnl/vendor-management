@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{ca551206-7ce0-4613-a64a-0737eef51e27}</savedqueryid>
+    <layoutxml>
+      <grid name="rpvms_onetrustassessments" jump="rpvms_onetrustassessmentname" select="1" icon="1" preview="1">
+        <row name="rpvms_onetrustassessment" id="rpvms_onetrustassessmentid">
+          <cell name="rpvms_onetrustassessmentname" width="300" />
+          <cell name="createdon" width="125" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>2</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="rpvms_onetrustassessment">
+          <attribute name="rpvms_onetrustassessmentid" />
+          <attribute name="rpvms_onetrustassessmentname" />
+          <attribute name="createdon" />
+          <order attribute="rpvms_onetrustassessmentname" descending="false" />
+          <filter type="and">
+            <condition attribute="statecode" operator="eq" value="0" />
+          </filter>
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="OneTrust Assessment Associated View" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

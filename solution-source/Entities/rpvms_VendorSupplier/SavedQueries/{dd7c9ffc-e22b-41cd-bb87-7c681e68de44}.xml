@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{dd7c9ffc-e22b-41cd-bb87-7c681e68de44}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="rpvms_vendorsuppliername" select="1" icon="1" preview="1">
+        <row name="result" id="rpvms_vendorsupplierid">
+          <cell name="rpvms_vendorsuppliername" width="300" />
+          <cell name="createdon" width="125" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>1</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="rpvms_vendorsupplier">
+          <attribute name="rpvms_vendorsupplierid" />
+          <attribute name="rpvms_vendorsuppliername" />
+          <attribute name="createdon" />
+          <order attribute="rpvms_vendorsuppliername" descending="false" />
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Vendor Supplier Advanced Find View" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

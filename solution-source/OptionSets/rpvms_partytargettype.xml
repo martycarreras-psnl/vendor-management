@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<optionset Name="rpvms_partytargettype" localizedName="Contract Party Target Type" description="ContractParty.PartyTargetType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <OptionSetType>picklist</OptionSetType>
+  <IsGlobal>1</IsGlobal>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <IsCustomizable>1</IsCustomizable>
+  <displaynames>
+    <displayname description="Contract Party Target Type" languagecode="1033" />
+  </displaynames>
+  <Descriptions>
+    <Description description="ContractParty.PartyTargetType" languagecode="1033" />
+  </Descriptions>
+  <options>
+    <option value="412900000" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Vendor" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="Default resolution" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900001" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Supplier" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="When contract line is supplier-scoped" languagecode="1033" />
+      </Descriptions>
+    </option>
+  </options>
+</optionset>

@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<optionset Name="rpvms_assessmenttype" localizedName="ServiceNow Assessment Type" description="ServiceNowAssessment.AssessmentType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <OptionSetType>picklist</OptionSetType>
+  <IsGlobal>1</IsGlobal>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <IsCustomizable>1</IsCustomizable>
+  <displaynames>
+    <displayname description="ServiceNow Assessment Type" languagecode="1033" />
+  </displaynames>
+  <Descriptions>
+    <Description description="ServiceNowAssessment.AssessmentType" languagecode="1033" />
+  </Descriptions>
+  <options>
+    <option value="412900000" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Criticality" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="From VendorCriticalitySN" languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900001" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Performance" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="From VendorPerformanceSN" languagecode="1033" />
+      </Descriptions>
+    </option>
+  </options>
+</optionset>

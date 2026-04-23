@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<optionset Name="rpvms_scorestatus" localizedName="Vendor Score Review Status" description="Lifecycle for the VP review of a VendorScore. VP Submit transitions directly to Approved (no second persona for v1)." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <OptionSetType>picklist</OptionSetType>
+  <IsGlobal>1</IsGlobal>
+  <IntroducedVersion>1.0.0.4</IntroducedVersion>
+  <IsCustomizable>1</IsCustomizable>
+  <displaynames>
+    <displayname description="Vendor Score Review Status" languagecode="1033" />
+  </displaynames>
+  <Descriptions>
+    <Description description="Lifecycle for the VP review of a VendorScore. VP Submit transitions directly to Approved (no second persona for v1)." languagecode="1033" />
+  </Descriptions>
+  <options>
+    <option value="412900000" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Not Started" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="Assigned but no score work has begun." languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900001" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Draft" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="VP has begun scoring; autosaved between wizard steps." languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900002" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Approved" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="VP submitted; score is final for the cycle." languagecode="1033" />
+      </Descriptions>
+    </option>
+    <option value="412900003" ExternalValue="" IsHidden="0">
+      <labels>
+        <label description="Rejected" languagecode="1033" />
+      </labels>
+      <Descriptions>
+        <Description description="Admin-only rollback of an Approved score." languagecode="1033" />
+      </Descriptions>
+    </option>
+  </options>
+</optionset>

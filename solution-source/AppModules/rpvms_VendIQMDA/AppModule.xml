@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AppModule>
+  <UniqueName>rpvms_VendIQMDA</UniqueName>
+  <IntroducedVersion>1.0.0.1</IntroducedVersion>
+  <WebResourceId>953b9fac-1e5e-e611-80d6-00155ded156f</WebResourceId>
+  <OptimizedFor></OptimizedFor>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+  <FormFactor>1</FormFactor>
+  <ClientType>4</ClientType>
+  <NavigationType>0</NavigationType>
+  <AppModuleComponents>
+    <AppModuleComponent type="1" schemaName="rpvms_contract" />
+    <AppModuleComponent type="1" schemaName="rpvms_contractparty" />
+    <AppModuleComponent type="1" schemaName="rpvms_gltransaction" />
+    <AppModuleComponent type="1" schemaName="rpvms_onetrustassessment" />
+    <AppModuleComponent type="1" schemaName="rpvms_servicenowassessment" />
+    <AppModuleComponent type="1" schemaName="rpvms_supplier" />
+    <AppModuleComponent type="1" schemaName="rpvms_vendor" />
+    <AppModuleComponent type="1" schemaName="rpvms_vendorbudget" />
+    <AppModuleComponent type="1" schemaName="rpvms_vendornamealias" />
+    <AppModuleComponent type="1" schemaName="rpvms_vendorproductservice" />
+    <AppModuleComponent type="1" schemaName="rpvms_vendorratecard" />
+    <AppModuleComponent type="1" schemaName="rpvms_vendorscore" />
+    <AppModuleComponent type="1" schemaName="rpvms_vendorsupplier" />
+    <AppModuleComponent type="62" schemaName="rpvms_VendIQMDA" />
+  </AppModuleComponents>
+  <AppModuleRoleMaps>
+    <Role id="{627090ff-40a3-4053-8790-584edc5be201}" />
+    <Role id="{119f245c-3cc8-4b62-b31c-d1a046ced15d}" />
+  </AppModuleRoleMaps>
+  <LocalizedNames>
+    <LocalizedName description="VendIQMDA" languagecode="1033" />
+  </LocalizedNames>
+  <Descriptions>
+    <Description description="Streamline vendor and supplier management by centralizing contracts, assessments, budgets, and performance metrics in VendIQMDA. Empower business users to efficiently oversee relationships and transactions for improved operational visibility." languagecode="1033" />
+  </Descriptions>
+  <appsettings>
+    <appsetting settingdefinitionid.uniquename="AppChannel">
+      <iscustomizable>1</iscustomizable>
+      <value>1</value>
+    </appsetting>
+    <appsetting settingdefinitionid.uniquename="m365copilotmodelappenabled">
+      <iscustomizable>1</iscustomizable>
+      <value>2</value>
+    </appsetting>
+  </appsettings>
+</AppModule>
