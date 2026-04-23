@@ -215,6 +215,38 @@ Seed + operational utilities:
 
 ---
 
+## Form pattern — metadata-backed required fields
+
+Every editable Dataverse-bound field goes through the shared [`DataverseFieldLabel`](src/components/ui/dataverse-field-label.tsx) primitive, which reads live `RequiredLevel` from Dataverse column metadata (`SystemRequired` or `ApplicationRequired` → `required`). No hardcoded asterisks. See [`AGENTS.md`](AGENTS.md) and [`.github/instructions/09-form-field-pattern.instructions.md`](.github/instructions/09-form-field-pattern.instructions.md) for the mandatory rules.
+
+Key building blocks:
+
+| Piece | Location | Purpose |
+|---|---|---|
+| `DataverseFieldLabel` | `src/components/ui/dataverse-field-label.tsx` | Renders label + required indicator from live metadata (or `required` override for client-only fields) |
+| `useDataverseFieldMetadata` / `useDataverseFieldRequired` | `src/hooks/vendiq/use-dataverse-field-metadata.ts` | Fetch + cache column metadata per table |
+| `useDataverseRequiredFields` | `src/hooks/vendiq/use-dataverse-field-metadata.ts` | List all required columns on a table (for batch save-time validation) |
+| `toDataverseFieldName` | `src/lib/dataverse-field-name.ts` | Convention mapper: `key` → `rpvms_<key.toLowerCase()>` |
+| `findEmptyRequiredKeys` | `src/lib/required-fields-validator.ts` | Validate a form values object against the live required list |
+| `FormValidationContext` | `src/lib/form-validation-context.tsx` | Propagates `aria-invalid` to field helpers without prop-drilling |
+| `fieldMetadataServiceRegistry` | `src/services/vendiq/dataverse-provider.ts` | Registers `getMetadata` for each Dataverse table — **required** when adding a new table |
+
+Visual affordance:
+
+- Required inputs carry `aria-required="true"` — styled with a soft amber accent via global CSS.
+- Save-time validation flips offending fields to `aria-invalid="true"` — styled as a stronger red/amber state and scrolled into view.
+
+Save-button behavior (uniform across all editable screens):
+
+1. Save is **always enabled** (except while a mutation is in flight).
+2. On click, `findEmptyRequiredKeys` runs against live metadata.
+3. If empty-required fields exist, the Save is aborted, those fields light up (`aria-invalid`), and focus moves to the first invalid one.
+4. If none are empty, the mutation proceeds.
+
+This fixes the previous inconsistency where some screens disabled Save while others silently preserved stale values when a required field was blanked (notably vendor edit).
+
+---
+
 ## Copilot + instruction set
 
 `.github/instructions/*.instructions.md` are loaded by GitHub Copilot to keep generated code aligned with the Code App rules: solution-first schema, three-layer architecture, adapters over generated services, hash routing, port 3000, relative build base, no raw GUIDs in UI. See also [`AGENTS.md`](AGENTS.md) for the non-negotiable agent guardrails.
