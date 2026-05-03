@@ -24,6 +24,14 @@
         "microsoftcopilotstudio"
       ],
       "dataSets": {}
+    },
+    "bb92a5c8-4af1-49b2-8de6-7c3de84bdfb6": {
+      "id": "/providers/Microsoft.PowerApps/apis/shared_onedriveforbusiness",
+      "displayName": "OneDrive for Business",
+      "dataSources": [
+        "onedriveforbusiness"
+      ],
+      "dataSets": {}
     }
   },
   "databaseReferences": {
