@@ -8,7 +8,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-export function ConnectivityPill() {
+export function ConnectivityPill({ compact }: { compact?: boolean }) {
   const { status, refetch } = useConnectivity();
 
   const config = (() => {
@@ -55,14 +55,21 @@ export function ConnectivityPill() {
             type="button"
             onClick={refetch}
             className={cn(
-              'inline-flex w-full items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+              'inline-flex items-center rounded-full border transition-colors',
+              compact
+                ? 'h-7 w-7 justify-center p-0'
+                : 'w-full gap-2 px-3 py-1 text-xs font-medium',
               config.bg,
             )}
             aria-label={`Dataverse connectivity: ${config.label}`}
           >
             <span className={cn('inline-block h-2 w-2 rounded-full', config.dot)} aria-hidden />
-            <Icon className={cn('h-3.5 w-3.5', status.state === 'checking' || status.state === 'reconnecting' ? 'animate-spin' : '')} aria-hidden />
-            <span className="truncate">{config.label}</span>
+            {!compact && (
+              <>
+                <Icon className={cn('h-3.5 w-3.5', status.state === 'checking' || status.state === 'reconnecting' ? 'animate-spin' : '')} aria-hidden />
+                <span className="truncate">{config.label}</span>
+              </>
+            )}
           </button>
         </TooltipTrigger>
         <TooltipContent className="max-w-xs">

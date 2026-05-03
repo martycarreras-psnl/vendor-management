@@ -12,11 +12,15 @@ import {
   AppWindow,
   ChevronDown,
   ChevronRight,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ConnectivityPill } from '@/components/vendiq/connectivity-pill';
+import { ChatPanel } from '@/components/vendiq/chat-panel';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useIsVPAdmin } from '@/hooks/vendiq/use-vp-review-context';
-import { useState, useEffect, type KeyboardEvent } from 'react';
+import { useState, useEffect, useCallback, type KeyboardEvent } from 'react';
 import vendiqIconMarkup from '@/assets/vendiq_icon.svg?raw';
 
 interface NavItem {
@@ -57,6 +61,11 @@ export function AppShell() {
   const [searchText, setSearchText] = useState('');
   const isAdmin = useIsVPAdmin();
   const navItems = filterItems(NAV_ITEMS, isAdmin);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [chatPanelOpen, setChatPanelOpen] = useState(false);
+
+  const toggleChatPanel = useCallback(() => setChatPanelOpen((v) => !v), []);
+  const closeChatPanel = useCallback(() => setChatPanelOpen(false), []);
 
   // Track which parent items are expanded. Auto-expand when a child route is active.
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -119,15 +128,64 @@ export function AppShell() {
       </header>
 
       <div className="flex min-h-0 flex-1">
-        {/* Expanded sidebar */}
-        <aside className="flex w-56 shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground">
-          <nav className="flex-1 p-2 pt-3">
+        {/* Collapsible sidebar */}
+        <aside
+          className={cn(
+            'flex shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-in-out',
+            sidebarCollapsed ? 'w-14' : 'w-56',
+          )}
+        >
+          {/* Collapse toggle */}
+          <div className="flex justify-end p-2 pb-0">
+            <button
+              type="button"
+              onClick={() => setSidebarCollapsed((v) => !v)}
+              className="flex h-7 w-7 items-center justify-center rounded-md transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              {sidebarCollapsed ? (
+                <PanelLeftOpen className="h-4 w-4" aria-hidden />
+              ) : (
+                <PanelLeftClose className="h-4 w-4" aria-hidden />
+              )}
+            </button>
+          </div>
+
+          <nav className="flex-1 p-2 pt-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const hasChildren = !!item.children && item.children.length > 0;
+
+              /* --- Parent with children --- */
               if (hasChildren) {
                 const isOpen = !!expanded[item.to];
                 const Chev = isOpen ? ChevronDown : ChevronRight;
+
+                if (sidebarCollapsed) {
+                  // Collapsed: show icon-only for parent, skip children
+                  return (
+                    <Tooltip key={item.to}>
+                      <TooltipTrigger asChild>
+                        <NavLink
+                          to={item.to}
+                          end
+                          className={({ isActive }) =>
+                            cn(
+                              'flex h-9 w-full items-center justify-center rounded-md transition-colors',
+                              'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                              isActive && 'bg-sidebar-accent text-sidebar-accent-foreground',
+                            )
+                          }
+                        >
+                          <Icon className="h-4 w-4" aria-hidden />
+                        </NavLink>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">{item.label}</TooltipContent>
+                    </Tooltip>
+                  );
+                }
+
                 return (
                   <div key={item.to}>
                     <button
@@ -183,6 +241,31 @@ export function AppShell() {
                   </div>
                 );
               }
+
+              /* --- Leaf item --- */
+              if (sidebarCollapsed) {
+                return (
+                  <Tooltip key={item.to}>
+                    <TooltipTrigger asChild>
+                      <NavLink
+                        to={item.to}
+                        end={item.end}
+                        className={({ isActive }) =>
+                          cn(
+                            'flex h-9 w-full items-center justify-center rounded-md transition-colors',
+                            'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                            isActive && 'bg-sidebar-accent text-sidebar-accent-foreground',
+                          )
+                        }
+                      >
+                        <Icon className="h-4 w-4" aria-hidden />
+                      </NavLink>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">{item.label}</TooltipContent>
+                  </Tooltip>
+                );
+              }
+
               return (
                 <NavLink
                   key={item.to}
@@ -202,17 +285,45 @@ export function AppShell() {
               );
             })}
           </nav>
-          <div className="mt-auto flex flex-col gap-2 border-t border-sidebar-border p-3">
-            <ConnectivityPill />
-            <div className="text-[11px] opacity-70">v0.1 · Code App · Dev</div>
+          <div
+            className={cn(
+              'mt-auto flex flex-col gap-2 border-t border-sidebar-border p-3',
+              sidebarCollapsed && 'items-center px-1',
+            )}
+          >
+            {sidebarCollapsed ? (
+              <ConnectivityPill compact />
+            ) : (
+              <>
+                <ConnectivityPill />
+                <div className="text-[11px] opacity-70">v0.1 · Code App · Dev</div>
+              </>
+            )}
           </div>
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 overflow-auto p-6">
+        <main className="relative flex-1 overflow-auto p-6">
           <Outlet />
+
+          {/* FAB – Ask vendIQ */}
+          <button
+            type="button"
+            onClick={toggleChatPanel}
+            className={cn(
+              'fixed bottom-6 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-all hover:scale-105 hover:shadow-xl active:scale-95',
+              chatPanelOpen && 'scale-0 opacity-0 pointer-events-none',
+            )}
+            title="Ask vendIQ"
+            aria-label="Open vendIQ chat"
+          >
+            <Sparkles className="h-6 w-6" aria-hidden />
+          </button>
         </main>
       </div>
+
+      {/* Chat slide-in panel */}
+      <ChatPanel open={chatPanelOpen} onClose={closeChatPanel} />
     </div>
   );
 }
