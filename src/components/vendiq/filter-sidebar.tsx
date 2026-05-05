@@ -1,5 +1,6 @@
 // Amazon-style vertical filter sidebar for the Vendor Lookup page.
 
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import type {
@@ -118,11 +119,19 @@ export function FilterSidebar({
   );
 }
 
-function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
+function FilterSection({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
     <div>
-      <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{title}</div>
-      <div className="space-y-1">{children}</div>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="mb-2 flex w-full items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+      >
+        {title}
+        <span className={cn('text-xs transition-transform', open && 'rotate-180')}>▾</span>
+      </button>
+      {open && <div className="space-y-1">{children}</div>}
     </div>
   );
 }
