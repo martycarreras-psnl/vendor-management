@@ -4,9 +4,9 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* VendIQ / Radiology Partners theme tokens.
-     NOTE: Palette is RP-inspired. Hex values TBD by brand; verify before release. */
-  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* VendIQ / Zava Healthcare theme tokens.
+     NOTE: Palette inspired by Microsoft Power Apps Code Apps design language. */
+  font-family: 'Segoe UI', 'Segoe UI Web', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -21,34 +21,34 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  /* RP primary: deep navy */
-  --primary: oklch(0.28 0.07 250);
+  /* Primary: Microsoft blue #0078D4 */
+  --primary: oklch(0.55 0.17 250);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
+  --secondary: oklch(0.97 0.005 270);
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
+  --muted: oklch(0.97 0.005 270);
   --muted-foreground: oklch(0.556 0 0);
-  /* RP accent: medical teal */
-  --accent: oklch(0.70 0.12 200);
+  /* Accent: teal #00B7C3 */
+  --accent: oklch(0.72 0.11 195);
   --accent-foreground: oklch(0.145 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.28 0.07 250);
-  --chart-1: oklch(0.28 0.07 250);
-  --chart-2: oklch(0.70 0.12 200);
-  --chart-3: oklch(0.65 0.18 40);
+  --ring: oklch(0.55 0.17 250);
+  --chart-1: oklch(0.55 0.17 250);
+  --chart-2: oklch(0.72 0.11 195);
+  --chart-3: oklch(0.58 0.20 330);
   --chart-4: oklch(0.80 0.15 90);
   --chart-5: oklch(0.55 0.22 30);
-  /* Sidebar: navy */
-  --sidebar: oklch(0.28 0.07 250);
+  /* Sidebar: Microsoft blue */
+  --sidebar: oklch(0.55 0.17 250);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.70 0.12 200);
+  --sidebar-primary: oklch(0.72 0.11 195);
   --sidebar-primary-foreground: oklch(0.145 0 0);
-  --sidebar-accent: oklch(0.34 0.07 250);
+  --sidebar-accent: oklch(0.45 0.15 250);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.70 0.12 200);
+  --sidebar-ring: oklch(0.72 0.11 195);
   /* VendIQ signal colors (30/60/90 & health) */
   --signal-red: oklch(0.60 0.22 28);
   --signal-amber: oklch(0.72 0.17 55);

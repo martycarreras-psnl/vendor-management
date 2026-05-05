@@ -97,7 +97,7 @@ export function AppShell() {
             aria-label="VendIQ"
             dangerouslySetInnerHTML={{ __html: vendiqIconMarkup }}
           />
-          <span className="text-sm font-semibold">Radiology Partners</span>
+          <span className="text-sm font-semibold">Zava Healthcare</span>
           <span className="text-sm opacity-60">|</span>
           <span className="text-sm opacity-80">VendIQ</span>
         </div>
