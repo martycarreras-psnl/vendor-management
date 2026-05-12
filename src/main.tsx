@@ -6,6 +6,7 @@ import { RouterProvider } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { VendiqProvider } from '@/services/vendiq/provider-context';
 import { CopilotChatProvider } from '@/providers/copilot-chat-provider';
+import { CurrentRecordProvider } from '@/providers/current-record-provider';
 import { router } from './router';
 import './index.css';
 
@@ -19,12 +20,14 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <VendiqProvider>
-        <CopilotChatProvider>
-          <FluentProvider theme={webLightTheme}>
-            <RouterProvider router={router} />
-            <Toaster richColors position="top-right" />
-          </FluentProvider>
-        </CopilotChatProvider>
+        <CurrentRecordProvider>
+          <CopilotChatProvider>
+            <FluentProvider theme={webLightTheme}>
+              <RouterProvider router={router} />
+              <Toaster richColors position="top-right" />
+            </FluentProvider>
+          </CopilotChatProvider>
+        </CurrentRecordProvider>
       </VendiqProvider>
     </QueryClientProvider>
   </StrictMode>,

@@ -10,6 +10,7 @@ import {
 } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { invokeAgent, VENDIQ_AGENT_NAME } from '@/services/vendiq/copilot-provider';
+import { useCurrentRecord } from '@/providers/current-record-provider';
 
 export interface ChatMessage {
   id: string;
@@ -88,13 +89,21 @@ export function CopilotChatProvider({
     conversationIdRef.current = conversationId;
   }, [conversationId]);
 
+  // The current-record provider exposes its own ref so we can read the latest
+  // record inside the mutation without forcing a re-render every navigation.
+  const { currentRecordRef } = useCurrentRecord();
+
   useEffect(() => {
     savePersisted(messages, conversationId);
   }, [messages, conversationId]);
 
   const mutation = useMutation({
     mutationFn: async (message: string) => {
-      return invokeAgent(message, { agentName, conversationId: conversationIdRef.current });
+      return invokeAgent(message, {
+        agentName,
+        conversationId: conversationIdRef.current,
+        recordContext: currentRecordRef.current ?? undefined,
+      });
     },
     onSuccess: (result) => {
       if (result.conversationId && result.conversationId !== conversationIdRef.current) {

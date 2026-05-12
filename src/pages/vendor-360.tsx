@@ -1,10 +1,11 @@
 // Vendor 360 page with polished tab experience and editable overview.
 // All vendor custom fields are displayed and inline-editable on the Overview tab.
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useVendiq } from '@/services/vendiq/provider-context';
+import { useSetCurrentRecord, type CurrentRecord } from '@/providers/current-record-provider';
 import { CriticalityPill } from '@/components/vendiq/criticality-pill';
 import { AdjustCriticalityDialog } from '@/components/vendiq/adjust-criticality-dialog';
 import { DataGrid, type ColumnDef } from '@/components/vendiq/data-grid';
@@ -152,6 +153,29 @@ export default function Vendor360Page() {
   const { canAdjustCriticality } = useCurrentUserRoles();
 
   const query = useVendor360(vendorId ?? '');
+
+  // Register the current record for the chat agent's contextual grounding.
+  const recordContext = useMemo<CurrentRecord | null>(() => {
+    const v = query.data?.vendor;
+    if (!vendorId || !v) return null;
+    return {
+      type: 'vendor',
+      id: vendorId,
+      displayName: v.vendorName,
+      summary: {
+        status: v.status ?? null,
+        classification: v.classification ?? null,
+        commercialRole: v.commercialRole ?? null,
+        categoryL1: v.categoryL1 ?? null,
+        categoryL2: v.categoryL2 ?? null,
+        criticality: query.data?.currentCriticality ?? null,
+        activePhiAccess: v.activePhiAccess ?? null,
+        isVar: v.isVar ?? null,
+      },
+      routePath: `/vendors/${vendorId}`,
+    };
+  }, [vendorId, query.data?.vendor, query.data?.currentCriticality]);
+  useSetCurrentRecord(recordContext);
 
   if (!vendorId) {
     return <div className="text-sm text-muted-foreground">Missing vendor id.</div>;

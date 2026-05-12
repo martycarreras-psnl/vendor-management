@@ -2,7 +2,9 @@
 // Tabs: Overview (editable), Vendors, Contracts, GL Transactions.
 
 import { useState, useCallback } from 'react';
+import { useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useSetCurrentRecord, type CurrentRecord } from '@/providers/current-record-provider';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useVendiq } from '@/services/vendiq/provider-context';
 import { Button } from '@/components/ui/button';
@@ -86,6 +88,24 @@ export default function Supplier360Page() {
   const [activeTab, setActiveTab] = useState('overview');
 
   const query = useSupplier360(supplierId ?? '');
+
+  // Register the current record for the chat agent's contextual grounding.
+  const recordContext = useMemo<CurrentRecord | null>(() => {
+    const s = query.data?.supplier;
+    if (!supplierId || !s) return null;
+    return {
+      type: 'supplier',
+      id: supplierId,
+      displayName: s.supplierName,
+      summary: {
+        supplierCategory: s.supplierCategory ?? null,
+        tinType: s.tinType ?? null,
+        isReseller: s.isReseller ?? null,
+      },
+      routePath: `/suppliers/${supplierId}`,
+    };
+  }, [supplierId, query.data?.supplier]);
+  useSetCurrentRecord(recordContext);
 
   if (!supplierId) {
     return <div className="text-sm text-muted-foreground">Missing supplier id.</div>;

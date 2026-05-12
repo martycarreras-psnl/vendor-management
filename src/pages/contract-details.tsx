@@ -3,7 +3,9 @@
 // Portfolio treemap / donut, and Top Vendors table expiration links.
 
 import { useState, useCallback } from 'react';
+import { useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useSetCurrentRecord, type CurrentRecord } from '@/providers/current-record-provider';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useVendiq } from '@/services/vendiq/provider-context';
 import { Button } from '@/components/ui/button';
@@ -65,6 +67,29 @@ export default function ContractDetailsPage() {
   const queryClient = useQueryClient();
   const provider = useVendiq();
   const query = useContractDetails(contractId ?? '');
+
+  // Register the current record for the chat agent's contextual grounding.
+  const recordContext = useMemo<CurrentRecord | null>(() => {
+    const c = query.data?.contract;
+    if (!contractId || !c) return null;
+    return {
+      type: 'contract',
+      id: contractId,
+      displayName: c.contractName,
+      summary: {
+        contractStatus: c.contractStatus ?? null,
+        contractType: c.contractType ?? null,
+        effectiveDate: c.effectiveDate ?? null,
+        expirationDate: c.expirationDate ?? null,
+        autoRenew: c.autoRenew ?? null,
+        supplierId: c.supplierId ?? null,
+        supplierName: c.supplierName ?? null,
+      },
+      routePath: `/contracts/${contractId}`,
+    };
+  }, [contractId, query.data?.contract]);
+  useSetCurrentRecord(recordContext);
+
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Partial<Contract>>({});
   const [saveError, setSaveError] = useState<string | null>(null);

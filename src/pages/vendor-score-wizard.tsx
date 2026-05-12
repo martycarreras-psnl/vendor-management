@@ -12,6 +12,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useVendiq } from '@/services/vendiq/provider-context';
+import { useSetCurrentRecord, type CurrentRecord } from '@/providers/current-record-provider';
 import { useVPReviewContext } from '@/hooks/vendiq/use-vp-review-context';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -54,6 +55,23 @@ export default function VendorScoreWizardPage() {
   const item = queueQ.data?.find((q) => q.assignment.id === assignmentId);
   const vendor = item?.vendor;
   const vendorId = vendor?.id;
+
+  // Register the current record for the chat agent's contextual grounding.
+  const recordContext = useMemo<CurrentRecord | null>(() => {
+    if (!assignmentId || !item) return null;
+    return {
+      type: 'review',
+      id: assignmentId,
+      displayName: vendor?.vendorName,
+      summary: {
+        vendorId: vendorId ?? null,
+        cycleYear: cycleYear,
+        status: (item.currentScore?.status as ScoreStatus | undefined) ?? null,
+      },
+      routePath: `/reviews/${assignmentId}/score`,
+    };
+  }, [assignmentId, item, vendor?.vendorName, vendorId, cycleYear]);
+  useSetCurrentRecord(recordContext);
 
   // Fetch signals for the suggestion panel (criticality / dependency / spend).
   const signalsQ = useQuery({
